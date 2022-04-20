@@ -1,0 +1,9 @@
+﻿global using Microsoft.Extensions.Logging;
+global using MTGView.Core.Extensions;
+global using MTGView.Core.Responses;
+global using MTGView.Data.Scryfall.Extensions;
+global using MTGView.Data.Scryfall.Models;
+global using MTGView.Data.Scryfall.Services;
+global using System.Net;
+global using System.Runtime.CompilerServices;
+global using System.Text.Json;

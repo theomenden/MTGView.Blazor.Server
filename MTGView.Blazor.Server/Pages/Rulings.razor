@@ -1,0 +1,53 @@
+﻿@page "/rulings"
+@using MTGView.Data.Scryfall.Services
+@using MTGView.Core.Enums
+
+<Container Fluid 
+           Background="Background.Dark"
+           Margin="Margin.Is3.OnY.Is2.OnX.OnWidescreen.Is4.OnY.Is3.OnX.OnMobile">
+    <DataGrid @ref="_dataGrid"
+              TItem="Ruling"
+              Class="table table-dark border border-2 border-light rounded rounded-2 shadow"
+              Narrow
+              Responsive
+              Hoverable
+              Striped
+              Sortable
+              TotalItems="_rulingsCount"
+              FixedHeader
+              FixedHeaderDataGridHeight="400px"
+              HeaderThemeContrast="ThemeContrast.Light"
+              Data="_rulings"
+              ReadData="OnReadData"
+              Virtualize
+              VirtualizeOptions="_virtualizeOptions"
+              CommandMode="DataGridCommandMode.Commands"
+              ShowPager
+              ShowPageSizes
+              Padding="Padding.Is3.OnY.OnWidescreen.Is4.OnY.OnMobile">
+        <EmptyTemplate>
+            <Div TextColor="TextColor.Danger">
+                No Rulings Found
+            </Div>
+        </EmptyTemplate>
+        <LoadingTemplate>
+            <Span>
+                <SpinKit  Type="SpinKitType.Grid" Size="3rem" Centered Color="#ff4a3d" /> 
+                <Paragraph TextColor="TextColor.Light">Loading Results</Paragraph>
+            </Span>
+        </LoadingTemplate>
+        <DataGridAggregates>
+            <DataGridAggregate Field="@nameof(Ruling.Id)" Aggregate="DataGridAggregateType.Count">
+                <DisplayTemplate>
+                    @($"Total Rulings: {context.Value}")
+                </DisplayTemplate>
+            </DataGridAggregate>
+        </DataGridAggregates>
+        <DataGridColumns>
+            <DataGridNumericColumn TItem="Ruling" Caption="#" Field="@nameof(Ruling.Id)" Sortable />
+            <DataGridColumn TItem="Ruling" Caption="Ruling Unique Id" Field="@nameof(Ruling.RulingGuid)" />
+            <DataGridDateColumn TItem="Ruling" Caption="Date Created" Field="@nameof(Ruling.CreatedAt)" Sortable />
+            <DataGridColumn TItem="Ruling" Caption="Rule Text" Field="@nameof(Ruling.RuleText)" />
+        </DataGridColumns>
+    </DataGrid>
+</Container>

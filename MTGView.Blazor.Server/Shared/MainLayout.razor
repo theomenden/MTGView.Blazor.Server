@@ -1,0 +1,23 @@
+﻿@layout RootLayout
+@inherits LayoutComponentBase
+
+<Layout Sider>
+    <LayoutSider>
+        <LayoutSiderContent>
+            <NavMenu />
+        </LayoutSiderContent>
+    </LayoutSider>
+    <Layout>
+        <LayoutHeader>
+            <MtgHeader />
+        </LayoutHeader>
+        <Layout>
+            <LayoutContent>
+                @Body
+            </LayoutContent>
+        </Layout>
+        <LayoutFooter>
+            <MtgFooter />
+        </LayoutFooter>
+    </Layout>
+</Layout>

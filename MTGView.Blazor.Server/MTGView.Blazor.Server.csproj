@@ -1,0 +1,83 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Deterministic>false</Deterministic>
+	</PropertyGroup>
+	<PropertyGroup>
+		<Date>$([System.DateTime]::Now.ToString("yyy.M.d.HHmm"))</Date>
+		<AssemblyFileVersionAttribute>[assembly:System.Reflection.AssemblyFileVersion("$(Date)")]</AssemblyFileVersionAttribute>
+	</PropertyGroup>
+	<Target Name="GenerateVersionInfo" BeforeTargets="BeforeBuild">
+		<WriteLinesToFile File="Properties\VersionInfo.cs" Lines="$(AssemblyFileVersionAttribute)" Overwrite="true">
+		</WriteLinesToFile>
+	</Target>
+	<ItemGroup>
+	  <Content Remove="compilerconfig.json" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Blazorise" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Animate" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Bootstrap5" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Charts" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Components" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.DataGrid" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Icons.Bootstrap" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Markdown" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.QRCode" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.RichTextEdit" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Sidebar" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.Snackbar" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.SpinKit" Version="1.0.3" />
+	  <PackageReference Include="Blazorise.TreeView" Version="1.0.3" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.4" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.4">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+	  <PackageReference Include="Nosthy.Blazor.DexieWrapper" Version="0.4.5" />
+	  <PackageReference Include="Serilog" Version="2.10.0" />
+	  <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
+	  <PackageReference Include="Serilog.Enrichers.AssemblyName" Version="1.0.9" />
+	  <PackageReference Include="Serilog.Enrichers.Context" Version="4.2.0" />
+	  <PackageReference Include="Serilog.Enrichers.CorrelationId" Version="3.0.1" />
+	  <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+	  <PackageReference Include="Serilog.Enrichers.Memory" Version="1.0.4" />
+	  <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+	  <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+	  <PackageReference Include="Serilog.Exceptions" Version="8.1.0" />
+	  <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
+	  <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+	  <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
+	  <PackageReference Include="Serilog.Formatting.Compact.Reader" Version="1.0.5" />
+	  <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
+	  <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+	  <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+	  <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+	  <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.7.0" />
+	  <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+	  <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.1" />
+	  <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.18" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="compilerconfig.json" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\MTGView.Core\MTGView.Core.csproj" />
+	  <ProjectReference Include="..\MTGView.Data.CardImage\MTGView.Data.Scryfall.csproj" />
+	  <ProjectReference Include="..\MTGView.Data.EFCore\MTGView.Data.EFCore.csproj" />
+	  <ProjectReference Include="..\MTGView.Data.Personal.EfCore\MTGView.Data.Personal.EfCore.csproj" />
+	</ItemGroup>
+</Project>

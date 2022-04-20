@@ -1,0 +1,32 @@
+﻿@page "/collection"
+
+<Jumbotron Background="Background.Dark"
+           TextColor="TextColor.Light"
+           Margin="Margin.Is3.OnY.OnWidescreen.Is2.OnX.OnWidescreen.Is4.OnY.OnMobile.Is3.OnX.OnMobile"
+           Border="Border.Is2.Rounded.Light.OnAll"
+           Shadow="Shadow.Default">
+    <JumbotronTitle>This is your personal collection of Cards</JumbotronTitle>
+    <JumbotronSubtitle>Add cards to your collection, or view</JumbotronSubtitle>
+</Jumbotron>
+
+<Container Fluid
+           Background="Background.Dark"
+           TextColor="TextColor.Light"
+           Margin="Margin.Is2.OnAll.OnWidescreen.Is3.OnAll.OnMobile"
+           Padding="Padding.Is2.OnY.OnWidescreen.Is3.OnY.OnMobile"
+           Border="Border.Is2.Rounded.Light.OnAll">
+    @if (_personalCollection is null)
+    {
+
+        <Button Type="ButtonType.Link" Color="Color.Success" To="/addCollection" Size="Size.Large" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+            Add your personal Collection
+        </Button>
+    }
+    else
+    {
+        <Button Type="ButtonType.Link" Color="Color.Success" To="/addCollection" Size="Size.Large" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+            Add to your personal Collection
+        </Button>
+    }
+    
+</Container>

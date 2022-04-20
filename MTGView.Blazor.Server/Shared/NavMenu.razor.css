@@ -1,0 +1,116 @@
+.vertical-nav {
+    position: fixed;
+    background: white;
+    box-shadow: 0 0 40px rgba(0, 0, 33, 0);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 70px;
+}
+
+.vertical-nav li {
+    list-style: none;
+    display: block;
+    width: 100%;
+    border-bottom: solid 1px #f2f5ff;
+    text-align: center;
+    position: relative;
+    flex-grow: 1;
+    align-items: stretch;
+    display: flex;
+}
+
+.vertical-nav li:last-child {
+    border: none;
+}
+
+.vertical-nav li a {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.vertical-nav li:hover > a {
+    background: #fafafa;
+    transition: all 0.2s ease;
+}
+
+.vertical-nav li:hover > a .feather {
+    transform: scale(1.1);
+    transition: all 0.2s ease;
+}
+
+.vertical-nav li:hover > .hover-menu,
+.vertical-nav li:focus-within > .hover-menu {
+    visibility: visible;
+    opacity: 1;
+    -webkit-animation: slide-down 0.2s ease-out;
+    -moz-animation: slide-down 0.2s ease-out;
+    transition: all 0.5s ease;
+    display: block;
+}
+
+.vertical-nav li .hover-menu {
+    background: white;
+    visibility: hidden;
+    transition: all 0.5s ease;
+    opacity: 0;
+    display: none;
+    position: absolute;
+    left: 70px;
+    min-width: 200px;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    box-shadow: 0 0 40px #000021;
+    box-shadow: 0 0 40px rgba(0, 0, 33, 0);
+}
+
+.vertical-nav li .hover-menu:after {
+    right: 100%;
+    top: 20%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: rgba(255, 255, 255, 0);
+    border-right-color: #ffffff;
+    border-width: 10px;
+    margin-top: -10px;
+}
+
+.vertical-nav li .hover-menu ul {
+    margin: 0;
+    padding: 0;
+}
+
+.vertical-nav li .hover-menu ul li {
+    list-style: none;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.vertical-nav li .hover-menu ul li a {
+    width: 100%;
+    display: block !important;
+    text-decoration: none;
+    padding: 15px 20px;
+    text-align: left;
+    height: auto !important;
+    font-weight: 400;
+}
+
+.vertical-nav li .hover-menu ul li a:hover {
+    background: #fafafa;
+    transition: 0.3s ease;
+}

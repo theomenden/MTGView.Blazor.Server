@@ -1,0 +1,36 @@
+﻿<Bar Breakpoint="Breakpoint.Desktop"
+     Background="Background.Dark"
+     ThemeContrast="ThemeContrast.Dark"
+     Position="Position.Relative"
+     Width="Width.Is100"
+     Height="Height.Is100">
+    <BarMenu >
+        <BarStart>
+            <BarItem>
+                <Addons>
+                    <Addon AddonType="AddonType.Start">
+                        <AddonLabel>
+                            <BarIcon IconName="IconName.Language" IconSize="IconSize.Small" IconStyle="IconStyle.Regular" />
+                        </AddonLabel>
+                    </Addon>
+                    <Addon AddonType="AddonType.Body">
+                        
+                    </Addon>
+                </Addons>
+            </BarItem>
+        </BarStart>
+        <BarEnd>
+            <BarItem Margin="Margin.Is3.FromTop.OnWidescreen.Is3.FromTop.OnMobile">
+            </BarItem>
+            <BarItem Margin="Margin.Is2.FromTop.Is2.OnX.OnWidescreen.Is3.OnX.OnMobile">
+                <BarDropdown RightAligned>
+                    <BarDropdownToggle>
+                        <Paragraph TextColor="TextColor.Light" Flex="Flex.InlineFlex.AlignContent.Center.JustifyContent.Between">
+                            <Blazorise.Icon Name="IconName.Tint" /> Theme
+                        </Paragraph>
+                    </BarDropdownToggle>
+                </BarDropdown>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>

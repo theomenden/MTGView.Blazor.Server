@@ -1,0 +1,69 @@
+﻿@page "/symbols"
+<Container Fluid>
+    <Tabs RenderMode="TabsRenderMode.LazyReload" SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged" Background="Background.Dark" TextColor="TextColor.Light">
+        <Items>
+            <Tab Name="manaCosts">Mana Costs</Tab>
+            <Tab Name="manaRepresentatives">Mana Representations</Tab>
+            <Tab Name="transposables">Transposables</Tab>
+            <Tab Name="funny">Funny</Tab>
+            <Tab Name="other">Other</Tab>
+        </Items>
+        <Content>
+            <TabPanel Name="manaCosts" Background="Background.Dark" TextColor="TextColor.Light">
+                <ListGroup>
+                    <Repeater TItem="SymbologyDatum" Items="@_manaCostSymbols" Context="manaSymbolContext">
+                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
+                            <img data-src="@manaSymbolContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@manaSymbolContext.English" class="lazyload" />
+                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@manaSymbolContext.Symbol</Heading>
+                            <Small>@manaSymbolContext.English</Small>
+                        </Div>
+                    </Repeater>
+                </ListGroup>
+            </TabPanel>
+            <TabPanel Name="manaRepresentatives" Background="Background.Dark" TextColor="TextColor.Light">
+                <ListGroup>
+                    <Repeater TItem="SymbologyDatum" Items="@_manaSymbols" Context="manaRepresentativeContext">
+                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
+                            <img data-src="@manaRepresentativeContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@manaRepresentativeContext.English" class="lazyload" />
+                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@manaRepresentativeContext.Symbol</Heading>
+                            <Small>@manaRepresentativeContext.English</Small>
+                        </Div>
+                    </Repeater>
+                </ListGroup>
+            </TabPanel>
+            <TabPanel Name="transposables" Background="Background.Dark" TextColor="TextColor.Light">
+                <ListGroup>
+                    <Repeater TItem="SymbologyDatum" Items="@_transposableSymbols" Context="transposableContext">
+                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
+                            <img data-src="@transposableContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@transposableContext.English" class="lazyload" />
+                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@transposableContext.Symbol</Heading>
+                            <Small>@transposableContext.English</Small>
+                        </Div>
+                    </Repeater>
+                </ListGroup>
+            </TabPanel>
+            <TabPanel Name="funny" Background="Background.Dark" TextColor="TextColor.Light">
+                <ListGroup>
+                    <Repeater TItem="SymbologyDatum" Items="@_funnySymbols" Context="funnyContext">
+                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
+                            <img data-src="@funnyContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@funnyContext.English" class="lazyload" />
+                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@funnyContext.Symbol</Heading>
+                            <Small>@funnyContext.English</Small>
+                        </Div>
+                    </Repeater>
+                </ListGroup>
+            </TabPanel>
+            <TabPanel Name="other" Background="Background.Dark" TextColor="TextColor.Light">
+                <ListGroup>
+                    <Repeater TItem="SymbologyDatum" Items="@_otherSymbols" Context="miscContext">
+                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
+                            <img data-src="@miscContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@miscContext.English" class="lazyload" />
+                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@miscContext.Symbol</Heading>
+                            <Small>@miscContext.English</Small>
+                        </Div>
+                    </Repeater>
+                </ListGroup>
+            </TabPanel>
+        </Content>
+    </Tabs>
+</Container>

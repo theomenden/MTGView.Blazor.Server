@@ -1,0 +1,121 @@
+﻿@page "/analysis"
+<Jumbotron Background="Background.Dark"
+           TextColor="TextColor.Light"
+           Margin="Margin.Is2.OnY.OnWidescreen.Is4.OnY.OnMobile"
+           Border="Border.Is2.Rounded.Light.OnAll"
+           Shadow="Shadow.Default">
+    <JumbotronTitle Size="JumbotronTitleSize.Is2">
+        Select a set from the provided dropdown to view the basic analytics for that set
+    </JumbotronTitle>
+    <JumbotronSubtitle>
+        Analytics can be filtered down per color, cost, and set.
+    </JumbotronSubtitle>
+</Jumbotron>
+
+<Container Fluid
+           Margin="Margin.Is3.OnAll.OnWidescreen.Is4.OnAll.OnMobile">
+    <Row>
+        <Card Background="Background.Dark" Border="Border.Is2.Rounded.Light.OnAll">
+            <CardBody>
+                <Column ColumnSize="ColumnSize.IsHalf" Flex="Flex.Grow.Is1.Row.JustifyContent.Around">
+                    <Autocomplete TItem="MagicSet"
+                                  TValue="string"
+                                  Data="@_magicSets"
+                                  TextField="@((item) => item.name)"
+                                  ValueField="@((item) => item.code)"
+                                  @bind-SelectedValue="@_selectedSetValue"
+                                  @bind-SelectedText="selectedAutoCompleteText"
+                                  Placeholder="Search for a Set to Analyze"
+                                  Filter="AutocompleteFilter.StartsWith"
+                                  FreeTyping
+                                  CustomFilter="@((item, searchValue) => item.name.IndexOf(searchValue, 0, StringComparison.OrdinalIgnoreCase) >= 0)">
+                        <NotFoundContent>
+                            Sorry... @context was not found! :(
+                        </NotFoundContent>
+                        <ItemContent>
+                            <Div Flex="Flex.InlineFlex.JustifyContent.Between" Width="Width.Is100">
+                                <Heading Size="HeadingSize.Is3" Margin="Margin.Is2.FromBottom">@context.Value</Heading>
+                                <Small>@context.Item.baseSetSize</Small>
+                            </Div>
+                            <Paragraph Margin="Margin.Is2.FromBottom">@context.Text</Paragraph>
+                        </ItemContent>
+                    </Autocomplete>
+                </Column>
+            </CardBody>
+            <CardBody>
+                <Column Flex="Flex.Grow.Is1.Row.JustifyContent.Around">
+                    <Field Horizontal Background="Background.Dark" TextColor="TextColor.Light" Margin="Margin.Is1.OnY.OnWidescreen.Is3.OnY.OnDesktop">
+                        <FieldBody ColumnSize="ColumnSize.IsHalf">
+                            <Paragraph Margin="Margin.Is2.OnX.OnWidescreen.Is3.OnX.OnMobile">
+                                Set Code: @_selectedSetValue
+                            </Paragraph>
+                        </FieldBody>
+                        <FieldBody ColumnSize="ColumnSize.IsHalf">
+                            <Paragraph Margin="Margin.Is2.OnX.OnWidescreen.Is3.OnX.OnMobile">
+                                Analyzing Set: @_magicSets?.FirstOrDefault(x => x.code.Equals(_selectedSetValue))?.name
+                            </Paragraph>
+                        </FieldBody>
+                    </Field>
+                </Column>
+            </CardBody>
+        </Card>
+    </Row>
+    @{
+        var chosenSet = _magicSets?.FirstOrDefault(x => x.code.Equals(_selectedSetValue));
+    }
+    <Row>
+        <Column ColumnSize="ColumnSize.IsThird">
+            <Card Background="Background.Dark" TextColor="TextColor.Light">
+                <CardHeader>
+                    Color Distribution for @chosenSet?.name
+                </CardHeader>
+                <CardBody>
+                    <BarChart @ref="@_barChart" TItem="ColorAnalyticsBySet" Options="@_barChartOptions" />
+                </CardBody>
+                <CardFooter>
+                    <Paragraph>
+                        Distributed across @chosenSet?.baseSetSize
+                    </Paragraph>
+                </CardFooter>
+            </Card>
+        </Column>
+        <Column ColumnSize="ColumnSize.IsThird">
+            <Card Background="Background.Dark" TextColor="TextColor.Light">
+                <CardHeader>
+                    Mana Costs for @chosenSet?.name
+                </CardHeader>
+                <CardBody>
+                </CardBody>
+                <CardFooter>
+                    Distributed across @chosenSet?.baseSetSize
+                </CardFooter>
+            </Card>
+        </Column>
+        <Column ColumnSize="ColumnSize.IsThird">
+            <Card Background="Background.Dark" TextColor="TextColor.Light">
+                <CardHeader>
+                    Keyword effects for @chosenSet?.name
+                </CardHeader>
+                <CardBody>
+                </CardBody>
+                <CardFooter>
+                    Distributed across @chosenSet?.baseSetSize
+                </CardFooter>
+            </Card>
+        </Column>
+    </Row>
+    <Row>
+        <Column ColumnSize="ColumnSize.IsHalf">
+
+        </Column>
+        <Column ColumnSize="ColumnSize.IsHalf">
+
+        </Column>
+    </Row>
+    <Row>
+
+    </Row>
+    <Row>
+
+    </Row>
+</Container>

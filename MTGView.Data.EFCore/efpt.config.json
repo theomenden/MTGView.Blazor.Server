@@ -1,0 +1,55 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "MagicthegatheringDbContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": "Contexts",
+   "OutputPath": "Models",
+   "ProjectRootNamespace": "MTGView.Data.EFCore",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "[MTG].[Cards]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[MTG].[legalities]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[MTG].[Meta]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[MTG].[rulings]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[MTG].[sets]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "DESKTOP-8U2LRVO.MagicTheGathering.db",
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDbContextSplitting": true,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": true,
+   "UseManyToManyEntity": true,
+   "UseNoConstructor": true,
+   "UseNoDefaultConstructor": true,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": true,
+   "UseSchemaFolders": false,
+   "UseSpatial": false
+}

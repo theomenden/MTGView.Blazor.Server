@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "bootstrap-icons@1.8.1",
+      "destination": "wwwroot/css/bootstrap-icons/"
+    },
+    {
+      "library": "lazysizes@5.3.2",
+      "destination": "wwwroot/js/lazysizes/"
+    },
+    {
+      "library": "dexie@3.2.1",
+      "destination": "wwwroot/js/dexie/"
+    }
+  ]
+}

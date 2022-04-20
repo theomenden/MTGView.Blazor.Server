@@ -1,0 +1,99 @@
+﻿@page "/cards"
+<Jumbotron Background="Background.Dark" Margin="Margin.Is3.OnY.Is2.OnX.OnWidescreen.Is4.OnY.Is3.OnX.OnTablet">
+    <JumbotronTitle Size="JumbotronTitleSize.Is2" TextColor="TextColor.Light">
+        Below is a grid of all the magic the gathering cards in existence as according to the latest MTG.Json
+    </JumbotronTitle>
+    <JumbotronSubtitle TextColor="TextColor.White50">
+        (This can be updated by uploading a new json version, or matching with scryfall)
+    </JumbotronSubtitle>
+</Jumbotron>
+<Blazorise.Container Fluid Margin="Margin.Is2.OnY.OnWidescreen.Is4.OnY.OnMobile">
+    <DataGrid TItem="MagicCard"
+              TotalItems="_magicCardCount"
+              ReadData="OnReadData"
+              Data="_magicCards"
+              ShowPager
+              PageSize="25"
+              PageSizes="new Int32[] { 10, 25, 50, 100, 200 }"
+              Padding="Padding.Is3.OnY.OnWidescreen.Is5.OnY.OnMobile"
+              Class="table-dark border border-light border-2 rounded rounded-2 shadow"
+              Responsive
+              Hoverable
+              FixedHeader
+              FixedHeaderDataGridHeight="1000px"
+              FixedHeaderDataGridMaxHeight="100vh"
+              HeaderThemeContrast="ThemeContrast.Light"
+              Striped
+              Sortable
+              Filterable
+              DetailRowTrigger="@((e) => e.Item.id == _selectedCard?.id)">
+        <EmptyTemplate>
+            <Paragraph>
+                No Magic Cards were found in the database
+            </Paragraph>
+        </EmptyTemplate>
+        <LoadingTemplate>
+            <Span>
+                <SpinKit Type="SpinKitType.Grid" Size="3em" Color="#8E7CC3" />
+                <Paragraph TextColor="TextColor.Danger">Loading Magic Cards from Database</Paragraph>
+            </Span>
+        </LoadingTemplate>
+        <DataGridAggregates>
+
+        </DataGridAggregates>
+        <DataGridColumns>
+            <DataGridCommandColumn />
+            <DataGridNumericColumn Field="@nameof(MagicCard.id)" Caption="Database Id" Sortable />
+            <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name">
+                <DisplayTemplate>
+                    @{
+                        var magicCard = context as MagicCard;
+
+                        var magicCardImages = String.Join(',', magicCard?.ScryfallImagesAsSizes.ToList() ?? new List<string> { magicCard?.ScryfallImageUri ?? String.Empty });
+
+                        <Tooltip Placement="TooltipPlacement.BottomEnd"
+                             Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
+                            <Paragraph>@context?.name</Paragraph>
+                        </Tooltip>
+                    }
+                </DisplayTemplate>
+            </DataGridColumn>
+            <DataGridColumn Field="@nameof(MagicCard.manaCost)" Caption="Mana Cost" Sortable Filterable>
+                <DisplayTemplate>
+                    <Repeater TItem="string" Items="context.ManaCostSvgUris" Context="manaCostContext">
+                        <Image Source="@manaCostContext" Text="@context.manaCost" Style="height: 32px; width: 32px;" />
+                    </Repeater>
+                </DisplayTemplate>
+            </DataGridColumn>
+            <DataGridColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" Sortable Filterable>
+                <DisplayTemplate>
+                    <Image Source="@context.ScryfallSetIconUri" Style="height: 32px; width: 32px;" Text="@context.setCode" Class="lazyload" Background="Background.Secondary"/>
+                </DisplayTemplate>
+            </DataGridColumn>
+        </DataGridColumns>
+        <PageButtonTemplate>
+            <Span TextColor="TextColor.Success">
+                @context.PageNumer
+            </Span>
+        </PageButtonTemplate>
+        <FirstPageButtonTemplate>
+            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepBackward" TextColor="TextColor.Success" />
+            First
+        </FirstPageButtonTemplate>
+        <LastPageButtonTemplate>
+            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepForward" TextColor="TextColor.Success" />
+            Last
+        </LastPageButtonTemplate>
+        <NextPageButtonTemplate>
+            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Forward" TextColor="TextColor.Success" />
+            Next
+        </NextPageButtonTemplate>
+        <PreviousPageButtonTemplate>
+            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Backward" TextColor="TextColor.Success" />
+            Previous
+        </PreviousPageButtonTemplate>
+        <TotalItemsTemplate><Badge Color="Color.Success">@context.TotalItems total items</Badge></TotalItemsTemplate>
+        <ItemsPerPageTemplate></ItemsPerPageTemplate>
+    </DataGrid>
+</Blazorise.Container>
+

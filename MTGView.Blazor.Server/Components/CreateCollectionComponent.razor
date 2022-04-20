@@ -1,0 +1,81 @@
+﻿@page "/addCollection"
+<Container Fluid Background="Background.Dark" TextColor="TextColor.Light" Margin="Margin.Is2.OnY.Is3.OnX.OnWidescreen.Is3.OnY.Is4.OnX.OnMobile">
+    <Row>
+        <Column ColumnSize="ColumnSize.Is12">
+            <SelectList TItem="MagicSet"
+                        TValue="int"
+                        Data="@_magicSets"
+                        TextField="@(item => item.name)"
+                        ValueField="@(item => item.id)"
+                        SelectedValue="@_selectedSet"
+                        SelectedValueChanged="@OnMagicSetChanged"
+                        DefaultItemText="Choose a Magic Set" />
+        </Column>
+    </Row>
+    <Row>
+        <Column ColumnSize="ColumnSize.IsThird">
+            <ListView TItem="MagicCard"
+                      Data="_magicCards"
+                      TextField="item => item.name"
+                      Mode="ListGroupMode.Selectable"
+                      MaxHeight="1000px"
+                      @bind-SelectedItem="@_selectedMagicCard">
+            </ListView>
+        </Column>
+        <Column ColumnSize="ColumnSize.IsThird">
+            <Div Flex="Flex.Column.Grow.Is1.JustifyContent.Center">
+                <Button Type="ButtonType.Button" Clicked="AddMagicCardToCollection" Color="Color.Success" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+                    <Icon Name="IconName.ArrowRight" TextColor="TextColor.Light" IconSize="IconSize.x5" />
+                </Button>
+                <Button Type="ButtonType.Button" Clicked="RemoveMagicCardFromCollection" Color="Color.Danger" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+                    <Icon Name="IconName.ArrowLeft" TextColor="TextColor.Light" IconSize="IconSize.x5" />
+                </Button>
+            </Div>
+        </Column>
+        <Column ColumnSize="ColumnSize.IsThird">
+            <ListGroup Flush Background="Background.Dark" Mode="ListGroupMode.Selectable" @bind-SelectedItem="_selectedPersonalCardName">
+                @if (_createdCollection?.CardMappings is not null && _createdCollection.CardMappings.Any())
+                {
+                    <Repeater TItem="MagicCard" Items="_personalMagicCards">
+                        <ListGroupItem Name="@context.name">
+                            <Card Background="Background.Dark" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default" Margin="Margin.Is3.OnY">
+                                @{
+                                    var magicCard = context as MagicCard;
+
+                                    var magicCardImages = String.Join(',', magicCard?.ScryfallImagesAsSizes.ToList() ?? new List<string> { magicCard?.ScryfallImageUri ?? String.Empty });
+
+                                    <Tooltip Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
+                                        <CardBody Flex="Flex.InlineFlex.JustifyContent.Between.Grow.Is1">
+                                            <Paragraph TextColor="TextColor.Light">Name: @context.name</Paragraph>
+                                            <Paragraph TextColor="TextColor.Light" Margin="Margin.Is1.OnX.OnDesktop.Is2.OnX.OnMobile">Mana Cost: @context.manaCost</Paragraph>
+                                            <Paragraph TextColor="TextColor.Light">Set: @context.setCode</Paragraph>
+                                        </CardBody>
+                                    </Tooltip>
+                                }
+                            </Card>
+                        </ListGroupItem>
+                    </Repeater>
+                }
+            </ListGroup>
+        </Column>
+    </Row>
+    <Row Flex="Flex.JustifyContent.Center">
+        <Column Background="Background.Dark" ColumnSize="ColumnSize.IsThird">
+            <Div Flex="Flex.Column.Grow.Is1.JustifyContent.Center">
+                <Button Type="ButtonType.Submit"
+                        Color="Color.Primary"
+                        Border="Border.Is2.Rounded.Light.OnAll"
+                        Shadow="Shadow.Default"
+                        Clicked="OnSubmit"
+                        Loading="@_loading">
+                    <LoadingTemplate>
+                        <SpinKit Type="SpinKitType.Chase" Centered Color="#fff" Size="3em" />
+                    </LoadingTemplate>
+                    <ChildContent>
+                        Create Collection
+                    </ChildContent>
+                </Button>
+            </Div>
+        </Column>
+    </Row>
+</Container>

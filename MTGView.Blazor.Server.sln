@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Blazor.Server", "MTGView.Blazor.Server\MTGView.Blazor.Server.csproj", "{7F0138A4-3153-47F2-A814-889242B57185}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.EFCore", "MTGView.Data.EFCore\MTGView.Data.EFCore.csproj", "{64C94B8F-4E40-4A5B-B530-328E15C61166}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.Scryfall", "MTGView.Data.CardImage\MTGView.Data.Scryfall.csproj", "{A641A749-96EE-4F06-88DF-05EF35EA67DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Core", "MTGView.Core\MTGView.Core.csproj", "{19AA4324-CE89-4CBF-BFBD-684BB2006A26}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.Personal.EfCore", "MTGView.Data.Personal.EfCore\MTGView.Data.Personal.EfCore.csproj", "{5C84E934-E5E2-46AB-A372-B463A2F6B69D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F0138A4-3153-47F2-A814-889242B57185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F0138A4-3153-47F2-A814-889242B57185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F0138A4-3153-47F2-A814-889242B57185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F0138A4-3153-47F2-A814-889242B57185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64C94B8F-4E40-4A5B-B530-328E15C61166}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64C94B8F-4E40-4A5B-B530-328E15C61166}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64C94B8F-4E40-4A5B-B530-328E15C61166}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64C94B8F-4E40-4A5B-B530-328E15C61166}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A641A749-96EE-4F06-88DF-05EF35EA67DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A641A749-96EE-4F06-88DF-05EF35EA67DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A641A749-96EE-4F06-88DF-05EF35EA67DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A641A749-96EE-4F06-88DF-05EF35EA67DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19AA4324-CE89-4CBF-BFBD-684BB2006A26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19AA4324-CE89-4CBF-BFBD-684BB2006A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19AA4324-CE89-4CBF-BFBD-684BB2006A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19AA4324-CE89-4CBF-BFBD-684BB2006A26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C01DFF3F-1DE5-4F24-B1C6-7DE54F6BBCF7}
+	EndGlobalSection
+EndGlobal
