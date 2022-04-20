@@ -1,0 +1,1 @@
+MTGView.Blazor.Server
