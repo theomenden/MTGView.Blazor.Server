@@ -72,7 +72,7 @@ public partial class SetAnalytics : ComponentBase
                                Count = await grouping.SumAsync(c => c.Count, cancellationToken)
                            })
                            .WithCancellation(cancellationToken))
-        {.
+        {
             yield return await colorGroup;
         }
         StateHasChanged();

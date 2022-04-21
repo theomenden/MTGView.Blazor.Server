@@ -1,0 +1,48 @@
+﻿@page "/uploads"
+<Jumbotron Background="Background.Dark"
+           TextColor="TextColor.Light"
+           Margin="Margin.Is2.OnAll.OnWidescreen.Is4.OnAll.OnMobile"
+           Padding="Padding.Is3.OnAll.OnWidescreen"
+           Border="Border.Is2.Rounded.Light.OnAll"
+           Shadow="Shadow.Default">
+    <JumbotronTitle Size="JumbotronTitleSize.Is2">Upload a Csv file from MTG.Json</JumbotronTitle>
+    <JumbotronSubtitle TextTransform="TextTransform.Lowercase"><em>Later feature to implement: Auto Sync with Scryfall</em></JumbotronSubtitle>
+</Jumbotron>
+<Card Background="Background.Dark"
+      TextColor="TextColor.Light"
+      Margin="Margin.Is3.OnY.OnWidescreen.Is4.OnAll.OnMobile"
+      Border="Border.Is2.Rounded.Light.OnAll"
+      Flex="Flex.JustifyContent.Center">
+    <CardHeader TextAlignment="TextAlignment.Center">Upload a file to update the database</CardHeader>
+    <CardTitle TextAlignment="TextAlignment.Center">Use the "All Printings" csv as found here <Blazorise.Link To="https://www.mtgjson.com/api/v5/csv/cards.csv.zip">Here (note will download the file in .zip)</Blazorise.Link> </CardTitle>
+    <CardSubtitle TextAlignment="TextAlignment.Center" Italic TextWeight="TextWeight.Light">NOTE: JSON Upload implementation in progress</CardSubtitle>
+    <Divider />
+    <CardBody>
+        <Form>
+            <Row Flex="Flex.Row.Grow.Is1.JustifyContent.Center">
+                <Column ColumnSize="ColumnSize.IsHalf">
+                    <Field>
+                        <FieldLabel>
+                            The File will be processed into the database
+                        </FieldLabel>
+                        <FieldBody>
+                            <FileEdit Filter=".csv" Changed="@OnChanged" Written="@OnWritten" Progressed="@OnProgressed"/>
+                        </FieldBody>
+                    </Field>
+                </Column>
+            </Row>
+            <Row Flex="Flex.Row.Grow.Is1.JustifyContent.Center">
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Button Type="ButtonType.Submit"
+                            Color="Color.Primary"
+                            Border="Border.Is2.Rounded.Light.OnAll">
+                        Submit
+                    </Button>
+                </Column>
+            </Row>
+        </Form>
+    </CardBody>
+    <CardFooter TextAlignment="TextAlignment.Center">
+        <Paragraph Class="font-monospace" TextColor="TextColor.White50" TextWeight="TextWeight.Light" TextTransform="TextTransform.Lowercase" Italic>File must be a .csv</Paragraph>
+    </CardFooter>
+</Card>

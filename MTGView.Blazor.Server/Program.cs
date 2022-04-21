@@ -45,6 +45,7 @@ try
 
     builder.Services.AddLazyCache();
 
+    builder.Services.AddAutomappingProfiles<Program>();
     builder.Services.AddScoped<IModuleFactory, EsModuleFactory>();
     builder.Services.AddScoped<MtgIndexedDb>();
     builder.Services.AddScoped<SetInformationRepository>();

@@ -1,77 +1,102 @@
 ﻿  <Bar Breakpoint="Breakpoint.Desktop"
-     NavigationBreakpoint="Breakpoint.Tablet"
-     ThemeContrast="ThemeContrast.Dark"
-     Mode="BarMode.VerticalInline"
-     CollapseMode="BarCollapseMode.Small"
-     TextColor="TextColor.White"
-     Flex="Flex.Column.AlignContent.Center"
-     Margin="Margin.Is0.FromStart.Is0.FromTop"
-     Background="Background.Dark"
-     Border="Border.Is2.RoundedEnd.Light.OnEnd"
-     Shadow="Shadow.Default">
-        <BarToggler />
-        <BarBrand>
-            <BarItem>
-                <BarLink To="">
-                    <BarIcon IconName="IconName.Home" />
-                    MTG Builder App
-                </BarLink>
-            </BarItem>
-        </BarBrand>
-        <BarMenu>
-            <BarStart>
-                <Container Class="list-hover-slide">
-                    <BarItem>
-                        <Divider />
-                        <BarLink To="">
-                            <BarIcon IconName="IconName.Dashboard" />
-                            Home
-                        </BarLink>
-                    </BarItem>
-                    <Divider />
-                    <BarItem>
-                        <BarLink To="/cards">
-                            <BarIcon IconName="IconName.IdCard" />
-                            Cards
-                        </BarLink>
-                    </BarItem>
-                    <Divider />
-                    <BarItem>
-                        <BarLink To="/symbols">
-                            <BarIcon IconName="IconName.ArrowAltCircleDown" />
-                            Symbols
-                        </BarLink>
-                        <Divider />
-                    </BarItem>
-                    <BarItem>
-                        <BarLink To="/collection">
-                            <BarIcon IconName="IconName.Bookmark" />
-                            Collection
-                        </BarLink>
-                        <Divider />
-                    </BarItem>
-                    <BarItem>
-                        <BarLink To="/comboCreator">
-                            <BarIcon IconName="IconName.BookReader" />
-                            Combo
-                        </BarLink>
-                        <Divider />
-                    </BarItem>
-                    <BarItem>
-                        <BarLink To="/analysis">
-                            <BarIcon IconName="IconName.Code" />
-                            Analytics
-                        </BarLink>
-                        <Divider />
-                    </BarItem>
-                    <BarItem>
-                        <BarLink To="/rulings">
-                            <BarIcon IconName="IconName.RulerHorizontal" />
-                            Rulings
-                        </BarLink>
-                        <Divider />
-                    </BarItem>
-                </Container>
-            </BarStart>
-        </BarMenu>
-    </Bar>
+       NavigationBreakpoint="Breakpoint.Tablet"
+       ThemeContrast="ThemeContrast.Dark"
+       Mode="BarMode.VerticalInline"
+       CollapseMode="BarCollapseMode.Small"
+       TextColor="TextColor.White"
+       Flex="Flex.Column.AlignContent.Center"
+       Margin="Margin.Is0.FromStart.Is0.FromTop"
+       Background="Background.Dark"
+       Border="Border.Is2.RoundedEnd.Light.OnEnd"
+       Shadow="Shadow.Default">
+      <BarToggler />
+      <BarBrand>
+          <BarItem>
+              <BarLink To="">
+                  <BarIcon IconName="IconName.Home" />
+                  MTG Builder App
+              </BarLink>
+          </BarItem>
+      </BarBrand>
+      <BarMenu>
+          <BarStart>
+              <Container Class="list-hover-slide">
+                  <BarItem>
+                      <Divider />
+                      <BarLink To="">
+                          <BarIcon IconName="IconName.Dashboard" />
+                          Home
+                      </BarLink>
+                  </BarItem>
+                  <Divider />
+                  <BarItem>
+                      <BarLink To="/uploads">
+                          <BarIcon IconName="IconName.FileUpload" />
+                          Uploads
+                      </BarLink>
+                  </BarItem>
+                  @if (_databaseHasCards)
+                  {
+                      <Divider/>
+                      <BarItem >
+                          <BarLink To="/cards">
+                              <BarIcon IconName="IconName.IdCard"/>
+                              Cards
+                          </BarLink>
+                      </BarItem>
+                      <Divider/>
+                      <BarItem>
+                          <BarLink To="/symbols">
+                              <BarIcon IconName="IconName.ArrowAltCircleDown"/>
+                              Symbols
+                          </BarLink>
+                      </BarItem>
+                      <Divider/>
+                      <BarItem>
+                          <BarLink To="/collection">
+                              <BarIcon IconName="IconName.Bookmark"/>
+                              Collection
+                          </BarLink>
+                      </BarItem>
+                      <Divider/>
+                      <BarItem>
+                          <BarLink To="/comboCreator">
+                              <BarIcon IconName="IconName.BookReader"/>
+                              Combo
+                          </BarLink>
+                      </BarItem>
+                      <Divider/>
+                      <BarItem>
+                          <BarLink To="/analysis">
+                              <BarIcon IconName="IconName.Code"/>
+                              Analytics
+                          </BarLink>
+                      </BarItem>
+                      <Divider/>
+                      <BarItem>
+                          <BarLink To="/rulings">
+                              <BarIcon IconName="IconName.RulerHorizontal"/>
+                              Rulings
+                          </BarLink>
+                      </BarItem>
+                      <Divider/>
+                  }
+              </Container>
+          </BarStart>
+      </BarMenu>
+  </Bar>
+  
+@code{
+
+    [Inject] IDbContextFactory<MagicthegatheringDbContext> DbContextFactory { get; init; }
+
+    private bool _databaseHasCards = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        _databaseHasCards = await context.Cards.AnyAsync();
+    }
+
+}
