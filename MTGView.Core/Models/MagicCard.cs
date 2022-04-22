@@ -20,33 +20,32 @@ public partial class MagicCard
     public string? colorIndicator { get; set; }
     public string? colors { get; set; }
     public string? duelDeck { get; set; }
-    public short? edhrecRank { get; set; }
+    public int? edhrecRank { get; set; }
     public string? faceFlavorName { get; set; }
     public string? finishes { get; set; }
     public string? flavorText { get; set; }
     public string? frameEffects { get; set; }
     public string? frameVersion { get; set; }
-    public short? hasAlternativeDeckLimit { get; set; }
-    public short? hasContentWarning { get; set; }
-    public short? isAlternative { get; set; }
-    public short? isFullArt { get; set; }
-    public short? isFunny { get; set; }
-    public short? isOnlineOnly { get; set; }
-    public short? isOversized { get; set; }
-    public short? isPromo { get; set; }
-    public short? isRebalanced { get; set; }
-    public short? isReprint { get; set; }
-    public short? isReserved { get; set; }
-    public short? isStarter { get; set; }
-    public short? isStorySpotlight { get; set; }
-    public short? isTextless { get; set; }
-    public short? isTimeshifted { get; set; }
+    public bool? hasAlternativeDeckLimit { get; set; }
+    public bool? hasContentWarning { get; set; }
+    public bool? isAlternative { get; set; }
+    public bool? isFullArt { get; set; }
+    public bool? isFunny { get; set; }
+    public bool? isOnlineOnly { get; set; }
+    public bool? isOversized { get; set; }
+    public bool? isPromo { get; set; }
+    public bool? isRebalanced { get; set; }
+    public bool? isReprint { get; set; }
+    public bool? isReserved { get; set; }
+    public bool? isStarter { get; set; }
+    public bool? isStorySpotlight { get; set; }
+    public bool? isTextless { get; set; }
+    public bool? isTimeshifted { get; set; }
     public string? keywords { get; set; }
     public string? layout { get; set; }
-    public short? life { get; set; }
     public string? loyalty { get; set; }
     public string? manaCost { get; set; }
-    public short? manaValue { get; set; }
+    public decimal? manaValue { get; set; }
     public string? mtgjsonV4Id { get; set; }
     public int? mtgoFoilId { get; set; }
     public int? mtgoId { get; set; }

@@ -6,9 +6,6 @@ public sealed class MtgMappingProfile: Profile
 {
     public MtgMappingProfile()
     {
-        CreateMap<MtgCardExcelData, MagicCard>()
-            .IgnoreAllPropertiesWithAnInaccessibleSetter()
-            .ReverseMap();
     }
 }
 

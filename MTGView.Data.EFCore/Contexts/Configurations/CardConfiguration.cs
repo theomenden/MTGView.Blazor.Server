@@ -11,8 +11,9 @@ namespace MTGView.Data.EFCore.Contexts.Configurations
         {
             entity.ToTable("Cards", "MTG");
 
-            entity.HasIndex(e => e.uuid, "IX_Cards_UUID");
-
+            entity.HasIndex(e => e.setCode, "IX_Cards_SetCode")
+                .IncludeProperties(e => new { e.colorIdentity, e.scryfallId, e.manaCost });
+                
             entity.Property(e => e.id).ValueGeneratedNever();
 
             entity.Property(e => e.artist)
@@ -82,6 +83,9 @@ namespace MTGView.Data.EFCore.Contexts.Configurations
             entity.Property(e => e.manaCost)
                 .HasMaxLength(330)
                 .IsUnicode(false);
+
+            entity.Property(e => e.manaValue)
+                .HasColumnType("decimal(5,2)");
 
             entity.Property(e => e.mtgjsonV4Id)
                 .HasMaxLength(390)

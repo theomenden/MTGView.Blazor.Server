@@ -4,6 +4,7 @@ using MTGView.Data.EFCore.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTGView.Data.EFCore.Migrations
 {
     [DbContext(typeof(MagicthegatheringDbContext))]
-    partial class MagicthegatheringDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220422043742_RemoveLifeFromMagicCard")]
+    partial class RemoveLifeFromMagicCard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

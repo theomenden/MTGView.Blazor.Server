@@ -4,6 +4,7 @@ using MTGView.Data.EFCore.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTGView.Data.EFCore.Migrations
 {
     [DbContext(typeof(MagicthegatheringDbContext))]
-    partial class MagicthegatheringDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220422035716_UpdateIndiciesAndCardModels")]
+    partial class UpdateIndiciesAndCardModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,6 +189,9 @@ namespace MTGView.Data.EFCore.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(90)");
 
+                    b.Property<int?>("life")
+                        .HasColumnType("int");
+
                     b.Property<string>("loyalty")
                         .HasMaxLength(10)
                         .IsUnicode(false)
@@ -197,8 +202,8 @@ namespace MTGView.Data.EFCore.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(330)");
 
-                    b.Property<decimal?>("manaValue")
-                        .HasColumnType("decimal(5,2)");
+                    b.Property<int?>("manaValue")
+                        .HasColumnType("int");
 
                     b.Property<string>("mtgjsonV4Id")
                         .HasMaxLength(390)
