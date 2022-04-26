@@ -17,27 +17,27 @@ namespace MTGView.Blazor.Server.Pages
 
         [Inject] public SetInformationRepository SetInformationRepository { get; init; }
 
-        private IEnumerable<MagicCard> _magicCards = new List<MagicCard>(30_000);
+        private IEnumerable<MagicCard> _magicCards = new List<MagicCard>(70_000);
 
-        private Int32 _magicCardCount = 0;
+        private Int32 _magicCardCount;
 
         private MagicCard? _selectedCard;
 
-        private Regex _regex = new(@"\{.\}", RegexOptions.IgnoreCase);
+        private readonly Lazy<Regex> _regex = new(() => new(@"\{.\}", RegexOptions.IgnoreCase));
 
-        private async Task<IEnumerable<MagicCard>> LoadCards(MagicthegatheringDbContext context, CancellationToken cancellationToken)
+        private static Task<List<MagicCard>> LoadCards(MagicthegatheringDbContext context, DataGridReadDataEventArgs<MagicCard> eventArgs)
         {
-            var cards = await context.Cards
-                .OrderBy(c => c.id)
-                .ThenBy(c => c.index)
-                .AsQueryable()
-                .ToListAsync(cancellationToken);
+            var cards = context.Cards
+                .DynamicFilter(eventArgs)
+                .DynamicSort(eventArgs)
+                .Paging(eventArgs)
+                .ToListAsync();
 
             return cards;
         }
 
-        private async Task<Int32> GetCardCount(MagicthegatheringDbContext context,
-            CancellationToken cancellationToken = default) => await context.Cards.CountAsync(cancellationToken);
+        private static Task<Int32> GetCardCount(MagicthegatheringDbContext context,
+            CancellationToken cancellationToken = default) => context.Cards.CountAsync(cancellationToken);
 
         private async Task OnReadData(DataGridReadDataEventArgs<MagicCard> e)
         {
@@ -49,12 +49,7 @@ namespace MTGView.Blazor.Server.Pages
 
                 if (!e.CancellationToken.IsCancellationRequested)
                 {
-                    _magicCards = await LoadCards(context, e.CancellationToken);
-
-                    _magicCards = _magicCards
-                        .DynamicFilter(e)
-                        .DynamicSort(e)
-                        .Paging(e);
+                    _magicCards = await LoadCards(context, e);
 
                     foreach (var magicCard in _magicCards)
                     {
@@ -69,9 +64,9 @@ namespace MTGView.Blazor.Server.Pages
                         await AddVisibleSetSymbols(magicCard);
 
                         await AddManaCostVisibleSymbols(magicCard);
-                    }
 
-                    StateHasChanged();
+                        await InvokeAsync(StateHasChanged);
+                    }
                 }
             }
         }
@@ -79,7 +74,9 @@ namespace MTGView.Blazor.Server.Pages
         //THINDAL Provided Guidance :) 4/17/2022
         private async Task AddManaCostVisibleSymbols(MagicCard magicCard)
         {
-            var matches = _regex.Matches(magicCard.manaCost)
+            var regex = _regex.Value;
+
+            var matches = regex.Matches(magicCard.manaCost ?? String.Empty)
                 .SelectMany(match => match.Groups.Values);
 
             foreach (var match in matches)
@@ -92,9 +89,10 @@ namespace MTGView.Blazor.Server.Pages
 
         private async Task AddVisibleSetSymbols(MagicCard magicCard)
         {
-            var symbolToAdd = await SetInformationRepository.GetBySetCode(magicCard.setCode);
+            var symbolToAdd = await SetInformationRepository.GetBySetCode(magicCard.setCode ?? String.Empty);
 
             magicCard.ScryfallSetIconUri = symbolToAdd?.IconUri ?? String.Empty;
+
         }
     }
 }

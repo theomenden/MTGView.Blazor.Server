@@ -19,7 +19,9 @@
                       TextField="item => item.name"
                       Mode="ListGroupMode.Selectable"
                       MaxHeight="1000px"
-                      @bind-SelectedItem="@_selectedMagicCard">
+                      @bind-SelectedItem="@_selectedMagicCard"
+                      Flush
+                      >
             </ListView>
         </Column>
         <Column ColumnSize="ColumnSize.IsThird">
@@ -44,7 +46,7 @@
 
                                     var magicCardImages = String.Join(',', magicCard?.ScryfallImagesAsSizes.ToList() ?? new List<string> { magicCard?.ScryfallImageUri ?? String.Empty });
 
-                                    <Tooltip Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
+                                    <Tooltip Placement="TooltipPlacement.BottomEnd" Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
                                         <CardBody Flex="Flex.InlineFlex.JustifyContent.Between.Grow.Is1">
                                             <Paragraph TextColor="TextColor.Light">Name: @context.name</Paragraph>
                                             <Paragraph TextColor="TextColor.Light" Margin="Margin.Is1.OnX.OnDesktop.Is2.OnX.OnMobile">Mana Cost: @context.manaCost</Paragraph>

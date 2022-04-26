@@ -58,7 +58,6 @@ namespace MTGView.Blazor.Server.Components
 
             await LoadMagicCardsForSet();
 
-            StateHasChanged();
         }
 
         private async Task LoadMagicCardsForSet()
@@ -78,6 +77,8 @@ namespace MTGView.Blazor.Server.Components
                 card.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
 
                 _magicCards.Add(card);
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 

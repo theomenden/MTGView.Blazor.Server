@@ -1,7 +1,5 @@
-﻿using MTGView.Data.Scryfall.Models;
-using MTGView.Data.Scryfall.Services;
+﻿namespace MTGView.Blazor.Server.Pages;
 
-namespace MTGView.Blazor.Server.Pages;
 public partial class GameSymbols: ComponentBase
 {
     [Inject] public IScryfallSymbologyService ScryfallSymbologyService { get; init; }
