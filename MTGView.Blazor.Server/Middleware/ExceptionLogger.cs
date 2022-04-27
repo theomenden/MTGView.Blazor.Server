@@ -69,21 +69,4 @@ public class ExceptionLogger
         await context.Response.WriteAsync(result);
         context.Response.Redirect("/appError");
     }
-
-    private static string GetInnermostExceptionMessage(Exception exception)
-    {
-        var exceptionToCheck = exception;
-
-        while (exceptionToCheck.InnerException is not null)
-        {
-            if (exception.InnerException is null)
-            {
-                break;
-            }
-
-            exceptionToCheck = exceptionToCheck.InnerException;
-        }
-
-        return exceptionToCheck.Message;
-    }
 }

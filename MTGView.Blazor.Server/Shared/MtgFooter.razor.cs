@@ -1,4 +1,7 @@
-﻿namespace MTGView.Blazor.Server.Shared;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Components.Authorization;
+
+namespace MTGView.Blazor.Server.Shared;
 
 public partial class MtgFooter : ComponentBase
 {

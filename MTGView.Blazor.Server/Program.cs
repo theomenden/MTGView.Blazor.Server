@@ -7,6 +7,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithThreadId()
     .Enrich.WithProcessName()
     .Enrich.WithEnvironmentUserName()
+    .Enrich.WithMemoryUsage()
     .WriteTo.Async(a =>
     {
         a.File("./logs/log-.txt", rollingInterval: RollingInterval.Day);
@@ -102,7 +103,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal("An error occured before {appName} could launch: {@ex}", nameof(MTGView), ex);
+    Log.Fatal("An error occurred before {AppName} could launch: {@Ex}", nameof(MTGView), ex);
 }
 finally
 {

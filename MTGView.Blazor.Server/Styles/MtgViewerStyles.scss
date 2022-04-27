@@ -85,3 +85,34 @@ a, .btn-link {
     border-radius: 10px;
 }
 /*End Scrollbar */
+
+/*Pagination Styling*/
+ul.pagination {
+    border-radius: 25px;
+}
+
+ul.pagination a:hover {
+    color: whitesmoke;
+    background-color: rebeccapurple;
+}
+
+ul.pagination a .previous-page-button {
+    color: #dc3545;
+}
+
+ul.pagination a .previous-page-button:hover {
+    color: whitesmoke;
+}
+
+ul.pagination a {
+    color: #198754;
+    background-color: black;
+}
+
+li.page-item-disabled a {
+    background-color: black;
+}
+
+.page-item.disabled .page-link {
+    background-color: black;
+}

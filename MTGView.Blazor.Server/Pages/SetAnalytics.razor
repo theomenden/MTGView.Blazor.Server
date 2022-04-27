@@ -13,16 +13,17 @@
 </Jumbotron>
 <Container Fluid
            Margin="Margin.Is3.OnAll.OnWidescreen.Is4.OnAll.OnMobile">
-    <Row>
+    <Row Margin="Margin.Is2.OnX.OnWidescreen.Is4.OnX.OnMobile">
         <Card Background="Background.Dark" Border="Border.Is2.Rounded.Light.OnAll">
             <CardBody>
                 <Column ColumnSize="ColumnSize.IsHalf" Flex="Flex.Grow.Is1.Row.JustifyContent.Around">
                     <Autocomplete TItem="MagicSet"
-                                  TValue="string"
+                                  TValue="String"
                                   Data="@_magicSets"
-                                  TextField="@((item) => item.name)"
-                                  ValueField="@((item) => item.code)"
-                                  @bind-SelectedValue="@_selectedSetValue"
+                                  TextField="@(item => item.name)"
+                                  ValueField="@(item => item.code)"
+                                  SelectedValue="_selectedSetValue"
+                                  SelectedValueChanged="OnSelectedValueChanged"
                                   @bind-SelectedText="selectedAutoCompleteText"
                                   Placeholder="Search for a Set to Analyze"
                                   Filter="AutocompleteFilter.StartsWith"
@@ -42,7 +43,7 @@
                 </Column>
             </CardBody>
             <CardBody>
-                <Column Flex="Flex.Grow.Is1.Row.JustifyContent.Around">
+                <Column Flex="Flex.Grow.Is1.Row.JustifyContent.Between">
                     <Field Horizontal Background="Background.Dark" TextColor="TextColor.Light" Margin="Margin.Is1.OnY.OnWidescreen.Is3.OnY.OnDesktop">
                         <FieldBody ColumnSize="ColumnSize.IsHalf">
                             <Paragraph Margin="Margin.Is2.OnX.OnWidescreen.Is3.OnX.OnMobile">
@@ -62,59 +63,55 @@
     @{
         var chosenSet = _magicSets?.FirstOrDefault(x => x.code.Equals(_selectedSetValue));
     }
-    <Row>
-        <Column ColumnSize="ColumnSize.IsThird">
-            <Card Background="Background.Dark" TextColor="TextColor.Light">
-                <CardHeader>
-                    Color Distribution for @chosenSet?.name
-                </CardHeader>
-                <CardBody>
-                    <BarChart @ref="@_barChart" TItem="ColorAnalyticsBySet" Options="@_barChartOptions" />
-                </CardBody>
-                <CardFooter>
-                    <Paragraph>
+    <Row Margin="Margin.Is2.OnY.OnWidescreen.Is4.OnY.OnMobile">
+        <CardDeck Height="Height.Is100">
+            <Column ColumnSize="ColumnSize.IsThird">
+                <Card Background="Background.Dark" TextColor="TextColor.Light" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+                    <CardHeader>
+                        Color Distribution for @chosenSet?.name
+                    </CardHeader>
+                    <CardBody>
+                        <BarChart @ref="@_barChart" TItem="ColorAnalyticsBySet" Options="@_barChartOptions" />
+                    </CardBody>
+                    <CardFooter>
+                        <Paragraph>
+                            Distributed across @chosenSet?.baseSetSize
+                        </Paragraph>
+                    </CardFooter>
+                </Card>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsThird">
+                <Card Background="Background.Dark" TextColor="TextColor.Light" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default"> 
+                    <CardHeader>
+                        Mana Costs for @chosenSet?.name
+                    </CardHeader>
+                    <CardBody>
+                        <Chart @ref="@_pieChart"
+                               TItem="int"
+                               Options="@_pieChartOptions"
+                               Type="ChartType.Pie" />
+                    </CardBody>
+                    <CardFooter>
                         Distributed across @chosenSet?.baseSetSize
-                    </Paragraph>
-                </CardFooter>
-            </Card>
-        </Column>
-        <Column ColumnSize="ColumnSize.IsThird">
-            <Card Background="Background.Dark" TextColor="TextColor.Light">
-                <CardHeader>
-                    Mana Costs for @chosenSet?.name
-                </CardHeader>
-                <CardBody>
-                </CardBody>
-                <CardFooter>
-                    Distributed across @chosenSet?.baseSetSize
-                </CardFooter>
-            </Card>
-        </Column>
-        <Column ColumnSize="ColumnSize.IsThird">
-            <Card Background="Background.Dark" TextColor="TextColor.Light">
-                <CardHeader>
-                    Keyword effects for @chosenSet?.name
-                </CardHeader>
-                <CardBody>
-                </CardBody>
-                <CardFooter>
-                    Distributed across @chosenSet?.baseSetSize
-                </CardFooter>
-            </Card>
-        </Column>
-    </Row>
-    <Row>
-        <Column ColumnSize="ColumnSize.IsHalf">
-
-        </Column>
-        <Column ColumnSize="ColumnSize.IsHalf">
-
-        </Column>
-    </Row>
-    <Row>
-
-    </Row>
-    <Row>
-
+                    </CardFooter>
+                </Card>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsThird">
+                <Card Background="Background.Dark" TextColor="TextColor.Light" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+                    <CardHeader>
+                        Keyword effects for @chosenSet?.name
+                    </CardHeader>
+                    <CardBody>
+                        <Chart @ref="@_doughnutChart"
+                               TItem="int"
+                               Options="@_doughnutChartOptions"
+                               Type="ChartType.Doughnut" />
+                    </CardBody>
+                    <CardFooter>
+                        Distributed across @chosenSet?.baseSetSize
+                    </CardFooter>
+                </Card>
+            </Column>
+        </CardDeck>
     </Row>
 </Container>

@@ -23,8 +23,13 @@ public partial class SetAnalytics : ComponentBase
 
     private BarChart<ColorAnalyticsBySet> _barChart = new();
 
+    private Chart<Int32> _pieChart = new();
+
+    private Chart<Int32> _doughnutChart = new();
+
     private readonly BarChartOptions _barChartOptions = new()
     {
+        AspectRatio = 1.5,
         Parsing = new ChartParsing
         {
             XAxisKey = "color",
@@ -32,9 +37,30 @@ public partial class SetAnalytics : ComponentBase
         }
     };
 
+    private readonly PieChartOptions _pieChartOptions = new()
+    {
+        AspectRatio = 1.5,
+        Parsing = new ChartParsing
+        {
+            XAxisKey = "convertedmanacost",
+            YAxisKey = "count",
+        }
+    };
 
-    private readonly List<string> _backgroundColors = new List<string> { ChartColor.FromRgba(255, 255, 255, 1.0f), ChartColor.FromRgba(54, 84, 235, 0.66f), ChartColor.FromRgba(160, 84, 177, 0.66f), ChartColor.FromRgba(255, 25, 48, 0.8f), ChartColor.FromRgba(0, 253, 47, 0.82f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
-    private readonly List<string> _borderColors = new List<string> { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
+    private readonly DoughnutChartOptions _doughnutChartOptions = new()
+    {
+        AspectRatio = 1.5,
+        Parsing = new ChartParsing
+        {
+            XAxisKey = "keyword",
+            YAxisKey = "count",
+        }
+    };
+
+    private bool isAlreadyInitialized;
+
+    private readonly List<string> _backgroundColors = new() { ChartColor.FromRgba(255, 255, 255, 1.0f), ChartColor.FromRgba(54, 84, 235, 0.66f), ChartColor.FromRgba(160, 84, 177, 0.66f), ChartColor.FromRgba(255, 25, 48, 0.8f), ChartColor.FromRgba(0, 253, 47, 0.82f), ChartColor.FromRgba(255, 159, 64, 0.2f) };
+    private readonly List<string> _borderColors = new() { ChartColor.FromRgba(255, 99, 132, 1f), ChartColor.FromRgba(54, 162, 235, 1f), ChartColor.FromRgba(255, 206, 86, 1f), ChartColor.FromRgba(75, 192, 192, 1f), ChartColor.FromRgba(153, 102, 255, 1f), ChartColor.FromRgba(255, 159, 64, 1f) };
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,42 +69,77 @@ public partial class SetAnalytics : ComponentBase
         _magicSets = await GetMagicSetsAsync(context).ToListAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await HandleRedraw();
-        }
-    }
-
-    private async IAsyncEnumerable<ColorAnalyticsBySet> GetMagicCardsBySetAsync(MagicthegatheringDbContext context, String setCode, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    private async IAsyncEnumerable<ColorAnalyticsBySet> GetMagicColorGraphDataBySetAsync(MagicthegatheringDbContext context, String setCode, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var initialGroupingQuery = context.Cards
             .Where(c => c.setCode.Equals(setCode))
             .GroupBy(c => c.colorIdentity)
-            .Select(c => new { c.Key, Subtotal = c.Count() });
+            .Select(c => new { c.Key, Subtotal = c.Count() })
+            .AsAsyncEnumerable();
 
         await foreach (var colorGroup in initialGroupingQuery
-                           .AsAsyncEnumerable()
-                           .Select(c => new ColorAnalyticsBySet
-                           {
-                               Color = DetermineColorIdentity(c.Key),
-                               Count = c.Subtotal
-                           })
+                           .Select(c => new ColorAnalyticsBySet(
+                               DetermineColorIdentity(c.Key),
+                               c.Subtotal
+                           ))
                            .GroupBy(c => c.Color)
-                           .Select(async (grouping) => new ColorAnalyticsBySet
-                           {
-                               Color = grouping.Key,
-                               Count = await grouping.SumAsync(c => c.Count, cancellationToken)
-                           })
-                           .WithCancellation(cancellationToken))
+                           .SelectAwait(async grouping => new ColorAnalyticsBySet
+                           (
+                               grouping.Key,
+                               await grouping.SumAsync(c => c.Count, cancellationToken)
+                           )).WithCancellation(cancellationToken))
         {
-            yield return await colorGroup;
+            yield return colorGroup;
         }
+
         StateHasChanged();
     }
 
-    private async IAsyncEnumerable<MagicSet> GetMagicSetsAsync(MagicthegatheringDbContext context,
+    private async IAsyncEnumerable<ConvertedManaCostAnalyticsBySet> GetMagicManaCostDataBySetAsync(MagicthegatheringDbContext context, String setCode,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var initialGroupingQuery = context.Cards
+            .Where(c => c.setCode.Equals(setCode))
+            .GroupBy(c => c.manaValue)
+            .Select(c => new { c.Key, Subtotal = c.Count() })
+            .AsAsyncEnumerable();
+
+        await foreach (var convertedManaCostGroup in initialGroupingQuery
+                           .Select(c => new ConvertedManaCostAnalyticsBySet
+                           (
+                               c.Key?.ToString() ?? String.Empty,
+                               c.Subtotal
+                           )).WithCancellation(cancellationToken))
+        {
+            yield return convertedManaCostGroup;
+        }
+
+        StateHasChanged();
+    }
+
+    private async IAsyncEnumerable<KeywordAnalyticsBySet> GetKeywordDataBySetAsync(MagicthegatheringDbContext context, String setCode,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var initialGroupingQuery = context.Cards
+            .Where(c => c.keywords != null && c.setCode.Equals(setCode))
+            .GroupBy(c => c.keywords)
+            .Select(c => new { c.Key, Subtotal = c.Count() })
+            .AsAsyncEnumerable();
+
+        await foreach (var convertedManaCostGroup in initialGroupingQuery
+                           .Select(c => new KeywordAnalyticsBySet
+                           (
+                               c.Key?.ToString() ?? String.Empty,
+                               c.Subtotal
+                           )).WithCancellation(cancellationToken))
+        {
+            yield return convertedManaCostGroup;
+        }
+
+        StateHasChanged();
+    }
+
+    private static async IAsyncEnumerable<MagicSet> GetMagicSetsAsync(MagicthegatheringDbContext context,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
 
@@ -92,15 +153,15 @@ public partial class SetAnalytics : ComponentBase
         }
     }
 
-    private async Task HandleRedraw()
+    private async Task HandleBarChartRedraw()
     {
         await using var context = await DbContextFactory.CreateDbContextAsync();
 
         var labels = Enum.GetNames(typeof(MtgColors));
 
-        var setToResearch = String.IsNullOrWhiteSpace(_selectedSetValue) ? "ODY" : _selectedSetValue;
+        var setToResearch = _selectedSetValue;
 
-        var chartData = await GetMagicCardsBySetAsync(context, setToResearch).ToListAsync();
+        var chartData = await GetMagicColorGraphDataBySetAsync(context, setToResearch).ToListAsync();
 
         var dataSet = new BarChartDataset<ColorAnalyticsBySet>
         {
@@ -113,9 +174,76 @@ public partial class SetAnalytics : ComponentBase
         await _barChart.Clear();
 
         await _barChart.AddLabelsDatasetsAndUpdate(labels, dataSet);
+
+        StateHasChanged();
     }
 
-    private String DetermineColorIdentity(string setBasedIndicator)
+    private async Task HandlePieChartRedraw()
+    {
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        var chartData = await GetMagicManaCostDataBySetAsync(context, _selectedSetValue).ToListAsync();
+
+        var labels = chartData.DistinctBy(c => c.ConvertedManaCost)
+            .Select(c => c.ConvertedManaCost.ToString());
+
+        var dataSet = new PieChartDataset<Int32>
+        {
+            Label = "CMC Distributions",
+            Data = chartData.Select(c => c.Count).ToList(),
+            BorderColor = _borderColors,
+            BackgroundColor = _backgroundColors,
+            BorderRadius = 1
+        };
+
+        await _pieChart.Clear();
+
+        await _pieChart.AddLabelsDatasetsAndUpdate(labels.ToList(), dataSet);
+
+        StateHasChanged();
+    }
+
+    private async Task HandleDoughnutChartRedraw()
+    {
+        await using var context = await DbContextFactory.CreateDbContextAsync();
+
+        var chartData = await GetKeywordDataBySetAsync(context, _selectedSetValue).ToListAsync();
+
+        var labels = chartData.DistinctBy(c => c.Keyword)
+            .Select(c =>  c.Keyword);
+
+        var dataSet = new DoughnutChartDataset<Int32>
+        {
+            Label = "Keyword Distributions",
+            Data = chartData.Select(c => c.Count).ToList(),
+            BorderColor = _borderColors,
+            BackgroundColor = _backgroundColors,
+            BorderRadius = 1
+        };
+
+        await _doughnutChart.Clear();
+
+        await _doughnutChart.AddLabelsDatasetsAndUpdate(labels.ToList(), dataSet);
+
+        StateHasChanged();
+    }
+
+    private async Task<string> OnSelectedValueChanged(object? value)
+    {
+        _selectedSetValue = value?.ToString() ?? String.Empty;
+
+        await HandleBarChartRedraw();
+
+        await HandlePieChartRedraw();
+
+        await HandleDoughnutChartRedraw();
+
+        await InvokeAsync(StateHasChanged);
+
+        return _selectedSetValue;
+    }
+
+    private static String DetermineColorIdentity(string setBasedIndicator)
     {
         if (String.IsNullOrWhiteSpace(setBasedIndicator))
         {

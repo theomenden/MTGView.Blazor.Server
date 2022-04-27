@@ -12,6 +12,7 @@
               TotalItems="_magicCardCount"
               ReadData="OnReadData"
               Data="_magicCards"
+              CommandMode="DataGridCommandMode.Commands"
               ShowPager
               PageSize="25"
               PageSizes="new Int32[] { 10, 25, 50, 100, 200 }"
@@ -22,10 +23,11 @@
               FixedHeader
               FixedHeaderDataGridHeight="1000px"
               FixedHeaderDataGridMaxHeight="100vh"
-              HeaderThemeContrast="ThemeContrast.Light"
+              HeaderThemeContrast="ThemeContrast.Dark"
               Striped
               Sortable
               Filterable
+              FilterMethod="DataGridFilterMethod.Contains"
               DetailRowTrigger="@((e) => e.Item.id == _selectedCard?.id)">
         <EmptyTemplate>
             <Paragraph>
@@ -38,13 +40,24 @@
                 <Paragraph TextColor="TextColor.Danger">Loading Magic Cards from Database</Paragraph>
             </Span>
         </LoadingTemplate>
-        <DataGridAggregates>
-
-        </DataGridAggregates>
+        <EmptyFilterTemplate>
+            <Paragraph Background="Background.Dark" TextColor="TextColor.Danger" Italic>Couldn't find the cards based off of your filter</Paragraph>
+        </EmptyFilterTemplate>
         <DataGridColumns>
-            <DataGridCommandColumn />
-            <DataGridNumericColumn Field="@nameof(MagicCard.id)" Caption="Database Id" Sortable />
-            <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name">
+            <DataGridCommandColumn>
+                <ClearFilterCommandTemplate>
+                    <Button Color="Color.Warning"
+                            TextTransform="TextTransform.Capitalize"
+                            TextWeight="TextWeight.Bold"
+                            TextColor="TextColor.Dark"
+                            Border="Border.Is2.Rounded.Light.OnAll"
+                            Clicked="@context.Clicked">
+                        @context.LocalizationString
+                    </Button>
+                </ClearFilterCommandTemplate>
+            </DataGridCommandColumn>
+            <DataGridNumericColumn Field="@nameof(MagicCard.id)" Caption="Database Id" HeaderCellClass="bg-dark" Sortable />
+            <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark">
                 <DisplayTemplate>
                     @{
                         var magicCard = context as MagicCard;
@@ -58,39 +71,43 @@
                     }
                 </DisplayTemplate>
             </DataGridColumn>
-            <DataGridColumn Field="@nameof(MagicCard.manaCost)" Caption="Mana Cost" Sortable Filterable>
+            <DataGridColumn Field="@nameof(MagicCard.manaCost)" Caption="Mana Cost" HeaderCellClass="bg-dark" Sortable Filterable>
                 <DisplayTemplate>
                     <Repeater TItem="string" Items="context.ManaCostSvgUris" Context="manaCostContext">
                         <Image Source="@manaCostContext" Text="@context.manaCost" Style="height: 32px; width: 32px;" />
                     </Repeater>
                 </DisplayTemplate>
             </DataGridColumn>
-            <DataGridColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" Sortable Filterable>
+            <DataGridColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" HeaderCellClass="bg-dark" Sortable Filterable>
                 <DisplayTemplate>
-                    <Image Source="@context.ScryfallSetIconUri" Style="height: 32px; width: 32px;" Text="@context.setCode" Class="lazyload" Background="Background.Secondary"/>
+                    <Image Source="@context.ScryfallSetIconUri" Style="height: 32px; width: 32px;" Text="@context.setCode" Class="lazyload" Background="Background.Secondary" />
                 </DisplayTemplate>
             </DataGridColumn>
         </DataGridColumns>
         <PageButtonTemplate>
-            <Span TextColor="TextColor.Success">
+            <Div TextColor="@(context.Active ? TextColor.White50 : TextColor.Light)" Class="text-decoration-underline">
                 @context.PageNumer
-            </Span>
+            </Div>
         </PageButtonTemplate>
         <FirstPageButtonTemplate>
-            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepBackward" TextColor="TextColor.Success" />
-            First
+            <Div Class="previous-page-button">
+                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepBackward"/>
+                First
+            </Div>
         </FirstPageButtonTemplate>
         <LastPageButtonTemplate>
-            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepForward" TextColor="TextColor.Success" />
-            Last
+                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepForward"/>
+                Last
         </LastPageButtonTemplate>
         <NextPageButtonTemplate>
-            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Forward" TextColor="TextColor.Success" />
-            Next
+                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Forward"/>
+                Next
         </NextPageButtonTemplate>
         <PreviousPageButtonTemplate>
-            <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Backward" TextColor="TextColor.Success" />
-            Previous
+            <Div Class="previous-page-button">
+                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Backward"/>
+                Previous
+            </Div>
         </PreviousPageButtonTemplate>
         <TotalItemsTemplate><Badge Color="Color.Success">@context.TotalItems total items</Badge></TotalItemsTemplate>
         <ItemsPerPageTemplate></ItemsPerPageTemplate>
