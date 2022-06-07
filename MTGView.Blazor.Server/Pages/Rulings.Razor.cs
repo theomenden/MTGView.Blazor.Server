@@ -16,29 +16,23 @@ public partial class Rulings : ComponentBase
     private Int32 _rulingsCount = 0;
 
     private DataGrid<Ruling> _dataGrid = new();
-
-    private VirtualizeOptions _virtualizeOptions = new()
-    {
-        DataGridMaxHeight = "80%",
-        OverscanCount = 15
-    };
-
+    
     public int CurrentPage { get; set; } = 1;
 
-    private async IAsyncEnumerable<Ruling> GetRulingsFromDb(Int32 virtualizeOffset, Int32 virtualizeCount, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    protected override async Task OnInitializedAsync()
     {
-        await using var mtgContext = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await foreach (var ruling in mtgContext.Rulings
-                           .AsAsyncEnumerable()
-                           .Skip(virtualizeOffset)
-                           .Take(virtualizeCount)
-                           .OrderBy(r => r.Index)
-                           .ThenBy(r => r.Id)
-                           .WithCancellation(cancellationToken))
-        {
-            yield return ruling;
-        }
+    }
+
+    private static Task<List<Ruling>> LoadRulings(MagicthegatheringDbContext context, DataGridReadDataEventArgs<Ruling> eventArgs)
+    {
+        var cards = context.Rulings
+            .DynamicFilter(eventArgs)
+            .DynamicSort(eventArgs)
+            .Paging(eventArgs)
+            .ToListAsync(eventArgs.CancellationToken);
+
+        return cards;
     }
 
     private async Task<Int32> GetTotalRulingsFromDb(CancellationToken cancellationToken = default) 
@@ -50,13 +44,13 @@ public partial class Rulings : ComponentBase
 
     private async Task OnReadData(DataGridReadDataEventArgs<Ruling> e)
     {
+        await using var context = await DbContextFactory.CreateDbContextAsync(e.CancellationToken);
+
         if (!e.CancellationToken.IsCancellationRequested)
         {
-            var rulings = GetRulingsFromDb(e.VirtualizeOffset, e.VirtualizeCount);
-
             if (!e.CancellationToken.IsCancellationRequested)
             {
-                _rulings = await rulings.ToListAsync(e.CancellationToken);
+                _rulings = await LoadRulings(context, e);
 
                 _rulingsCount = await GetTotalRulingsFromDb(e.CancellationToken);
             }

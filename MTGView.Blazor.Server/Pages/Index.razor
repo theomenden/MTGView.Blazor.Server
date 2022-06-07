@@ -1,71 +1,88 @@
 ﻿@page "/"
-@using MTGView.Data.Scryfall.Services
-@using MTGView.Core.Enums
-@using MTGView.Blazor.Server.Data
-
 <PageTitle>Home</PageTitle>
-
-@if (_sets is null || !_sets.Any())
-{
-    <Span>
-        Loading Sets
-        <SpinKit Type="SpinKitType.Grid" Color="#CC0000" Centered Size="4em" />
-    </Span>
-}
-else
-{
-    <CardDeck Flex="Flex.Row.JustifyContent.Between.Grow.Is1">
-        <Repeater TItem="ScryfallSetDetails" Items="_sets">
-            <Card 
-                Background="Background.Dark" 
-                TextColor="TextColor.Light" 
-                Margin="Margin.Is3.OnY.OnWidescreen.Is4.OnY.OnMobile" 
-                Padding="Padding.Is2.OnAll.OnWidescreen.Is3.OnAll.OnWidescreen"
-                Border="Border.Is2.Rounded.Light.OnAll"
-                Height="Height.Is100">
-                <CardHeader Background="Background.Light" TextAlignment="TextAlignment.Center">
-                    <img data-src="@context.IconUri" data-sizes="auto" height="64px" width="64px" alt="@context.Name" class="lazyload" />
-                </CardHeader>
-                <CardBody TextAlignment="TextAlignment.Center">
-                    <Paragraph>Set Name: @context.Name</Paragraph>
-                    @if (!String.IsNullOrWhiteSpace(context.Block))
-                    {
-                        <Paragraph>Block: @context.Block Code: @context?.BlockCode</Paragraph>
-                    }
-                    <Paragraph>Release Date: @context.ReleasedAt.ToString("d")</Paragraph>
-                    <Paragraph>Cards in Set: @context.CardsInSet</Paragraph>
-                </CardBody>
-                <CardFooter>
-                    @context.Id
-                </CardFooter>
-            </Card>
-        </Repeater>
-    </CardDeck>
-}
-
-@code
-{
-    [Inject] public IScryfallSetInformationService SetInformationService { get; init; }
-
-    [Inject] public SetInformationRepository SetInformationRepository { get; set; } = null!;
-
-    private IEnumerable<ScryfallSetDetails> _sets = new List<ScryfallSetDetails>(200);
-
-    protected override async Task OnInitializedAsync()
-    {
-        var apiSetResponse = await SetInformationService.GetAllSetsAsync();
-
-        if (apiSetResponse.Outcome.OperationResult is OperationResult.Success)
-        {
-            _sets = apiSetResponse.Data.ToList();
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender && (_sets is not null || _sets.Any()))
-        {
-            await SetInformationRepository.CreateOrUpdateMany(_sets);
-        }
-    }
-}
+<Container Fluid Margin="Margin.Is2.OnY.OnFullHD.Is3.OnX.OnFullHD">
+    <Row Flex="Flex.AlignItems.Center">
+        <Column ColumnSize="ColumnSize.IsHalf">
+            @if (_magicCard is null)
+            {
+                <Span>
+                    <SpinKit Type="SpinKitType.Plane" Centered Color="#AF00BF" />
+                </Span>
+            }
+            else
+            {
+                <Card 
+                    Background="Background.Dark" 
+                    TextColor="TextColor.Light" 
+                    Border="Border.Is2.Rounded.Light.OnAll"
+                    Shadow="Shadow.Default"
+                    Flex="Flex.AlignItems.Center">
+                    <CardHeader>
+                        Random Card
+                    </CardHeader>
+                    <CardBody>
+                        <CardImage 
+                            Source="@_magicCard.ScryfallImageUri" 
+                            Alt="@_magicCard.artist"
+                            Margin="Margin.Is2.OnX"
+                            Style="height:30em;width:auto;" 
+                            Border="Border.Is1.Rounded.Light.OnAll"/>
+                        <CardTitle>
+                            @_magicCard.name
+                        </CardTitle>
+                        <CardSubtitle>
+                            <Paragraph>Artwork by: @_magicCard.artist</Paragraph> 
+                            <Paragraph>Set: @((MarkupString)_setName)</Paragraph>
+                        </CardSubtitle>
+                    </CardBody>
+                    <CardBody>
+                        @(_magicCard.flavorText ?? _magicCard.text)
+                    </CardBody>
+                    <CardFooter>
+                        @_magicCard.colorIdentity
+                    </CardFooter>
+                </Card>
+            }
+        </Column>
+    </Row>
+    <Row Margin="Margin.Is2.FromTop" Flex="Flex.AlignItems.Center">
+        <Column ColumnSize="ColumnSize.IsHalf">
+            <Table Background="Background.Dark" 
+                   Borderless 
+                   Narrow
+                   Responsive 
+                   Resizable 
+                   ResizeMode="TableResizeMode.Columns"
+                   TextAlignment="TextAlignment.Center"
+                   Border="Border.Is2.Rounded.Light.OnAll"
+                   Shadow="Shadow.Default">
+                <TableHeader ThemeContrast="ThemeContrast.Dark">
+                    <TableRow>
+                        <TableHeaderCell>
+                            Sets Stored
+                        </TableHeaderCell>
+                        <TableHeaderCell>
+                            Symbols Stored
+                        </TableHeaderCell>
+                        <TableHeaderCell>
+                            Cards Stored
+                        </TableHeaderCell>
+                    </TableRow>
+                </TableHeader>
+                <TableBody TextColor="TextColor.Light" TextWeight="TextWeight.Light">
+                    <TableRow>
+                        <TableRowCell>
+                            @_setsStored
+                        </TableRowCell>
+                        <TableRowCell>
+                            @_symbolsStored
+                        </TableRowCell>
+                        <TableRowCell>
+                            @_cardsStored
+                        </TableRowCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+        </Column>
+    </Row>
+</Container>

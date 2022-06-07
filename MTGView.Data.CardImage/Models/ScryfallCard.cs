@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace MTGView.Data.Scryfall.Models;
-
+#nullable disable
 /// <summary>
 /// Parent class for Scryfall Api information - retrives the entire object based off of the scryfall id
 /// </summary>

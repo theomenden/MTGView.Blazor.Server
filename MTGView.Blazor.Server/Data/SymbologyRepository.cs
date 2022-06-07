@@ -33,8 +33,7 @@ public class SymbologyRepository
                 await _db.ScryfallSymbolInformationStore.BulkAdd(symbologyDetails, cancellationToken);
                 return;
             }
-
-
+            
             await _db.ScryfallSymbolInformationStore.BulkPut(symbologyDetails, cancellationToken);
         }
 

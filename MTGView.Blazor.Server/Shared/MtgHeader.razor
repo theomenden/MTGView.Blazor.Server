@@ -1,10 +1,8 @@
 ﻿<Bar Breakpoint="Breakpoint.Desktop"
      Background="Background.Dark"
      ThemeContrast="ThemeContrast.Dark"
-     Position="Position.Relative"
-     Width="Width.Is100"
-     Height="Height.Is100">
-    <BarMenu >
+     Position="Position.Relative">
+    <BarMenu Margin="Margin.Is2.FromStart.OnWidescreen.Is4.FromStart.OnMobile">
         <BarStart>
             <BarItem>
                 <Addons>
@@ -14,7 +12,14 @@
                         </AddonLabel>
                     </Addon>
                     <Addon AddonType="AddonType.Body">
-                        
+                        <SelectList TItem="@CultureInfo"
+                                    TValue="CultureInfo"
+                                    Data="@TextLocalizerService.AvailableCultures"
+                                    TextField="@(item => item.DisplayName)"
+                                    ValueField="@(item => item)"
+                                    SelectedValue="@_selectedCultureName"
+                                    SelectedValueChanged="@SelectedCultureChanged"
+                                    DefaultItemText="@CultureInfo.CurrentCulture.DisplayName" />
                     </Addon>
                 </Addons>
             </BarItem>

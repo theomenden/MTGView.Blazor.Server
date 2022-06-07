@@ -1,5 +1,8 @@
+using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using MTGView.Blazor.Server.Bootstrapping;
 using MTGView.Blazor.Server.Middleware;
+using MTGView.Blazor.Server.UrlHashing;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
@@ -44,7 +47,13 @@ try
         .AddBootstrapIcons()
         .AddBlazoriseRichTextEdit();
 
+    builder.Services.AddLocalization();
+
     builder.Services.AddLazyCache();
+    
+    builder.Services.AddBlazoredLocalStorage();
+
+    builder.Services.AddBlazoredSessionStorage();
 
     builder.Services.AddAutomappingProfiles<Program>();
     builder.Services.AddScoped<IModuleFactory, EsModuleFactory>();
@@ -52,9 +61,11 @@ try
     builder.Services.AddScoped<SetInformationRepository>();
     builder.Services.AddScoped<SymbologyRepository>();
 
+    builder.Services.AddTransient<IUrlHasher, UrlHasher>();
+
     builder.Services.AddResponseCompression(options =>
     {
-        options.MimeTypes = new[] { System.Net.Mime.MediaTypeNames.Application.Octet };
+        options.MimeTypes = new[] { MediaTypeNames.Application.Octet };
     });
 
     builder.Services.AddResponseCaching();

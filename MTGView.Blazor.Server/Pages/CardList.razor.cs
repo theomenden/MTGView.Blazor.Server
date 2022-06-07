@@ -1,7 +1,5 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Blazorise.DataGrid;
-using MTGView.Data.Scryfall.Services;
 
 namespace MTGView.Blazor.Server.Pages
 {
@@ -23,7 +21,7 @@ namespace MTGView.Blazor.Server.Pages
 
         private MagicCard? _selectedCard;
 
-        private readonly Lazy<Regex> _regex = new(() => new(@"\{.\}", RegexOptions.IgnoreCase));
+        private readonly Lazy<Regex> _regex = new(() => new(@"\{.\}", RegexOptions.Compiled | RegexOptions.IgnoreCase));
 
         private static Task<List<MagicCard>> LoadCards(MagicthegatheringDbContext context, DataGridReadDataEventArgs<MagicCard> eventArgs)
         {
@@ -31,7 +29,7 @@ namespace MTGView.Blazor.Server.Pages
                 .DynamicFilter(eventArgs)
                 .DynamicSort(eventArgs)
                 .Paging(eventArgs)
-                .ToListAsync();
+                .ToListAsync(eventArgs.CancellationToken);
 
             return cards;
         }
@@ -57,7 +55,7 @@ namespace MTGView.Blazor.Server.Pages
 
                         var scryfallData = scryfallDataResponse.Data;
 
-                        magicCard.ScryfallImageUri = scryfallData.image_uris.border_crop;
+                        magicCard.ScryfallImageUri = scryfallData.image_uris.BorderCropped;
 
                         magicCard.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
 
@@ -92,7 +90,7 @@ namespace MTGView.Blazor.Server.Pages
             var symbolToAdd = await SetInformationRepository.GetBySetCode(magicCard.setCode ?? String.Empty);
 
             magicCard.ScryfallSetIconUri = symbolToAdd?.IconUri ?? String.Empty;
-
         }
+
     }
 }

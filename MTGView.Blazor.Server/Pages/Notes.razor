@@ -1,0 +1,16 @@
+﻿@page "/notes"
+<Card>
+    <CardBody>
+        <Row>
+            <Column ColumnSize="ColumnSize.IsHalf">
+                <Markdown 
+                    Value="@_markdownValue"
+                    ValueChanged="OnMarkdownValueChanged"
+                          Shortcuts="@(new MarkdownShortcuts { CleanBlock = null, ToggleCodeBlock = "Cmd+E" })" />
+            </Column>
+            <Column ColumnSize="ColumnSize.IsHalf">
+                @(new MarkupString(_markdownHtml ?? String.Empty))
+            </Column>
+        </Row>
+    </CardBody>
+</Card>

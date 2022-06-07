@@ -1,0 +1,38 @@
+﻿@page "/cardDetails"
+@if (_magicCardToReview is null)
+{
+    <Span>
+        <SpinKit Centered Color="#E52B50" Type="SpinKitType.Chase" Size="3em" />
+    </Span>
+}
+else
+{
+    <Card Background="Background.Dark"
+      TextColor="TextColor.Light"
+      Border="Border.Is2.Rounded.Light.OnAll"
+      Margin="Margin.Is2.OnY.OnFullHD.Is3.OnX.OnFullHD.Is4.OnMobile">
+        <CardHeader>
+            <Repeater TItem="string" Items="@_magicCardToReview.ManaCostSvgUris" Context="manaCostContext">
+                <Image Source="@manaCostContext" Text="@_magicCardToReview.manaCost" Style="height: 32px; width: 32px;" />
+            </Repeater>
+        </CardHeader>
+        <CardImage Source="@_magicCardToReview.ScryfallImageUri" 
+                   Alt="@_magicCardToReview.name" >
+        </CardImage>
+        <CardTitle Size="5">
+            @_magicCardToReview.name
+        </CardTitle>
+        <CardSubtitle>
+            @_magicCardToReview.types
+        </CardSubtitle>
+        <CardBody>
+            <Paragraph>@_magicCardToReview.text</Paragraph>
+        </CardBody>
+        <CardBody>
+            <Paragraph>@_magicCardToReview.flavorText</Paragraph>
+        </CardBody>
+        <CardFooter>
+            <Small>Artwork by: @_magicCardToReview.artist</Small>
+        </CardFooter>
+    </Card>
+}

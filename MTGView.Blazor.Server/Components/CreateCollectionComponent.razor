@@ -1,15 +1,43 @@
 ﻿@page "/addCollection"
-<Container Fluid Background="Background.Dark" TextColor="TextColor.Light" Margin="Margin.Is2.OnY.Is3.OnX.OnWidescreen.Is3.OnY.Is4.OnX.OnMobile">
-    <Row>
-        <Column ColumnSize="ColumnSize.Is12">
-            <SelectList TItem="MagicSet"
-                        TValue="int"
-                        Data="@_magicSets"
-                        TextField="@(item => item.name)"
-                        ValueField="@(item => item.id)"
-                        SelectedValue="@_selectedSet"
-                        SelectedValueChanged="@OnMagicSetChanged"
-                        DefaultItemText="Choose a Magic Set" />
+<Container Fluid
+           Background="Background.Dark"
+           Border="Border.Is3.Rounded.Light.OnAll"
+           Shadow="Shadow.Large"
+           TextColor="TextColor.Light"
+           Margin="Margin.Is3.OnY.OnWidescreen.Is4.OnY.OnMobile"
+           Padding="Padding.Is2.OnX.OnWidescreen">
+    <Row Padding="Padding.Is2.OnAll.OnWidescreen.Is4.OnAll.OnMobile"
+         Margin="Margin.Is3.OnX.OnWidescreen.Is5.OnX.OnMobile">
+        <Column ColumnSize="ColumnSize.Is12"
+                Margin="Margin.Is2.OnX.OnWidescreen.Is1.OnY.OnWidescreen.Is3.OnAll.OnMobile">
+            <Autocomplete TItem="MagicSet"
+                          TValue="int"
+                          Data="@_magicSets"
+                          TextField="@(item => item.name)"
+                          ValueField="@(item => item.id)"
+                          SelectedValue="_selectedSet"
+                          SelectedValueChanged="OnMagicSetChanged"
+                          @bind-SelectedText="selectedAutoCompleteText"
+                          Placeholder="Search for a Set to Load"
+                          Filter="AutocompleteFilter.StartsWith"
+                          FreeTyping
+                          CustomFilter="@((item, searchValue) => item.name.IndexOf(searchValue, 0, StringComparison.OrdinalIgnoreCase) >= 0)">
+                <NotFoundContent>
+                    <Paragraph Background="Background.Dark" TextColor="TextColor.White50" Italic TextWeight="TextWeight.Light" TextTransform="TextTransform.Capitalize">
+                        Sorry... @context was not found! <Icon Name="IconName.MinusCircle" TextColor="TextColor.Danger" />
+                    </Paragraph>
+                </NotFoundContent>
+                <ItemContent>
+                    <Card Flex="Flex.InlineFlex.JustifyContent.Between.Row" Padding="Padding.Is3.OnX.OnWidescreen.Is4.OnX.OnMobile" Background="Background.Dark">
+                        <CardTitle TextColor="TextColor.Light" TextAlignment="TextAlignment.Start">
+                            <Heading Size="HeadingSize.Is3" Margin="Margin.Is2.FromBottom">@context.Text</Heading>
+                        </CardTitle>
+                        <CardFooter TextColor="TextColor.White50">
+                            <Small Margin="Margin.Is2.FromBottom" Class="fst-italic fw-light">@context.Item.code</Small>
+                        </CardFooter>
+                    </Card>
+                </ItemContent>
+            </Autocomplete>
         </Column>
     </Row>
     <Row>
@@ -20,22 +48,34 @@
                       Mode="ListGroupMode.Selectable"
                       MaxHeight="1000px"
                       @bind-SelectedItem="@_selectedMagicCard"
-                      Flush
-                      >
+                      Flush>
             </ListView>
         </Column>
         <Column ColumnSize="ColumnSize.IsThird">
             <Div Flex="Flex.Column.Grow.Is1.JustifyContent.Center">
-                <Button Type="ButtonType.Button" Clicked="AddMagicCardToCollection" Color="Color.Success" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+                <Button Type="ButtonType.Button"
+                        Clicked="AddMagicCardToCollection"
+                        Color="Color.Success"
+                        Border="Border.Is2.Rounded.Light.OnAll"
+                        Shadow="Shadow.Default"
+                        Margin="Margin.Is2.OnY.OnWidescreen.Is3.OnMobile">
                     <Icon Name="IconName.ArrowRight" TextColor="TextColor.Light" IconSize="IconSize.x5" />
                 </Button>
-                <Button Type="ButtonType.Button" Clicked="RemoveMagicCardFromCollection" Color="Color.Danger" Border="Border.Is2.Rounded.Light.OnAll" Shadow="Shadow.Default">
+                <Button Type="ButtonType.Button"
+                        Clicked="RemoveMagicCardFromCollection"
+                        Color="Color.Danger"
+                        Border="Border.Is2.Rounded.Light.OnAll"
+                        Shadow="Shadow.Default"
+                        Margin="Margin.Is2.OnY.OnWidescreen.Is3.OnMobile">
                     <Icon Name="IconName.ArrowLeft" TextColor="TextColor.Light" IconSize="IconSize.x5" />
                 </Button>
             </Div>
         </Column>
         <Column ColumnSize="ColumnSize.IsThird">
-            <ListGroup Flush Background="Background.Dark" Mode="ListGroupMode.Selectable" @bind-SelectedItem="_selectedPersonalCardName">
+            <ListGroup Flush
+                       Background="Background.Dark"
+                       Mode="ListGroupMode.Selectable"
+                       @bind-SelectedItem="_selectedPersonalCardName">
                 @if (_createdCollection?.CardMappings is not null && _createdCollection.CardMappings.Any())
                 {
                     <Repeater TItem="MagicCard" Items="_personalMagicCards">
@@ -69,7 +109,8 @@
                         Border="Border.Is2.Rounded.Light.OnAll"
                         Shadow="Shadow.Default"
                         Clicked="OnSubmit"
-                        Loading="@_loading">
+                        Loading="@_loading"
+                        Margin="Margin.Is4.OnY.OnWidescreen.Is5.OnY.OnMobile">
                     <LoadingTemplate>
                         <SpinKit Type="SpinKitType.Chase" Centered Color="#fff" Size="3em" />
                     </LoadingTemplate>

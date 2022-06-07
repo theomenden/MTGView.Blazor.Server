@@ -30,7 +30,9 @@
                                   FreeTyping
                                   CustomFilter="@((item, searchValue) => item.name.IndexOf(searchValue, 0, StringComparison.OrdinalIgnoreCase) >= 0)">
                         <NotFoundContent>
-                            Sorry... @context was not found! :(
+                            <Paragraph Background="Background.Dark" TextColor="TextColor.White50" Italic TextWeight="TextWeight.Light" TextTransform="TextTransform.Capitalize">
+                                Sorry... @context was not found! <Icon Name="IconName.MinusCircle" TextColor="TextColor.Danger" />
+                            </Paragraph>
                         </NotFoundContent>
                         <ItemContent>
                             <Div Flex="Flex.InlineFlex.JustifyContent.Between" Width="Width.Is100">

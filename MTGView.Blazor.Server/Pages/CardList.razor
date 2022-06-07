@@ -7,7 +7,7 @@
         (This can be updated by uploading a new json version, or matching with scryfall)
     </JumbotronSubtitle>
 </Jumbotron>
-<Blazorise.Container Fluid Margin="Margin.Is2.OnY.OnWidescreen.Is4.OnY.OnMobile">
+<Container Fluid Margin="Margin.Is2.OnY.OnWidescreen.Is4.OnY.OnMobile">
     <DataGrid TItem="MagicCard"
               TotalItems="_magicCardCount"
               ReadData="OnReadData"
@@ -56,7 +56,19 @@
                     </Button>
                 </ClearFilterCommandTemplate>
             </DataGridCommandColumn>
-            <DataGridNumericColumn Field="@nameof(MagicCard.id)" Caption="Database Id" HeaderCellClass="bg-dark" Sortable />
+            <DataGridColumn Field="@nameof(MagicCard.id)" Caption="Details" HeaderCellClass="bg-dark" Filterable="false">
+                <DisplayTemplate>
+                    <Button
+                        Type="ButtonType.Link"
+                        Color="Color.Primary"
+                        TextWeight="TextWeight.Light"
+                        TextColor="TextColor.White"
+                        Border="Border.Is2.Rounded.Light.OnAll"
+                        To="@($"/cardDetails?cardId={context?.id ?? 0}")">
+                        Details
+                    </Button>
+                </DisplayTemplate>
+                </DataGridColumn>
             <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark">
                 <DisplayTemplate>
                     @{
@@ -112,5 +124,5 @@
         <TotalItemsTemplate><Badge Color="Color.Success">@context.TotalItems total items</Badge></TotalItemsTemplate>
         <ItemsPerPageTemplate></ItemsPerPageTemplate>
     </DataGrid>
-</Blazorise.Container>
+</Container>
 

@@ -1,0 +1,49 @@
+﻿@page "/sets"
+@inject SetInformationRepository SetInformation
+
+@if (!_sets.Any())
+{
+    <Span>
+        <SpinKit Centered Type="SpinKitType.Chase" Color="#000" />
+    </Span>   
+}
+else
+{
+    <CardDeck Flex="Flex.Row.JustifyContent.Between.Grow.Is1">
+        <Repeater TItem="ScryfallSetDetails" Items="_sets">
+            <Card
+                Background="Background.Dark"
+                TextColor="TextColor.Light"
+                Margin="Margin.Is3.OnY.OnWidescreen.Is4.OnY.OnMobile"
+                Padding="Padding.Is2.OnAll.OnWidescreen.Is3.OnAll.OnWidescreen"
+                Border="Border.Is2.Rounded.Light.OnAll"
+                Height="Height.Is100">
+                <CardHeader Background="Background.Light" TextAlignment="TextAlignment.Center">
+                    <img data-src="@context.IconUri" data-sizes="auto" height="64px" width="64px" alt="@context.Name" class="lazyload"/>
+                </CardHeader>
+                <CardBody TextAlignment="TextAlignment.Center">
+                    <Paragraph>Set Name: @context.Name</Paragraph>
+                    @if (!String.IsNullOrWhiteSpace(context.Block))
+                    {
+                        <Paragraph>Block: @context.Block Code: @context?.BlockCode</Paragraph>
+                    }
+                    <Paragraph>Release Date: @context.ReleasedAt.ToString("d")</Paragraph>
+                    <Paragraph>Cards in Set: @context.CardsInSet</Paragraph>
+                </CardBody>
+                <CardFooter>
+                    @context.Id
+                </CardFooter>
+            </Card>
+        </Repeater>
+    </CardDeck>
+}
+@code {
+    private List<ScryfallSetDetails> _sets = new(751);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        _sets = await SetInformation.GetAll();
+
+        StateHasChanged();
+    }
+}

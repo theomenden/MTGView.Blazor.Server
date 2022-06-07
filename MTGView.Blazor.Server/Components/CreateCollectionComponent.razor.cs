@@ -32,6 +32,8 @@ namespace MTGView.Blazor.Server.Components
 
         private string _selectedPersonalCardName;
 
+        private string? selectedAutoCompleteText;
+
         private PersonalCardMapping _personalCollectionMapping;
         
         private PersonalCollection _createdCollection = new();
@@ -64,6 +66,11 @@ namespace MTGView.Blazor.Server.Components
         {
             await using var context = await MagicDbContextFactory.CreateDbContextAsync();
 
+            if (_magicCards.Any())
+            {
+                _magicCards.Clear();
+            }
+
             await foreach (var card in context.Cards
                                .Where(c => c.setCode.Equals(_magicSet.code))
                                .AsAsyncEnumerable())
@@ -72,9 +79,13 @@ namespace MTGView.Blazor.Server.Components
 
                 var scryfallData = scryfallDataResponse.Data;
 
-                card.ScryfallImageUri = scryfallData.image_uris.border_crop;
+                if (scryfallData.image_uris is not null)
+                {
+                    card.ScryfallImageUri = scryfallData.image_uris?.BorderCropped ?? String.Empty;
 
-                card.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
+                    card.ScryfallImagesAsSizes =
+                        scryfallData.image_uris?.GetAllImagesAsSizes() ?? new List<String>(1) { };
+                }
 
                 _magicCards.Add(card);
 
@@ -99,17 +110,16 @@ namespace MTGView.Blazor.Server.Components
         private Task RemoveMagicCardFromCollection()
         {
             _selectedPersonalCard = _magicCards.FirstOrDefault(c => c.name.Equals(_selectedPersonalCardName));
-
+            
             if (_selectedPersonalCard is null)
             {
                 return Task.CompletedTask;
             }
 
-            _createdCollection.CardMappings.Remove(
-                _createdCollection.CardMappings.First(c => c.CardId == _selectedPersonalCard.id)
-            );
+            _createdCollection.CardMappings.Remove(_createdCollection.CardMappings.First(c => c.CardId == _selectedPersonalCard.id));
 
-            _personalMagicCards.Remove(_personalMagicCards.First(c => c.id == _selectedPersonalCard.id));
+            _personalMagicCards.Remove(_personalMagicCards.First(c => c.id == _selectedPersonalCard.id 
+                                                                      && c.setCode.Equals(_selectedPersonalCard.setCode)));
 
             StateHasChanged();
 

@@ -6,7 +6,7 @@ public static class ArrayExtensions
 {
     public static T[] SubArray<T>(this T[] source, Int32 index)
     {
-        return SubArray<T>(source, index, source.Length - index);
+        return SubArray(source, index, source.Length - index);
     }
 
     public static T[] SubArray<T>(this T[] source, Int32 index, Int32 length)

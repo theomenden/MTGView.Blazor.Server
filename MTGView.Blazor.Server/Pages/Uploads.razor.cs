@@ -49,12 +49,12 @@ public partial class Uploads : ComponentBase
         await SanitizeRecordsFromCsv(context, file);
     }
 
-    private void OnWritten(FileWrittenEventArgs e)
+    private static void OnWritten(FileWrittenEventArgs e)
     {
         Console.WriteLine($"File: {e.File.Name} Position: {e.Position} Data: {Convert.ToBase64String(e.Data)}");
     }
 
-    private void OnProgressed(FileProgressedEventArgs e)
+    private static void OnProgressed(FileProgressedEventArgs e)
     {
         Console.WriteLine($"File: {e.File.Name} Progress: {e.Percentage}");
     }
@@ -71,9 +71,7 @@ public partial class Uploads : ComponentBase
 
             csv.Context.RegisterClassMap<MagicCardExcelMap>();
 
-            var deserializedMagicCardStream = csv.EnumerateRecordsAsync<MagicCard>(new ());
-
-            await foreach (var magicCard in deserializedMagicCardStream)
+            await foreach (var magicCard in csv.EnumerateRecordsAsync<MagicCard>(new()))
             {
                 context.Cards.Update(magicCard);
 
@@ -85,33 +83,5 @@ public partial class Uploads : ComponentBase
         {
             Logger.LogError("Exception while trying to parse {file}: {@ex}", csvToRead.Name, ex);
         }
-    }
-
-    private static async Task<T> DeserializeFromStream<T>(Stream stream, CancellationToken cancellationToken = default)
-    {
-        if (stream?.CanRead == false)
-        {
-            return default;
-        }
-
-        var searchResult = await JsonSerializer.DeserializeAsync<T>(stream!, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true }, cancellationToken);
-
-        return searchResult;
-    }
-
-    private static async Task<String> DeserializeStreamToStringAsync(Stream stream)
-    {
-        var content = String.Empty;
-
-        if (stream is null)
-        {
-            return content;
-        }
-
-        using var sr = new StreamReader(stream);
-
-        content = await sr.ReadToEndAsync();
-
-        return content;
     }
 }
