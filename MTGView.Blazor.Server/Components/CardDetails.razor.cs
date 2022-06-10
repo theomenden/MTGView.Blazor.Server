@@ -5,6 +5,7 @@ namespace MTGView.Blazor.Server.Components;
 
 public partial class CardDetails : ComponentBase
 {
+    #region Injected Members
     [Inject] public IDbContextFactory<MagicthegatheringDbContext> MtgContextFactory { get; init; }
 
     [Inject] public IScryfallCardService ScryfallCardService { get; init; }
@@ -14,11 +15,11 @@ public partial class CardDetails : ComponentBase
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
 
     [Inject] public SetInformationRepository SetInformationRepository { get; init; }
-
+    #endregion
     private readonly Lazy<Regex> _regex = new(() => new(@"\{.\}", RegexOptions.Compiled | RegexOptions.IgnoreCase));
     
     private MagicCard? _magicCardToReview;
-    
+    #region Lifecycle Methods
     protected override async Task OnInitializedAsync()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
@@ -31,15 +32,21 @@ public partial class CardDetails : ComponentBase
 
             _magicCardToReview = context.Cards.FirstOrDefault(card => card.id == magicCardId);
         }
-
-        if (_magicCardToReview is not null)
-        {
-            await GetScryfallImageInformation();
-            await AddManaCostVisibleSymbols();
-            await AddVisibleSetSymbols();
-        }
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+                await GetScryfallImageInformation();
+                await AddManaCostVisibleSymbols();
+                await AddVisibleSetSymbols();
+
+                StateHasChanged();
+        }
+    }
+    #endregion
+    #region Private Methods
     private async Task GetScryfallImageInformation()
     {
         var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCardToReview.scryfallId);
@@ -73,6 +80,5 @@ public partial class CardDetails : ComponentBase
 
         _magicCardToReview.ScryfallSetIconUri = symbolToAdd?.IconUri ?? String.Empty;
     }
-
-
+    #endregion
 }

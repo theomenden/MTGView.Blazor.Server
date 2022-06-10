@@ -1,11 +1,18 @@
 ﻿@page "/symbols"
-<Container Fluid>
-    <Tabs RenderMode="TabsRenderMode.LazyReload" 
-          SelectedTab="@selectedTab" 
-          SelectedTabChanged="@OnSelectedTabChanged" 
-          Background="Background.Dark" 
+<Container Fluid
+           Margin="Margin.Is2.OnAll.OnFullHD.Is4.OnAll.OnMobile"
+           Shadow="Shadow.Default"
+           Border="Border.Is2.Rounded.OnAll.Light"
+           Background="Background.Dark"
+           Width="Width.Is50">
+    <Tabs RenderMode="TabsRenderMode.LazyReload"
+          SelectedTab="@selectedTab"
+          SelectedTabChanged="@OnSelectedTabChanged"
+          Background="Background.Dark"
           TextColor="TextColor.Light"
-          Flex="Flex.Row.AlignContent.Between">
+          Flex="Flex.Row.AlignContent.Between"
+          Margin="Margin.Is1.FromTop.OnFullHD.Is3.FromTop.OnMobile"
+          FullWidth>
         <Items>
             <Tab Name="manaCosts" Border="Border.Is1.Rounded.Light.OnAll">Mana Costs</Tab>
             <Tab Name="manaRepresentatives" Border="Border.Is1.Rounded.Light.OnAll">Mana Representations</Tab>
@@ -15,94 +22,189 @@
         </Items>
         <Content>
             <TabPanel Name="manaCosts" Background="Background.Dark" TextColor="TextColor.Light">
-                <ListGroup>
-                    <ListGroupItem Background="Background.Dark" TextColor="TextColor.Light">
-                        <Div Flex="Flex.JustifyContent.Between"  Border="Border.Is2.RoundedBottom.Light.OnBottom" Width="Width.Is100">
-                            <Heading Size="HeadingSize.Is2">Image</Heading>
-                            <Heading Size="HeadingSize.Is2">Text</Heading>
-                            <Heading Size="HeadingSize.Is2">Description</Heading>
-                        </Div>
-                    </ListGroupItem>
-                    <Repeater TItem="SymbologyDatum" Items="@_manaCostSymbols" Context="manaSymbolContext">
-                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
-                            <img data-src="@manaSymbolContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@manaSymbolContext.English" class="lazyload"/>
-                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@manaSymbolContext.Symbol</Heading>
-                            <Small>@manaSymbolContext.English</Small>
-                        </Div>
-                    </Repeater>
-                </ListGroup>
+                <Table Responsive
+                       Narrow
+                       Borderless
+                       Striped
+                       Background="Background.Dark"
+                       TextColor="TextColor.Light">
+                    <TableHeader ThemeContrast="ThemeContrast.Dark" Width="Width.Is100">
+                        <TableRow>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Image</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Text</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Description</Heading>
+                            </TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody Width="Width.Is100">
+                        <Repeater TItem="SymbologyDatum" Items="@_manaCostSymbols" Context="manaSymbolContext">
+                            <TableRow>
+                                <TableRowCell>
+                                    <Image data-src="@manaSymbolContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@manaSymbolContext.English" Class="lazyload" />
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@manaSymbolContext.Symbol</Heading>
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Small TextColor="TextColor.Light">@manaSymbolContext.English</Small>
+                                </TableRowCell>
+                            </TableRow>
+                        </Repeater>
+                    </TableBody>
+                </Table>
             </TabPanel>
             <TabPanel Name="manaRepresentatives" Background="Background.Dark" TextColor="TextColor.Light">
-                <ListGroup>
-                    <ListGroupItem Background="Background.Dark" TextColor="TextColor.Light" Width="Width.Is100">
-                        <Div Flex="Flex.JustifyContent.Between"  Border="Border.Is2.RoundedBottom.Light.OnBottom">
-                            <Heading Size="HeadingSize.Is2">Image</Heading>
-                            <Heading Size="HeadingSize.Is2">Text</Heading>
-                            <Heading Size="HeadingSize.Is2">Description</Heading>
-                        </Div>
-                    </ListGroupItem>
-                    <Repeater TItem="SymbologyDatum" Items="@_manaSymbols" Context="manaRepresentativeContext">
-                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
-                            <img data-src="@manaRepresentativeContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@manaRepresentativeContext.English" class="lazyload"/>
-                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@manaRepresentativeContext.Symbol</Heading>
-                            <Small>@manaRepresentativeContext.English</Small>
-                        </Div>
-                    </Repeater>
-                </ListGroup>
+                <Table Responsive
+                       Narrow
+                       Borderless
+                       Striped
+                       Background="Background.Dark"
+                       TextColor="TextColor.Light">
+                    <TableHeader ThemeContrast="ThemeContrast.Dark" Width="Width.Is100">
+                        <TableRow>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Image</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Text</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Description</Heading>
+                            </TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody Width="Width.Is100">
+                        <Repeater TItem="SymbologyDatum" Items="@_manaSymbols" Context="manaRepresentativeContext">
+                            <TableRow>
+                                <TableRowCell>
+                                    <Image data-src="@manaRepresentativeContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@manaRepresentativeContext.English" Class="lazyload" />
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@manaRepresentativeContext.Symbol</Heading>
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Small TextColor="TextColor.Light">@manaRepresentativeContext.English</Small>
+                                </TableRowCell>
+                            </TableRow>
+                        </Repeater>
+                    </TableBody>
+                </Table>
             </TabPanel>
             <TabPanel Name="transposables" Background="Background.Dark" TextColor="TextColor.Light" Width="Width.Is100">
-                <ListGroup>
-                    <ListGroupItem Background="Background.Dark" TextColor="TextColor.Light">
-                        <Div Flex="Flex.JustifyContent.Between"  Border="Border.Is2.RoundedBottom.Light.OnBottom">
-                            <Heading Size="HeadingSize.Is2">Image</Heading>
-                            <Heading Size="HeadingSize.Is2">Text</Heading>
-                            <Heading Size="HeadingSize.Is2">Description</Heading>
-                        </Div>
-                    </ListGroupItem>
-                    <Repeater TItem="SymbologyDatum" Items="@_transposableSymbols" Context="transposableContext">
-                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
-                            <img data-src="@transposableContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@transposableContext.English" class="lazyload"/>
-                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@transposableContext.Symbol</Heading>
-                            <Small>@transposableContext.English</Small>
-                        </Div>
-                    </Repeater>
-                </ListGroup>
+                <Table Responsive
+                       Narrow
+                       Borderless
+                       Striped
+                       Background="Background.Dark"
+                       TextColor="TextColor.Light">
+                    <TableHeader ThemeContrast="ThemeContrast.Dark" Width="Width.Is100">
+                        <TableRow>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Image</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Text</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Description</Heading>
+                            </TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody Width="Width.Is100">
+                        <Repeater TItem="SymbologyDatum" Items="@_transposableSymbols" Context="transposableContext">
+                            <TableRow>
+                                <TableRowCell>
+                                    <Image data-src="@transposableContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@transposableContext.English" Class="lazyload" />
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@transposableContext.Symbol</Heading>
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Small TextColor="TextColor.Light">@transposableContext.English</Small>
+                                </TableRowCell>
+                            </TableRow>
+                        </Repeater>
+                    </TableBody>
+                </Table>
             </TabPanel>
             <TabPanel Name="funny" Background="Background.Dark" TextColor="TextColor.Light">
-                <ListGroup>
-                    <ListGroupItem Background="Background.Dark" TextColor="TextColor.Light" Width="Width.Is100">
-                        <Div Flex="Flex.JustifyContent.Between"  Border="Border.Is2.RoundedBottom.Light.OnBottom">
-                            <Heading Size="HeadingSize.Is2">Image</Heading>
-                            <Heading Size="HeadingSize.Is2">Text</Heading>
-                            <Heading Size="HeadingSize.Is2">Description</Heading>
-                        </Div>
-                    </ListGroupItem>
-                    <Repeater TItem="SymbologyDatum" Items="@_funnySymbols" Context="funnyContext">
-                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
-                            <img data-src="@funnyContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@funnyContext.English" class="lazyload"/>
-                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@funnyContext.Symbol</Heading>
-                            <Small>@funnyContext.English</Small>
-                        </Div>
-                    </Repeater>
-                </ListGroup>
+                <Table Responsive
+                       Narrow
+                       Borderless
+                       Striped
+                       Background="Background.Dark"
+                       TextColor="TextColor.Light">
+                    <TableHeader ThemeContrast="ThemeContrast.Dark" Width="Width.Is100">
+                        <TableRow>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Image</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Text</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Description</Heading>
+                            </TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody Width="Width.Is100">
+                        <Repeater TItem="SymbologyDatum" Items="@_funnySymbols" Context="funnyContext">
+                            <TableRow>
+                                <TableRowCell>
+                                    <Image data-src="@funnyContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@funnyContext.English" Class="lazyload" />
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@funnyContext.Symbol</Heading>
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Small TextColor="TextColor.Light">@funnyContext.English</Small>
+                                </TableRowCell>
+                            </TableRow>
+                        </Repeater>
+                    </TableBody>
+                </Table>
             </TabPanel>
             <TabPanel Name="other" Background="Background.Dark" TextColor="TextColor.Light">
-                <ListGroup>
-                    <ListGroupItem Background="Background.Dark" TextColor="TextColor.Light">
-                        <Div Flex="Flex.JustifyContent.Between" Border="Border.Is2.RoundedBottom.Light.OnBottom" Width="Width.Is100">
-                            <Heading Size="HeadingSize.Is2">Image</Heading>
-                            <Heading Size="HeadingSize.Is2">Text</Heading>
-                            <Heading Size="HeadingSize.Is2">Description</Heading>
-                        </Div>
-                    </ListGroupItem>
-                    <Repeater TItem="SymbologyDatum" Items="@_otherSymbols" Context="miscContext">
-                        <Div Flex="Flex.JustifyContent.Between" Width="Width.Is100">
-                            <img data-src="@miscContext.SvgUri" data-sizes="auto" height="32px" width="32px" alt="@miscContext.English" class="lazyload"/>
-                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom">@miscContext.Symbol</Heading>
-                            <Small>@miscContext.English</Small>
-                        </Div>
-                    </Repeater>
-                </ListGroup>
+                <Table Responsive
+                       Narrow
+                       Borderless
+                       Striped
+                       Background="Background.Dark"
+                       TextColor="TextColor.Light">
+                    <TableHeader ThemeContrast="ThemeContrast.Dark" Width="Width.Is100">
+                        <TableRow>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Image</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Text</Heading>
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                <Heading Size="HeadingSize.Is2">Description</Heading>
+                            </TableHeaderCell>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody Width="Width.Is100">
+                        <Repeater TItem="SymbologyDatum" Items="@_otherSymbols" Context="miscContext">
+                            <TableRow>
+                                <TableRowCell>
+                                    <Image data-src="@miscContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@miscContext.English" Class="lazyload" />
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@miscContext.Symbol</Heading>
+                                </TableRowCell>
+                                <TableRowCell>
+                                    <Small TextColor="TextColor.Light">@miscContext.English</Small>
+                                </TableRowCell>
+                            </TableRow>
+                        </Repeater>
+                    </TableBody>
+                </Table>
             </TabPanel>
         </Content>
     </Tabs>

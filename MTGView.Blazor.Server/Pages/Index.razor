@@ -11,35 +11,38 @@
             }
             else
             {
-                <Card 
-                    Background="Background.Dark" 
-                    TextColor="TextColor.Light" 
-                    Border="Border.Is2.Rounded.Light.OnAll"
-                    Shadow="Shadow.Default"
-                    Flex="Flex.AlignItems.Center">
+                <Card Background="Background.Dark"
+                  TextColor="TextColor.Light"
+                  Border="Border.Is2.Rounded.Light.OnAll"
+                  Shadow="Shadow.Default"
+                  Flex="Flex.AlignItems.Center">
                     <CardHeader>
                         Random Card
                     </CardHeader>
+                    <CardImage Source="@_magicCard.ScryfallImageUri"
+                           Alt="@_magicCard.artist"
+                           Margin="Margin.Is2.OnX"
+                           Style="height:30em;width:auto;"
+                           Border="Border.Is1.Rounded.Light.OnAll" />
                     <CardBody>
-                        <CardImage 
-                            Source="@_magicCard.ScryfallImageUri" 
-                            Alt="@_magicCard.artist"
-                            Margin="Margin.Is2.OnX"
-                            Style="height:30em;width:auto;" 
-                            Border="Border.Is1.Rounded.Light.OnAll"/>
                         <CardTitle>
                             @_magicCard.name
                         </CardTitle>
                         <CardSubtitle>
-                            <Paragraph>Artwork by: @_magicCard.artist</Paragraph> 
+                            <Paragraph>Artwork by: @_magicCard.artist</Paragraph>
                             <Paragraph>Set: @((MarkupString)_setName)</Paragraph>
                         </CardSubtitle>
                     </CardBody>
                     <CardBody>
-                        @(_magicCard.flavorText ?? _magicCard.text)
+                        <Text Italic TextWeight="TextWeight.Light">@(_magicCard.flavorText ?? _magicCard.text)</Text>
                     </CardBody>
-                    <CardFooter>
-                        @_magicCard.colorIdentity
+                    <CardFooter Flex="Flex.Row.JustifyContent.Between">
+                        <Paragraph>
+                            Color Identity:
+                            <Repeater TItem="KeyValuePair<String,String>" Items="_magicCard.ColorIdentitySvgUris" Context="colorIdentityContext">
+                                <Image Border="Border.Is1.OnAll.Rounded.Light" Source="@colorIdentityContext.Value" Text="@colorIdentityContext.Key" Style="width: 48px;" />
+                            </Repeater>
+                        </Paragraph>
                     </CardFooter>
                 </Card>
             }
@@ -47,11 +50,11 @@
     </Row>
     <Row Margin="Margin.Is2.FromTop" Flex="Flex.AlignItems.Center">
         <Column ColumnSize="ColumnSize.IsHalf">
-            <Table Background="Background.Dark" 
-                   Borderless 
+            <Table Background="Background.Dark"
+                   Borderless
                    Narrow
-                   Responsive 
-                   Resizable 
+                   Responsive
+                   Resizable
                    ResizeMode="TableResizeMode.Columns"
                    TextAlignment="TextAlignment.Center"
                    Border="Border.Is2.Rounded.Light.OnAll"

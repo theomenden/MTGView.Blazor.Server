@@ -80,6 +80,10 @@ public partial class MagicCard
 
     [NotMapped]
     [JsonIgnore]
+    public string? SetName { get; set; }
+
+    [NotMapped]
+    [JsonIgnore]
     public string ScryfallImageUri { get; set; }
 
     [NotMapped]
@@ -96,4 +100,8 @@ public partial class MagicCard
     [NotMapped]
     [JsonIgnore]
     public IList<String> ManaCostSvgUris { get; set; } = new List<String>(10);
+
+    [NotMapped] 
+    [JsonIgnore] 
+    public IDictionary<String,String> ColorIdentitySvgUris { get; set; } = new Dictionary<String,String>(5);
 }

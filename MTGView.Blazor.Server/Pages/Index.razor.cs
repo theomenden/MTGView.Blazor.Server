@@ -1,7 +1,10 @@
-﻿namespace MTGView.Blazor.Server.Pages;
+﻿using System.Text.RegularExpressions;
 
-public partial class Index: ComponentBase
+namespace MTGView.Blazor.Server.Pages;
+
+public partial class Index : ComponentBase
 {
+    #region Injected Properties
     [Inject] public IDbContextFactory<MagicthegatheringDbContext> DbContextFactory { get; init; }
 
     [Inject] public IScryfallCardService ScryfallCardService { get; init; }
@@ -13,7 +16,8 @@ public partial class Index: ComponentBase
     [Inject] public SetInformationRepository SetInformationRepository { get; init; }
 
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
-
+    #endregion
+    #region Fields
     private IEnumerable<ScryfallSetDetails> _setDetails = new List<ScryfallSetDetails>(800);
     private IEnumerable<SymbologyDatum> _symbols = new List<SymbologyDatum>(800);
 
@@ -21,10 +25,13 @@ public partial class Index: ComponentBase
     private Int32 _setsStored;
     private Int32 _symbolsStored;
 
+    private readonly Lazy<Regex> _regex = new(() => new(@"([A-Z])", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline));
+    
     private MagicCard? _magicCard;
     private String? _setName;
     private readonly Random _random = new();
-
+    #endregion
+    #region Lifecycle Methods
     protected override async Task OnInitializedAsync()
     {
         await PopulateIndexedDbOnLoad();
@@ -32,8 +39,22 @@ public partial class Index: ComponentBase
         await PopulateRandomCardInformation();
 
         await PopulateRandomCardScryfallImage();
-    }
+        
+        await AddSetInformation();
 
+        await AddColorIdentitySymbols();
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            await SetInformationRepository.CreateOrUpdateMany(_setDetails);
+            await SymbologyRepository.CreateOrUpdateMany(_symbols);
+        }
+    }
+    #endregion
+    #region Private Methods
     private async Task PopulateRandomCardInformation()
     {
         await using var context = await DbContextFactory.CreateDbContextAsync();
@@ -47,13 +68,13 @@ public partial class Index: ComponentBase
 
     private async Task PopulateRandomCardScryfallImage()
     {
-        var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCard.scryfallId);
+        var scryfallCardDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCard.scryfallId);
 
-        var scryfallData = scryfallDataResponse.Data;
+        var materializedCardData = scryfallCardDataResponse.Data;
 
-        _magicCard.ScryfallImageUri = scryfallData.image_uris?.HighResolution ?? String.Empty;
+        _magicCard.ScryfallImageUri = materializedCardData.image_uris?.HighResolution ?? String.Empty;
 
-        _magicCard.ScryfallImagesAsSizes = scryfallData.image_uris?.GetAllImagesAsSizes() ?? new List<String>(1);
+        _magicCard.ScryfallImagesAsSizes = materializedCardData.image_uris?.GetAllImagesAsSizes() ?? new List<String>(1);
     }
 
     private async Task PopulateIndexedDbOnLoad()
@@ -75,22 +96,36 @@ public partial class Index: ComponentBase
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    //THINDAL Provided Guidance :) 4/17/2022
+    private Task AddColorIdentitySymbols()
     {
-        if(!firstRender)
+        var regex = _regex.Value;
+
+        var matches = regex.Matches(_magicCard.colorIdentity ?? String.Empty)
+            .SelectMany(match => match.Groups.Values);
+
+        foreach (var match in matches)
         {
-            await SetInformationRepository.CreateOrUpdateMany(_setDetails);
-            await SymbologyRepository.CreateOrUpdateMany(_symbols);
+            var symbolToAdd = _symbols.First(l => !String.IsNullOrWhiteSpace(l.LooseVariant)
+                                                                                    && l.LooseVariant.Equals(match.Value, StringComparison.OrdinalIgnoreCase));
 
-
-            if (!String.IsNullOrWhiteSpace(_magicCard?.setCode))
-            {
-                var setInformation = await SetInformationRepository.GetBySetCode(_magicCard.setCode);
-
-                _setName = $"<strong>{setInformation?.Name}</strong><br />Released: <em>{setInformation?.ReleasedAt:d}</em>";
-            }
-
-            StateHasChanged();
+            _magicCard.ColorIdentitySvgUris.TryAdd(match.Value, symbolToAdd.SvgUri);
         }
+
+        return Task.CompletedTask;
     }
+
+    private Task AddSetInformation()
+    {
+        if (String.IsNullOrWhiteSpace(_magicCard?.setCode))
+        {
+            var setInformation =
+                _setDetails.First(s => s.Code.Equals(_magicCard.setCode, StringComparison.OrdinalIgnoreCase));
+
+            _setName = $"<strong>{setInformation.Name}</strong><br />Released: <em>{setInformation.ReleasedAt:d}</em>";
+        }
+
+        return Task.CompletedTask;
+    }
+    #endregion
 }

@@ -1,128 +1,137 @@
 ﻿@page "/cards"
-<Jumbotron Background="Background.Dark" Margin="Margin.Is3.OnY.Is2.OnX.OnWidescreen.Is4.OnY.Is3.OnX.OnTablet">
-    <JumbotronTitle Size="JumbotronTitleSize.Is2" TextColor="TextColor.Light">
-        Below is a grid of all the magic the gathering cards in existence as according to the latest MTG.Json
-    </JumbotronTitle>
-    <JumbotronSubtitle TextColor="TextColor.White50">
-        (This can be updated by uploading a new json version, or matching with scryfall)
-    </JumbotronSubtitle>
-</Jumbotron>
+<PageTitle>MTG Cards</PageTitle>
 <Container Fluid Margin="Margin.Is2.OnY.OnWidescreen.Is4.OnY.OnMobile">
-    <DataGrid TItem="MagicCard"
-              TotalItems="_magicCardCount"
-              ReadData="OnReadData"
-              Data="_magicCards"
-              CommandMode="DataGridCommandMode.Commands"
-              ShowPager
-              PageSize="25"
-              PageSizes="new Int32[] { 10, 25, 50, 100, 200 }"
-              Padding="Padding.Is3.OnY.OnWidescreen.Is5.OnY.OnMobile"
-              Class="table-dark border border-light border-2 rounded rounded-2 shadow"
-              Responsive
-              Hoverable
-              FixedHeader
-              FixedHeaderDataGridHeight="1000px"
-              FixedHeaderDataGridMaxHeight="100vh"
-              HeaderThemeContrast="ThemeContrast.Dark"
-              Striped
-              Sortable
-              Filterable
-              FilterMethod="DataGridFilterMethod.Contains"
-              DetailRowTrigger="@((e) => e.Item.id == _selectedCard?.id)">
-        <EmptyTemplate>
-            <Paragraph>
-                No Magic Cards were found in the database
-            </Paragraph>
-        </EmptyTemplate>
-        <LoadingTemplate>
-            <Span>
-                <SpinKit Type="SpinKitType.Grid" Size="3em" Color="#8E7CC3" />
-                <Paragraph TextColor="TextColor.Danger">Loading Magic Cards from Database</Paragraph>
-            </Span>
-        </LoadingTemplate>
-        <EmptyFilterTemplate>
-            <Paragraph Background="Background.Dark" TextColor="TextColor.Danger" Italic>Couldn't find the cards based off of your filter</Paragraph>
-        </EmptyFilterTemplate>
-        <DataGridColumns>
-            <DataGridCommandColumn>
-                <ClearFilterCommandTemplate>
-                    <Button Color="Color.Warning"
-                            TextTransform="TextTransform.Capitalize"
-                            TextWeight="TextWeight.Bold"
-                            TextColor="TextColor.Dark"
-                            Border="Border.Is2.Rounded.Light.OnAll"
-                            Clicked="@context.Clicked">
-                        @context.LocalizationString
-                    </Button>
-                </ClearFilterCommandTemplate>
-            </DataGridCommandColumn>
-            <DataGridColumn Field="@nameof(MagicCard.id)" Caption="Details" HeaderCellClass="bg-dark" Filterable="false">
-                <DisplayTemplate>
-                    <Button
-                        Type="ButtonType.Link"
-                        Color="Color.Primary"
-                        TextWeight="TextWeight.Light"
-                        TextColor="TextColor.White"
-                        Border="Border.Is2.Rounded.Light.OnAll"
-                        To="@($"/cardDetails?cardId={context?.id ?? 0}")">
-                        Details
-                    </Button>
-                </DisplayTemplate>
-                </DataGridColumn>
-            <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark">
-                <DisplayTemplate>
-                    @{
-                        var magicCard = context as MagicCard;
+    <Jumbotron Background="Background.Dark"
+               Margin="Margin.Is3.OnY.Is2.OnX.OnWidescreen.Is4.OnY.Is3.OnX.OnTablet"
+               Border="Border.Is2.OnAll.Rounded.Light"
+               Shadow="Shadow.Default">
+        <JumbotronTitle Size="JumbotronTitleSize.Is2" TextColor="TextColor.Light">
+            Below is a grid of all the magic the gathering cards in existence as according to the latest MTG.Json
+        </JumbotronTitle>
+        <JumbotronSubtitle TextColor="TextColor.White50">
+            (This can be updated by uploading a new json version, or matching with scryfall)
+        </JumbotronSubtitle>
+    </Jumbotron>
+    <Row>
+        <Column ColumnSize="ColumnSize.IsFull">
+            <DataGrid TItem="MagicCard"
+                      TotalItems="_magicCardCount"
+                      ReadData="OnReadData"
+                      Data="_magicCards"
+                      CommandMode="DataGridCommandMode.Commands"
+                      ShowPager
+                      PageSize="25"
+                      PageSizes="new Int32[] { 10, 25, 50, 100, 200 }"
+                      Padding="Padding.Is3.OnY.OnWidescreen.Is5.OnY.OnMobile"
+                      Class="table-dark shadow"
+                      Responsive
+                      Hoverable
+                      FixedHeader
+                      FixedHeaderDataGridMaxHeight="100vh"
+                      FixedHeaderDataGridHeight="100vh"
+                      HeaderThemeContrast="ThemeContrast.Dark"
+                      Striped
+                      Sortable
+                      Borderless
+                      Filterable
+                      FilterMethod="DataGridFilterMethod.Contains"
+                      DetailRowTrigger="@((e) => e.Item.id == _selectedCard?.id)">
+                <EmptyTemplate>
+                    <Paragraph>
+                        No Magic Cards were found in the database
+                    </Paragraph>
+                </EmptyTemplate>
+                <LoadingTemplate>
+                    <Span>
+                        <SpinKit Type="SpinKitType.Grid" Size="3em" Color="#8E7CC3" />
+                        <Paragraph TextColor="TextColor.Danger">Loading Magic Cards from Database</Paragraph>
+                    </Span>
+                </LoadingTemplate>
+                <EmptyFilterTemplate>
+                    <Paragraph Background="Background.Dark" TextColor="TextColor.Danger" Italic>Couldn't find the cards based off of your filter</Paragraph>
+                </EmptyFilterTemplate>
+                <DataGridColumns>
+                    <DataGridCommandColumn>
+                        <ClearFilterCommandTemplate>
+                            <Button Color="Color.Warning"
+                                    TextTransform="TextTransform.Capitalize"
+                                    TextWeight="TextWeight.Bold"
+                                    TextColor="TextColor.Dark"
+                                    Border="Border.Is2.Rounded.Light.OnAll"
+                                    Clicked="@context.Clicked">
+                                @context.LocalizationString
+                            </Button>
+                        </ClearFilterCommandTemplate>
+                    </DataGridCommandColumn>
+                    <DataGridColumn Field="@nameof(MagicCard.id)" Caption="Details" HeaderCellClass="bg-dark" Filterable="false">
+                        <DisplayTemplate>
+                            <Button Type="ButtonType.Link"
+                                    Color="Color.Primary"
+                                    TextWeight="TextWeight.Light"
+                                    TextColor="TextColor.White"
+                                    Border="Border.Is2.Rounded.Light.OnAll"
+                                    To="@($"/cardDetails?cardId={context?.id ?? 0}")">
+                                Details
+                            </Button>
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                    <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark">
+                        <DisplayTemplate>
+                            @{
+                                var magicCard = context as MagicCard;
 
-                        var magicCardImages = String.Join(',', magicCard?.ScryfallImagesAsSizes.ToList() ?? new List<string> { magicCard?.ScryfallImageUri ?? String.Empty });
+                                var magicCardImages = String.Join(',', magicCard?.ScryfallImagesAsSizes.ToList() ?? new List<string> { magicCard?.ScryfallImageUri ?? String.Empty });
 
-                        <Tooltip Placement="TooltipPlacement.BottomEnd"
-                             Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
-                            <Paragraph>@context?.name</Paragraph>
-                        </Tooltip>
-                    }
-                </DisplayTemplate>
-            </DataGridColumn>
-            <DataGridColumn Field="@nameof(MagicCard.manaCost)" Caption="Mana Cost" HeaderCellClass="bg-dark" Sortable Filterable>
-                <DisplayTemplate>
-                    <Repeater TItem="string" Items="context.ManaCostSvgUris" Context="manaCostContext">
-                        <Image Source="@manaCostContext" Text="@context.manaCost" Style="height: 32px; width: 32px;" />
-                    </Repeater>
-                </DisplayTemplate>
-            </DataGridColumn>
-            <DataGridColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" HeaderCellClass="bg-dark" Sortable Filterable>
-                <DisplayTemplate>
-                    <Image Source="@context.ScryfallSetIconUri" Style="height: 32px; width: 32px;" Text="@context.setCode" Class="lazyload" Background="Background.Secondary" />
-                </DisplayTemplate>
-            </DataGridColumn>
-        </DataGridColumns>
-        <PageButtonTemplate>
-            <Div TextColor="@(context.Active ? TextColor.White50 : TextColor.Light)" Class="text-decoration-underline">
-                @context.PageNumer
-            </Div>
-        </PageButtonTemplate>
-        <FirstPageButtonTemplate>
-            <Div Class="previous-page-button">
-                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepBackward"/>
-                First
-            </Div>
-        </FirstPageButtonTemplate>
-        <LastPageButtonTemplate>
-                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepForward"/>
-                Last
-        </LastPageButtonTemplate>
-        <NextPageButtonTemplate>
-                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Forward"/>
-                Next
-        </NextPageButtonTemplate>
-        <PreviousPageButtonTemplate>
-            <Div Class="previous-page-button">
-                <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Backward"/>
-                Previous
-            </Div>
-        </PreviousPageButtonTemplate>
-        <TotalItemsTemplate><Badge Color="Color.Success">@context.TotalItems total items</Badge></TotalItemsTemplate>
-        <ItemsPerPageTemplate></ItemsPerPageTemplate>
-    </DataGrid>
+                                <Tooltip Placement="TooltipPlacement.BottomEnd"
+                                     Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
+                                    <Paragraph>@context?.name</Paragraph>
+                                </Tooltip>
+                            }
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                    <DataGridColumn Field="@nameof(MagicCard.manaCost)" Caption="Mana Cost" HeaderCellClass="bg-dark" Sortable Filterable>
+                        <DisplayTemplate>
+                            <Repeater TItem="string" Items="context.ManaCostSvgUris" Context="manaCostContext">
+                                <Image Source="@manaCostContext" Text="@context.manaCost" Style="height: 32px; width: 32px;" />
+                            </Repeater>
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                    <DataGridColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" HeaderCellClass="bg-dark" Sortable Filterable>
+                        <DisplayTemplate>
+                            <Tooltip Text="@context.SetName">
+                                <Image Source="@context.ScryfallSetIconUri" Style="height: 32px; width: 32px;" Text="@context.setCode" Class="lazyload" Background="Background.Secondary"/>
+                            </Tooltip>
+                        </DisplayTemplate>
+                    </DataGridColumn>
+                </DataGridColumns>
+                <PageButtonTemplate>
+                    <Div TextColor="@(context.Active ? TextColor.White50 : TextColor.Light)" Class="text-decoration-underline">
+                        @context.PageNumer
+                    </Div>
+                </PageButtonTemplate>
+                <FirstPageButtonTemplate>
+                    <Div Class="previous-page-button">
+                        <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepBackward" />
+                        First
+                    </Div>
+                </FirstPageButtonTemplate>
+                <LastPageButtonTemplate>
+                    <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.StepForward" />
+                    Last
+                </LastPageButtonTemplate>
+                <NextPageButtonTemplate>
+                    <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Forward" />
+                    Next
+                </NextPageButtonTemplate>
+                <PreviousPageButtonTemplate>
+                    <Div Class="previous-page-button">
+                        <Blazorise.Icon IconSize="IconSize.Default" IconStyle="IconStyle.Solid" Name="IconName.Backward" />
+                        Previous
+                    </Div>
+                </PreviousPageButtonTemplate>
+                <TotalItemsTemplate><Badge Color="Color.Success">@context.TotalItems total items</Badge></TotalItemsTemplate>
+            </DataGrid>
+        </Column>
+    </Row>
 </Container>
 
