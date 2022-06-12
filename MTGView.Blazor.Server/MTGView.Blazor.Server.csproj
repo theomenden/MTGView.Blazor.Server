@@ -80,6 +80,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\MTGView.Core\MTGView.Core.csproj" />
+	  <ProjectReference Include="..\MTGView.Data.Background\MTGView.Data.Background.csproj" />
 	  <ProjectReference Include="..\MTGView.Data.CardImage\MTGView.Data.Scryfall.csproj" />
 	  <ProjectReference Include="..\MTGView.Data.EFCore\MTGView.Data.EFCore.csproj" />
 	  <ProjectReference Include="..\MTGView.Data.Personal.EfCore\MTGView.Data.Personal.EfCore.csproj" />

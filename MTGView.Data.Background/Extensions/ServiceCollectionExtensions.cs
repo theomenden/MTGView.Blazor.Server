@@ -1,13 +1,30 @@
 ﻿using MTGView.Data.Background.Interfaces;
 using MTGView.Data.Background.Internal;
 using MTGView.Data.EFCore.Extensions;
-using MTGView.Core.Extensions;
 using Polly;
 using Polly.Extensions.Http;
 namespace MTGView.Data.Background.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+
+
+    public static IServiceCollection AddBackgroundProcessingServicesForBlazor(this IServiceCollection services, String mtgApiConnectionString)
+    {
+        services.AddHttpClient("MtgJsonClient", client =>
+            {
+                client.BaseAddress = new(mtgApiConnectionString);
+            })
+            .AddPolicyHandler(GetRetryPolicy())
+            .AddPolicyHandler(GetCircuitBreakerPolicy()); ;
+
+
+        services.AddScoped<IUnzippingService, UnzippingService>();
+        services.AddScoped<IReplaceCardsService, ReplaceCardsService>();
+
+        return services;
+    }
+
     public static IServiceCollection AddBackgroundProcessingServices(this IServiceCollection services, IDictionary<String, String> connectionStrings)
     {
         services.AddHttpClient("MtgJsonClient",client =>
@@ -20,7 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddMtgDataServices(connectionStrings["MtgDb"]);
 
         services.AddScoped<IUnzippingService, UnzippingService>();
-        services.AddScoped<IDeserializationService, DeserializeCardsService>();
+        services.AddScoped<IReplaceCardsService, ReplaceCardsService>();
         
         return services;
     }

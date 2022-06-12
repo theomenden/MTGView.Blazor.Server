@@ -3,6 +3,8 @@ using Blazored.SessionStorage;
 using MTGView.Blazor.Server.Bootstrapping;
 using MTGView.Blazor.Server.Middleware;
 using MTGView.Blazor.Server.UrlHashing;
+using MTGView.Data.Background;
+using MTGView.Data.Background.Extensions;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
@@ -60,7 +62,8 @@ try
     builder.Services.AddScoped<MtgIndexedDb>();
     builder.Services.AddScoped<SetInformationRepository>();
     builder.Services.AddScoped<SymbologyRepository>();
-
+    builder.Services.AddHostedService<BackgroundCardUpdatingService>();
+    builder.Services.AddBackgroundProcessingServicesForBlazor(builder.Configuration.GetConnectionString("MtgApi"));
     builder.Services.AddTransient<IUrlHasher, UrlHasher>();
 
     builder.Services.AddResponseCompression(options =>

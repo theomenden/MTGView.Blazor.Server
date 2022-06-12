@@ -3,15 +3,14 @@ using MTGView.Data.Background.Interfaces;
 
 namespace MTGView.Data.Background.Internal;
 
-internal sealed class UnzippingService: IUnzippingService
+internal sealed class UnzippingService : IUnzippingService
 {
     private readonly IHttpClientFactory _mtgJsonClientFactory;
     private readonly ILogger<UnzippingService> _logger;
 
     private const string CompressedExtension = ".zip";
-    private const string AllPrintingsFileName = "AllPrintings.json";
+    private const string AllPrintingsFileName = "AllPrintingsCSVFiles";
     private const string CompleteFileName = $"{AllPrintingsFileName}{CompressedExtension}";
-
     private string _filePath = String.Empty;
 
     public UnzippingService(IHttpClientFactory httpClientFactory, ILogger<UnzippingService> logger)
@@ -26,36 +25,29 @@ internal sealed class UnzippingService: IUnzippingService
 
         using var message = new HttpRequestMessage(HttpMethod.Get, $"{client.BaseAddress}{CompleteFileName}");
 
-        try
+        using var response = await client.SendAsync(message, cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+        
+        if (response.IsSuccessStatusCode)
         {
-            using var response = await client.SendAsync(message, cancellationToken);
-
-            response.EnsureSuccessStatusCode();
-
             await using var content = await response.Content.ReadAsStreamAsync(cancellationToken);
 
             await DeserializeStreamToFile(content);
 
             await UnzipDownloadedFile();
         }
-        catch (Exception ex)
-        {
-            _logger.LogError("Exception occurred while attempting to download file {@ex}", ex);
-        }
     }
 
     private Task UnzipDownloadedFile()
     {
-        if (File.Exists(_filePath))
-        {
-            File.Delete(_filePath);
-        }
-
         try
         {
-            ZipFile.ExtractToDirectory(_filePath, Directory.GetCurrentDirectory());
+            var currentDirectory = Directory.GetCurrentDirectory();
 
-            File.Delete(CompleteFileName);
+            ZipFile.ExtractToDirectory(_filePath, currentDirectory, true);
+
+            File.Delete($"{currentDirectory}\\{CompleteFileName}");
         }
         catch (DirectoryNotFoundException ex)
         {

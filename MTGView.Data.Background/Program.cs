@@ -1,7 +1,6 @@
 using MTGView.Data.Background;
 using MTGView.Data.Background.Extensions;
 
-
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(app => app.SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json", true, true)
@@ -17,7 +16,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         };
 
         services.AddBackgroundProcessingServices(connectionStrings);
-        services.AddHostedService<Worker>();
+        services.AddHostedService<BackgroundCardUpdatingService>();
 
     })
     .Build();

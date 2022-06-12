@@ -85,7 +85,7 @@ namespace MTGView.Data.EFCore.Contexts.Configurations
                 .IsUnicode(false);
 
             entity.Property(e => e.manaValue)
-                .HasColumnType("decimal(5,2)");
+                .HasColumnType("decimal(9,2)");
 
             entity.Property(e => e.mtgjsonV4Id)
                 .HasMaxLength(390)

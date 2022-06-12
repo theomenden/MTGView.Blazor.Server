@@ -2,7 +2,7 @@
 {
     public static class ServiceCollectionExtensions
     {
-        private static ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+        private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
         });
@@ -11,8 +11,9 @@
         {
             services.AddPooledDbContextFactory<MagicthegatheringDbContext>(config =>
             {
-                config.UseLoggerFactory(_loggerFactory)
+                config
                     .UseSqlServer(connectionString)
+                    .UseLoggerFactory(LoggerFactory)
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging()
                     .EnableServiceProviderCaching();
