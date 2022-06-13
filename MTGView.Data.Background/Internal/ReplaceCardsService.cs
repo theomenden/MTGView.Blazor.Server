@@ -2,7 +2,7 @@
 using CsvHelper;
 using Microsoft.EntityFrameworkCore;
 using MTGView.Core.Models;
-using MTGView.Data.Background.Extensions;
+using MTGView.Data.Background.Helpers;
 using MTGView.Data.Background.Interfaces;
 using MTGView.Data.Background.Models;
 using MTGView.Data.EFCore.Contexts;
@@ -16,8 +16,6 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
     private readonly ILogger<ReplaceCardsService> _logger;
 
     private const string FileExtension = "csv";
-
-    private static readonly MagicCard CardReference = new();
 
     public ReplaceCardsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory,
         ILogger<ReplaceCardsService> logger)
@@ -39,22 +37,16 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
         csv.Context.RegisterClassMap<MagicCardExcelMap>();
 
         var startTime = DateTime.Now;
-        
+
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
         var cardsToAdd = (await csv.GetRecordsAsync<MagicCard>(cancellationToken).ToArrayAsync(cancellationToken)).Chunk(1000);
-        
-        foreach (var card in cardsToAdd)
-        {
-            await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            context.ChangeTracker.AutoDetectChangesEnabled = false;
 
-            await context.Cards.AddRangeAsync(card, cancellationToken);
+        await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-            await context.SaveChangesAsync(cancellationToken);
-        }
-        
+        await context.BulkInsertAllAsync(cardsToAdd, cancellationToken);
+
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }
 

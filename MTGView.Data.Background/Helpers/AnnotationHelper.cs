@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace MTGView.Data.Background.Extensions;
+namespace MTGView.Data.Background.Helpers;
 
 public static class AnnotationHelper
 {
