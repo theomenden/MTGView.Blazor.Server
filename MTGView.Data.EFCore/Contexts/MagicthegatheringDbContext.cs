@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace MTGView.Data.EFCore.Contexts;
 
@@ -17,9 +18,13 @@ public partial class MagicthegatheringDbContext : DbContext
     }
 
     public virtual DbSet<MagicCard> Cards { get; set; } = null!;
+
     public virtual DbSet<Meta> Metas { get; set; } = null!;
+    
     public virtual DbSet<Legality> Legalities { get; set; } = null!;
+    
     public virtual DbSet<Ruling> Rulings { get; set; } = null!;
+    
     public virtual DbSet<MagicSet> Sets { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,105 +40,41 @@ public partial class MagicthegatheringDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
-    public void BulkInsertAll<T>(IEnumerable<T> entities)
-    {
-        entities = entities.ToArray();
-
-        var cs = Database.GetConnectionString();
-
-        using var conn = new SqlConnection(cs);
-
-        conn.Open();
-
-        using var transaction = conn.BeginTransaction();
-        try
-        {
-            var t = typeof(T);
-
-            var tableAttribute = (TableAttribute)t.GetCustomAttributes(typeof(TableAttribute), false).Single();
-
-            var bulkCopy = new SqlBulkCopy(conn)
-            {
-                DestinationTableName = tableAttribute.Name
-            };
-
-            var properties = t.GetProperties().Where(EventTypeFilter).ToArray();
-            var table = new DataTable();
-
-            foreach (var property in properties)
-            {
-                var propertyType = property.PropertyType;
-
-                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                {
-                    propertyType = Nullable.GetUnderlyingType(propertyType);
-                }
-
-                table.Columns.Add(new DataColumn(property.Name, propertyType));
-            }
-
-            foreach (var entity in entities)
-            {
-                table.Rows.Add(properties.Select(property => GetPropertyValue(property.GetValue(entity, null))).ToArray());
-            }
-
-            bulkCopy.WriteToServer(table);
-
-            transaction.Commit();
-        }
-        finally
-        {
-            conn.Close();
-        }
-    }
-
     public async Task BulkInsertAllAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default)
     {
-        entities = entities.ToArray();
-
         var connectionString = Database.GetConnectionString();
 
-        using var connection = new SqlConnection(connectionString);
+        await using var connection = new SqlConnection(connectionString);
 
-        var t = typeof(T);
+        var entityType = typeof(T);
 
-        var tableAttribute = (TableAttribute)t.GetCustomAttributes(typeof(TableAttribute), false).Single();
-
-        await connection.OpenAsync(cancellationToken);
-
-        await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        var destinationTableName = Model.FindEntityType(entityType)?.GetSchemaQualifiedTableName();
 
         try
         {
 
-            var bulkCopy = new SqlBulkCopy(connection)
+            await connection.OpenAsync(cancellationToken);
+
+            using var bulkCopy = new SqlBulkCopy(connection)
             {
-                DestinationTableName = tableAttribute.Name
+                DestinationTableName = destinationTableName
             };
 
-            var properties = t.GetProperties().Where(EventTypeFilter).ToArray();
-            var table = new DataTable();
+            var properties = Model.FindEntityType(entityType)!.GetProperties();
+            
+            using var table = new DataTable();
 
-            foreach (var property in properties)
-            {
-                var propertyType = property.PropertyType;
-
-                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                {
-                    propertyType = Nullable.GetUnderlyingType(propertyType);
-                }
-
-                table.Columns.Add(new DataColumn(property.Name, propertyType));
-            }
+            table.Columns.AddRange(properties.Select(CreateEntityDataColumns).ToArray());
 
             foreach (var entity in entities)
             {
-                table.Rows.Add(properties.Select(property => GetPropertyValue(property.GetValue(entity, null))).ToArray());
+                var mappedProperties = properties
+                    .Select(property => GetPropertyValue(property.PropertyInfo?.GetValue((entity)))).ToArray();
+
+                table.Rows.Add(mappedProperties);
             }
-
-            bulkCopy.WriteToServer(table);
-
-            await transaction.CommitAsync(cancellationToken);
+            
+            await bulkCopy.WriteToServerAsync(table, cancellationToken);
         }
         finally
         {
@@ -141,7 +82,21 @@ public partial class MagicthegatheringDbContext : DbContext
         }
     }
 
-    private static bool EventTypeFilter(PropertyInfo p) => Attribute.GetCustomAttribute(p, typeof(ForeignKeyAttribute)) is not ForeignKeyAttribute;
+    private static DataColumn CreateEntityDataColumns(IProperty property)
+    {
+        var propertyType = Type.GetType(property.ClrType.AssemblyQualifiedName!);
+
+        if (propertyType!.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            propertyType = Nullable.GetUnderlyingType(propertyType);
+        }
+
+        return new DataColumn(property.Name, propertyType!)
+        {
+            AllowDBNull = Nullable.GetUnderlyingType(Type.GetType(property.ClrType.AssemblyQualifiedName)) != null,
+        };
+    }
 
     private static object GetPropertyValue(object? o) => o ?? DBNull.Value;
+
 }

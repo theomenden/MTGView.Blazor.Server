@@ -6,31 +6,29 @@ namespace MTGView.Data.Background;
 public class BackgroundCardUpdatingService : BackgroundService
 {
     private readonly ILogger<BackgroundCardUpdatingService> _logger;
+    
+    private readonly IServiceProvider _services;
 
     public BackgroundCardUpdatingService(IServiceProvider services,
         ILogger<BackgroundCardUpdatingService> logger)
     {
-        Services = services;
+        _services = services;
         _logger = logger;
     }
 
-    public IServiceProvider Services { get; }
     
     private async Task ConsumeFileDownloadingServices(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Consume Scoped Service Hosted Service is working.");
+        using var scope = _services.CreateScope();
 
-        using var scope = Services.CreateScope();
-
-        var scopedProcessingService = scope.ServiceProvider
-                .GetRequiredService<IUnzippingService>();
+        var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IUnzippingService>();
 
         await scopedProcessingService.InitiateFileDownloadProcess(stoppingToken);
     }
 
     private async Task ConsumeCardReplacementServices(CancellationToken stoppingToken)
     {
-        using var scope = Services.CreateScope();
+        using var scope = _services.CreateScope();
 
         var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IReplaceCardsService>();
 
@@ -43,31 +41,33 @@ public class BackgroundCardUpdatingService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-    
-        _logger.LogInformation("Consume Scoped Service Hosted Service running.");
-     
         await ConsumeFileDownloadingServices(stoppingToken);
+
         await ConsumeCardReplacementServices(stoppingToken);
 
-        CleanupDownloadedFiles();
+        await CleanupDownloadedFiles(stoppingToken);
+
+        await StopAsync(stoppingToken);
     }
 
-    private static void CleanupDownloadedFiles()
+    private static Task CleanupDownloadedFiles(CancellationToken stoppingToken)
     {
         const string pattern = "*.csv";
 
-        var matches = Directory.GetFiles(Directory.GetCurrentDirectory(), pattern);
+        var currentDirectory = Directory.GetCurrentDirectory();
 
-        foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()).Where(fileName => matches.Contains(fileName)))
+        var matches = Directory.GetFiles(currentDirectory, pattern);
+
+        foreach (var file in Directory.GetFiles(currentDirectory).Where(fileName => matches.Contains(fileName)))
         {
             File.Delete(file);
         }
-    }
-
-    public override Task StopAsync(CancellationToken stoppingToken)
-    {
-        _logger.LogInformation("Consume Scoped Service Hosted Service is stopping.");
 
         return Task.CompletedTask;
+    }
+
+    public override async Task StopAsync(CancellationToken stoppingToken)
+    {
+        await base.StopAsync(stoppingToken);
     }
 }

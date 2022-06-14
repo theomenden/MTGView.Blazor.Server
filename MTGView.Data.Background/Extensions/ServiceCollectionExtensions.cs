@@ -16,8 +16,7 @@ public static class ServiceCollectionExtensions
                 client.BaseAddress = new(mtgApiConnectionString);
             })
             .AddPolicyHandler(GetRetryPolicy())
-            .AddPolicyHandler(GetCircuitBreakerPolicy()); ;
-
+            .AddPolicyHandler(GetCircuitBreakerPolicy());
 
         services.AddScoped<IUnzippingService, UnzippingService>();
         services.AddScoped<IReplaceCardsService, ReplaceCardsService>();
@@ -32,7 +31,7 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new (connectionStrings["MtgApi"]);
         })
             .AddPolicyHandler(GetRetryPolicy())
-            .AddPolicyHandler(GetCircuitBreakerPolicy()); ;
+            .AddPolicyHandler(GetCircuitBreakerPolicy());
 
         services.AddMtgDataServices(connectionStrings["MtgDb"]);
 

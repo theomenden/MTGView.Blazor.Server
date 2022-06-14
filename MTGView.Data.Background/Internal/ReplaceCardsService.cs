@@ -40,9 +40,10 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var cardsToAdd = (await csv.GetRecordsAsync<MagicCard>(cancellationToken).ToArrayAsync(cancellationToken)).Chunk(1000);
+        var cardsToAdd = new List<MagicCard>(70_000);
 
-
+        cardsToAdd.AddRange(csv.GetRecords<MagicCard>());
+        
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await context.BulkInsertAllAsync(cardsToAdd, cancellationToken);
@@ -50,20 +51,18 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }
 
-    private Task ClearDatabase()
+    private async Task ClearDatabase()
     {
         _logger.LogInformation("Cleaning Previous cards from Database at {timeStarted}", DateTime.Now);
 
-        using var context = _dbContextFactory.CreateDbContext();
+        await using var context = await _dbContextFactory.CreateDbContextAsync();
 
         var cmd = $"TRUNCATE TABLE {AnnotationHelper.TableName(context.Cards)}";
 
-        context.Database.ExecuteSqlRaw(cmd);
+        await context.Database.ExecuteSqlRawAsync(cmd);
 
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         _logger.LogInformation("Cleared Previous cards from Database at {timeEnded}", DateTime.Now);
-
-        return Task.CompletedTask;
     }
 }

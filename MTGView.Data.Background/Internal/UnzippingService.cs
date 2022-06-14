@@ -27,8 +27,6 @@ internal sealed class UnzippingService : IUnzippingService
 
         using var response = await client.SendAsync(message, cancellationToken);
 
-        response.EnsureSuccessStatusCode();
-        
         if (response.IsSuccessStatusCode)
         {
             await using var content = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -45,17 +43,24 @@ internal sealed class UnzippingService : IUnzippingService
         {
             var currentDirectory = Directory.GetCurrentDirectory();
 
-            ZipFile.ExtractToDirectory(_filePath, currentDirectory, true);
+            if (!Directory.Exists(currentDirectory))
+            {
+                var directoryNotFound = new DirectoryNotFoundException("Could not find requested directory");
+                _logger.LogError("{@ex}", directoryNotFound);
+                return Task.FromException(directoryNotFound);
+            }
 
+            if (!File.Exists(_filePath))
+            {
+                var fileNotFound = new FileNotFoundException($"{_filePath} did not contain the file!");
+                _logger.LogError("Could not process file: {@ex}", fileNotFound);
+
+                return Task.FromException(fileNotFound);
+            }
+
+            ZipFile.ExtractToDirectory(_filePath, currentDirectory, true);
+         
             File.Delete($"{currentDirectory}\\{CompleteFileName}");
-        }
-        catch (DirectoryNotFoundException ex)
-        {
-            _logger.LogError("Could not find requested directory: {@ex}", ex);
-        }
-        catch (IOException ex)
-        {
-            _logger.LogError("Could not process file: {@ex}", ex);
         }
         catch (Exception ex)
         {

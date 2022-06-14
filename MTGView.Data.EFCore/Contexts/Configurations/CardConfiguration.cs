@@ -11,10 +11,16 @@ namespace MTGView.Data.EFCore.Contexts.Configurations
         {
             entity.ToTable("Cards", "MTG");
 
+            entity.HasKey(e => e.id);
+
             entity.HasIndex(e => e.setCode, "IX_Cards_SetCode")
                 .IncludeProperties(e => new { e.colorIdentity, e.scryfallId, e.manaCost });
-                
-            entity.Property(e => e.id).ValueGeneratedNever();
+
+            entity.Property(e => e.index).ValueGeneratedNever();
+            
+            entity.Property(e => e.id)
+                .IsRequired()
+                .ValueGeneratedNever();
 
             entity.Property(e => e.artist)
                 .HasMaxLength(390)

@@ -26,7 +26,6 @@ public sealed class MagicCardExcelMap : ClassMap<MagicCard>
         Map(card => card.frameEffects).Name("frameEffects");
         Map(card => card.frameVersion).Name("frameVersion");
         Map(card => card.hasAlternativeDeckLimit).Convert(row => ConvertFromStringToBool(row.Row.GetField("hasAlternativeDeckLimit"))); ;
-        //Map(card => card.hasContentWarning).Convert(row => ConvertFromStringToBool(row.Row.GetField("hasContentWarning")));
         Map(card => card.isAlternative).Convert(row => ConvertFromStringToBool(row.Row.GetField("isAlternative")));
         Map(card => card.isFullArt).Convert(row => ConvertFromStringToBool(row.Row.GetField("isFullArt")));
         Map(card => card.isFunny).Convert(row => ConvertFromStringToBool(row.Row.GetField("isFunny")));

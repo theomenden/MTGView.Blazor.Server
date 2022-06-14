@@ -9,8 +9,8 @@ namespace MTGView.Core.Models;
 
 public partial class MagicCard
 {
-    public int? index { get; set; }
     public int id { get; set; }
+    public int? index { get; set; }
     public string? artist { get; set; }
     public string? asciiName { get; set; }
     public string? availability { get; set; }

@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-MTGView.Data.Background-6AC269D2-1A8A-45E2-9F3D-849BF4BE6A37</UserSecretsId>
+    <Description>An importer for Magic The Gathering related entities via MTGJson and Scryfall</Description>
+    <Copyright>2022</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

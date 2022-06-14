@@ -9,5 +9,5 @@ public static class FileNamesToProcess
     public const string Rulings = "rulings";
     public const string SetTranslations = "set_translations";
     public const string Sets = "sets";
-    public const string tokens = "tokens";
+    public const string Tokens = "tokens";
 }

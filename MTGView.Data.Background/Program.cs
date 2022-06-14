@@ -1,7 +1,7 @@
 using MTGView.Data.Background;
 using MTGView.Data.Background.Extensions;
 
-IHost host = Host.CreateDefaultBuilder(args)
+var host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(app => app.SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json", true, true)
         .AddEnvironmentVariables())
