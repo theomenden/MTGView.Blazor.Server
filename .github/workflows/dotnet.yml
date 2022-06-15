@@ -44,14 +44,14 @@ jobs:
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"theomenden_MTGView.Blazor.Server" /o:"theomenden" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           build:
-          steps:
-            - uses: actions/checkout@v3
-            - name: Setup .NET
-              uses: actions/setup-dotnet@v2
-              with:
-              dotnet-version: 6.0.x
-            - name: Restore dependencies
-              run: dotnet restore
-            - name: Build
-              run: dotnet build --no-restore
+            steps:
+              - uses: actions/checkout@v3
+              - name: Setup .NET
+                uses: actions/setup-dotnet@v2
+                with:
+                dotnet-version: 6.0.x
+              - name: Restore dependencies
+                run: dotnet restore
+              - name: Build
+                run: dotnet build --no-restore
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
