@@ -16,7 +16,7 @@ var host = Host.CreateDefaultBuilder(args)
         };
 
         services.AddBackgroundProcessingServices(connectionStrings);
-        services.AddHostedService<BackgroundCardUpdatingService>();
+        services.AddHostedService<BackgroundUpdatingService>();
 
     })
     .Build();

@@ -26,7 +26,7 @@ public partial class Index : ComponentBase
     private Int32 _symbolsStored;
 
     private readonly Lazy<Regex> _regex = new(() => new(@"([A-Z])", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline));
-    
+
     private MagicCard? _magicCard;
     private String? _setName;
     private readonly Random _random = new();
@@ -39,18 +39,21 @@ public partial class Index : ComponentBase
         await PopulateRandomCardInformation();
 
         await PopulateRandomCardScryfallImage();
-        
-        await AddSetInformation();
-
-        await AddColorIdentitySymbols();
     }
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
         {
+
             await SetInformationRepository.CreateOrUpdateMany(_setDetails);
             await SymbologyRepository.CreateOrUpdateMany(_symbols);
+
+            await AddSetInformation();
+
+            await AddColorIdentitySymbols();
+
+            StateHasChanged();
         }
     }
     #endregion
@@ -61,9 +64,12 @@ public partial class Index : ComponentBase
 
         _cardsStored = await context.Cards.CountAsync();
 
-        var seedValue = _random.Next(1, _cardsStored);
+        if (_cardsStored > 0)
+        {
+            var seedValue = _random.Next(1, _cardsStored);
 
-        _magicCard = await context.Cards.FirstOrDefaultAsync(card => card.index == seedValue);
+            _magicCard = await context.Cards.FirstOrDefaultAsync(card => card.index == seedValue);
+        }
     }
 
     private async Task PopulateRandomCardScryfallImage()

@@ -103,5 +103,15 @@ public partial class MagicCard
 
     [NotMapped] 
     [JsonIgnore] 
+    public IEnumerable<Legality> Legalities { get; set; } = new List<Legality>(15);
+
+    [NotMapped] 
+    [JsonIgnore] 
     public IDictionary<String,String> ColorIdentitySvgUris { get; set; } = new Dictionary<String,String>(5);
+
+    public static MagicCard From(MagicCard card, IEnumerable<Legality> legalities)
+    {
+        card.Legalities = legalities.ToArray();
+        return card;
+    }
 }

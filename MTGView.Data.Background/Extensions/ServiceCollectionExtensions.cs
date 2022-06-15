@@ -7,8 +7,6 @@ namespace MTGView.Data.Background.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-
-
     public static IServiceCollection AddBackgroundProcessingServicesForBlazor(this IServiceCollection services, String mtgApiConnectionString)
     {
         services.AddHttpClient("MtgJsonClient", client =>
@@ -18,8 +16,10 @@ public static class ServiceCollectionExtensions
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-        services.AddScoped<IUnzippingService, UnzippingService>();
-        services.AddScoped<IReplaceCardsService, ReplaceCardsService>();
+        services.AddScoped<IUnzippingService, UnzippingService>()
+            .AddScoped<IReplaceCardsService, ReplaceCardsService>()
+            .AddScoped<IReplaceRulingsService, ReplaceRulingsService>()
+            .AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>();
 
         return services;
     }
@@ -37,7 +37,9 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IUnzippingService, UnzippingService>();
         services.AddScoped<IReplaceCardsService, ReplaceCardsService>();
-        
+        services.AddScoped<IReplaceRulingsService, ReplaceRulingsService>();
+        services.AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>();
+
         return services;
     }
 

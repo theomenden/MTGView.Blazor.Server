@@ -19,11 +19,13 @@
                     <CardHeader>
                         Random Card
                     </CardHeader>
+                    <Blazorise.Link To="@($"/cardDetails?cardId={_magicCard?.uuid ?? Guid.Empty}")">
                     <CardImage Source="@_magicCard.ScryfallImageUri"
-                           Alt="@_magicCard.artist"
-                           Margin="Margin.Is2.OnX"
-                           Style="height:30em;width:auto;"
-                           Border="Border.Is1.Rounded.Light.OnAll" />
+                               Alt="@_magicCard.artist"
+                               Margin="Margin.Is2.OnX"
+                               Style="height:30em;width:auto;"
+                               Border="Border.Is1.Rounded.Light.OnAll"/>
+                    </Blazorise.Link>
                     <CardBody>
                         <CardTitle>
                             @_magicCard.name

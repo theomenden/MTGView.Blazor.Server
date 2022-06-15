@@ -5,29 +5,27 @@ using MTGView.Core.Mapping.ExcelMappings;
 using MTGView.Core.Models;
 using MTGView.Data.Background.Helpers;
 using MTGView.Data.Background.Interfaces;
-using MTGView.Data.Background.Models;
 using MTGView.Data.EFCore.Contexts;
 
 namespace MTGView.Data.Background.Internal;
 
-internal sealed class ReplaceCardsService : IReplaceCardsService
+internal sealed class ReplaceRulingsService: IReplaceRulingsService
 {
     private readonly IDbContextFactory<MagicthegatheringDbContext> _dbContextFactory;
 
-    private readonly ILogger<ReplaceCardsService> _logger;
+    private readonly ILogger<ReplaceRulingsService> _logger;
 
     private const string FileExtension = "csv";
 
-    public ReplaceCardsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory,
-        ILogger<ReplaceCardsService> logger)
+    public ReplaceRulingsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory, ILogger<ReplaceRulingsService> logger)
     {
-        _logger = logger;
         _dbContextFactory = dbContextFactory;
+        _logger = logger;
     }
 
-    public async Task DeserializeCsvToMagicCards(String fileName, CancellationToken cancellationToken = default)
+    public async Task DeserializeCsvToRulings(String fileName, CancellationToken cancellationToken = default)
     {
-        await ClearCards();
+        await ClearRulings();
 
         await using var fileStream = new FileStream($"{fileName}.{FileExtension}", FileMode.Open, FileAccess.Read);
 
@@ -35,35 +33,35 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
-        csv.Context.RegisterClassMap<MagicCardExcelMap>();
+        csv.Context.RegisterClassMap<RulingsExcelMap>();
 
         var startTime = DateTime.Now;
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var cardsToAdd = new List<MagicCard>(70_000);
-
-        cardsToAdd.AddRange(csv.GetRecords<MagicCard>());
+        var rulings = new List<Ruling>(70_000);
         
+        rulings.AddRange(csv.GetRecords<Ruling>());
+
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await context.BulkInsertAllAsync(cardsToAdd, cancellationToken);
+        await context.BulkInsertAllAsync(rulings, cancellationToken);
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }
 
-    private async Task ClearCards()
+    private async Task ClearRulings()
     {
-        _logger.LogInformation("Cleaning Previous cards from Database at {timeStarted}", DateTime.Now);
+        _logger.LogInformation("Cleaning Previous Rulings from Database at {timeStarted}", DateTime.Now);
 
         await using var context = await _dbContextFactory.CreateDbContextAsync();
 
-        var cmd = $"TRUNCATE TABLE {AnnotationHelper.TableName(context.Cards)}";
+        var cmd = $"TRUNCATE TABLE {AnnotationHelper.TableName(context.Rulings)}";
 
         await context.Database.ExecuteSqlRawAsync(cmd);
 
         await context.SaveChangesAsync();
 
-        _logger.LogInformation("Cleared Previous cards from Database at {timeEnded}", DateTime.Now);
+        _logger.LogInformation("Cleared Previous Rulings from Database at {timeEnded}", DateTime.Now);
     }
 }

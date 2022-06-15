@@ -11,26 +11,35 @@ public partial class CardDetails : ComponentBase
     [Inject] public IScryfallCardService ScryfallCardService { get; init; }
 
     [Inject] public NavigationManager NavigationManager { get; init; }
-    
+
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
 
     [Inject] public SetInformationRepository SetInformationRepository { get; init; }
     #endregion
     private readonly Lazy<Regex> _regex = new(() => new(@"\{.\}", RegexOptions.Compiled | RegexOptions.IgnoreCase));
-    
+
+    private readonly Dictionary<String, Color> _backgroundMappings = new(StringComparer.OrdinalIgnoreCase)
+    {
+        {"Banned", Color.Danger },
+        {"Restricted", Color.Warning},
+        {"Legal", Color.Success}
+    };
+
     private MagicCard? _magicCardToReview;
+
     #region Lifecycle Methods
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("cardId", out var cardId))
+
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("cardId", out var cardId)
+            && Guid.TryParse(cardId, out var magicGuid))
         {
-            var magicCardId = Convert.ToInt32(cardId);
+            using var context = MtgContextFactory.CreateDbContext();
 
-            await using var context = await MtgContextFactory.CreateDbContextAsync();
+            _magicCardToReview = context.Cards.First(card => card.uuid == magicGuid);
 
-            _magicCardToReview = context.Cards.FirstOrDefault(card => card.id == magicCardId);
+            _magicCardToReview.Legalities = context.Legalities.Where(legality => legality.uuid == magicGuid).ToArray();
         }
     }
 
@@ -38,11 +47,9 @@ public partial class CardDetails : ComponentBase
     {
         if (firstRender)
         {
-                await GetScryfallImageInformation();
-                await AddManaCostVisibleSymbols();
-                await AddVisibleSetSymbols();
-
-                StateHasChanged();
+            await GetScryfallImageInformation();
+            await AddManaCostVisibleSymbols();
+            await AddVisibleSetSymbols();
         }
     }
     #endregion
@@ -56,6 +63,8 @@ public partial class CardDetails : ComponentBase
         _magicCardToReview.ScryfallImageUri = scryfallData.image_uris.HighResolution;
 
         _magicCardToReview.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
+
+        StateHasChanged();
     }
 
     //THINDAL Provided Guidance :) 4/17/2022
@@ -72,6 +81,8 @@ public partial class CardDetails : ComponentBase
 
             _magicCardToReview.ManaCostSvgUris.Add(symbolToAdd?.SvgUri ?? String.Empty);
         }
+
+        StateHasChanged();
     }
 
     private async Task AddVisibleSetSymbols()
@@ -79,6 +90,17 @@ public partial class CardDetails : ComponentBase
         var symbolToAdd = await SetInformationRepository.GetBySetCode(_magicCardToReview.setCode ?? String.Empty);
 
         _magicCardToReview.ScryfallSetIconUri = symbolToAdd?.IconUri ?? String.Empty;
+
+        StateHasChanged();
+    }
+
+    private Color DetermineBackgroundFromStatus(String status)
+    {
+        if (String.IsNullOrWhiteSpace(status))
+        {
+            status = "Legal";
+        }
+        return _backgroundMappings[status];
     }
     #endregion
 }

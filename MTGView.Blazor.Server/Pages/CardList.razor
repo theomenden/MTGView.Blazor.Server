@@ -70,7 +70,7 @@
                                     TextWeight="TextWeight.Light"
                                     TextColor="TextColor.White"
                                     Border="Border.Is2.Rounded.Light.OnAll"
-                                    To="@($"/cardDetails?cardId={context?.id ?? 0}")">
+                                    To="@($"/cardDetails?cardId={context?.uuid ?? Guid.Empty}")">
                                 Details
                             </Button>
                         </DisplayTemplate>

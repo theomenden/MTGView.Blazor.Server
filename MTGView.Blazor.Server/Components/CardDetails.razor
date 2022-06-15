@@ -1,62 +1,91 @@
 ﻿@page "/cardDetails"
 <PageTitle>Details for @_magicCardToReview?.name</PageTitle>
-    <Container Fluid Margin="Margin.Is2.OnY.OnFullHD.Is3.OnX.OnFullHD">
-        <Row Flex="Flex.AlignItems.Center">
-            <Column ColumnSize="ColumnSize.IsHalf">
-                @if (_magicCardToReview is null)
-                {
-                    <Span>
-                        <SpinKit Centered Color="#E52B50" Type="SpinKitType.Chase" Size="3em" />
-                    </Span>
-                }
-                <Card Background="Background.Dark"
-                      TextColor="TextColor.Light"
-                      Border="Border.Is2.Rounded.Light.OnAll"
-                      Margin="Margin.Is2.OnY.OnFullHD.Is3.OnX.OnFullHD.Is4.OnMobile"
-                      Flex="Flex.Column.JustifyContent.Center.AlignContent.Center">
-                    <CardHeader>
-                        <Paragraph Flex="Flex.Row.Fill.Grow.Is1">
-                            <Heading Size="HeadingSize.Is5" Margin="Margin.Is3.FromEnd.OnFullHD.Is5.FromEnd.OnMobile">
-                                @_magicCardToReview.name
-                            </Heading>
-                            <Repeater TItem="string" Items="@_magicCardToReview.ManaCostSvgUris" Context="manaCostContext">
-                                <Image Source="@manaCostContext"
-                                       Text="@_magicCardToReview.manaCost"
-                                       Style="height: 48px; width: 48px;"
-                                       Border="Border.Is0.Rounded.OnAll.Light"/>
-                            </Repeater>
-                        </Paragraph>
-                    </CardHeader>
-                    <CardImage Source="@_magicCardToReview.ScryfallImageUri"
-                               Alt="@_magicCardToReview.name"
-                               Style="width: min-content;">
-                    </CardImage>
-                    <CardTitle Size="5">
-                    </CardTitle>
-                    <CardSubtitle>
-                        Types: <Text Italic TextWeight="TextWeight.Light">@_magicCardToReview.types</Text>
-                    </CardSubtitle>
-                    <CardBody>
-                        @_magicCardToReview.text
-                    </CardBody>
-                    <CardBody>
-                        @_magicCardToReview.flavorText
-                    </CardBody>
-                    <CardFooter>
-                        <Small>Artwork by: @_magicCardToReview.artist</Small>
-                    </CardFooter>
-                </Card>
-            </Column>
-        </Row>
-        <Row>
-            <Column ColumnSize="ColumnSize.Is3">
-                <Button Color="Color.Primary"
-                        Type="ButtonType.Link" 
-                        To="/cards" 
-                        Border="Border.Is2.OnAll.Rounded.Light" 
-                        Margin="Margin.Is2.OnX.OnFullHD.Is4.OnX.OnMobile">
-                    Back to List
-                </Button>
-            </Column>
-        </Row>
-    </Container>
+<Container Fluid Margin="Margin.Is2.OnY.OnFullHD.Is3.OnX.OnFullHD">
+    <Row Flex="Flex.AlignItems.Center">
+        <Column ColumnSize="ColumnSize.IsHalf">
+            @if (_magicCardToReview is null)
+            {
+                <Span>
+                    <SpinKit Centered Color="#E52B50" Type="SpinKitType.Chase" Size="3em" />
+                </Span>
+            }
+            <Card Background="Background.Dark"
+                  TextColor="TextColor.Light"
+                  Border="Border.Is2.Rounded.Light.OnAll"
+                  Margin="Margin.Is2.OnY.OnFullHD.Is3.OnX.OnFullHD.Is4.OnMobile"
+                  Flex="Flex.JustifyContent.Around">
+                <CardHeader>
+                    <Paragraph Flex="Flex.Row.Fill.Grow.Is1">
+                        <Repeater TItem="string" Items="@_magicCardToReview.ManaCostSvgUris" Context="manaCostContext">
+                            <Image Source="@manaCostContext"
+                                   Text="@_magicCardToReview.manaCost"
+                                   Style="height: 48px; width: 48px;"
+                                   Border="Border.Is0.Rounded.OnAll.Light" />
+                        </Repeater>
+                    </Paragraph>
+                </CardHeader>
+                <CardImage Source="@_magicCardToReview.ScryfallImageUri"
+                           Alt="@_magicCardToReview.name"
+                           Margin="Margin.Is4.FromStart.OnWidescreen.Is3.OnX.OnMobile"
+                           Flex="Flex.JustifyContent.Center">
+                </CardImage>
+                <CardTitle Size="5">
+                </CardTitle>
+                <CardSubtitle>
+                    Types: <Text Italic TextWeight="TextWeight.Light">@_magicCardToReview.types</Text>
+                </CardSubtitle>
+                <CardBody>
+                    @_magicCardToReview.text
+                </CardBody>
+                <CardBody>
+                    @_magicCardToReview.flavorText
+                </CardBody>
+                <CardFooter>
+                    <Small>Artwork by: @_magicCardToReview.artist</Small>
+                </CardFooter>
+            </Card>
+        </Column>
+        <Column ColumnSize="ColumnSize.IsThird">
+            <Card Border="Border.Is2.OnAll.Rounded.Light"
+                  Background="Background.Dark"
+                  TextColor="TextColor.Light">
+                <CardTitle Size="2" Flex="Flex.JustifyContent.Center" TextTransform="TextTransform.Capitalize" TextWeight="TextWeight.Bold">
+                    Legalities for @_magicCardToReview.name
+                </CardTitle>
+                <CardBody>
+                    <ListGroup Flush Background="Background.Transparent">
+                        <Repeater TItem="Legality" Items="_magicCardToReview?.Legalities">
+                            <ListGroupItem Background="Background.Transparent" TextColor="TextColor.Light" Border="Border.Is2.OnBottom.RoundedBottom.Light">
+                                <Div Background="Background.Transparent"
+                                     Flex="Flex.JustifyContent.Between.AlignItems.Start">
+                                    <Heading Size="HeadingSize.Is4"
+                                             Margin="Margin.Is1.FromBottom"
+                                             TextWeight="TextWeight.Bold"
+                                             TextTransform="TextTransform.Uppercase">@context.format</Heading>
+                                    <Badge Color="@DetermineBackgroundFromStatus(context.status)"
+                                           TextColor="@(context.status.Equals("Banned") ? TextColor.Light : TextColor.Dark)"
+                                           TextTransform="TextTransform.Uppercase"
+                                           Pill
+                                           Class="fs-5 fw-light text-decoration-underline fw-bolder">
+                                        @context.status
+                                    </Badge>
+                                </Div>
+                            </ListGroupItem>
+                        </Repeater>
+                    </ListGroup>
+                </CardBody>
+            </Card>
+        </Column>
+    </Row>
+    <Row>
+        <Column ColumnSize="ColumnSize.Is3">
+            <Button Color="Color.Primary"
+                    Type="ButtonType.Link"
+                    To="/cards"
+                    Border="Border.Is2.OnAll.Rounded.Light"
+                    Margin="Margin.Is2.OnX.OnFullHD.Is4.OnX.OnMobile">
+                Back to List
+            </Button>
+        </Column>
+    </Row>
+</Container>

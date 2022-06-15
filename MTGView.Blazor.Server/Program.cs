@@ -62,7 +62,7 @@ try
     builder.Services.AddScoped<MtgIndexedDb>();
     builder.Services.AddScoped<SetInformationRepository>();
     builder.Services.AddScoped<SymbologyRepository>();
-    builder.Services.AddHostedService<BackgroundCardUpdatingService>();
+    builder.Services.AddHostedService<BackgroundUpdatingService>();
     builder.Services.AddBackgroundProcessingServicesForBlazor(builder.Configuration.GetConnectionString("MtgApi"));
     builder.Services.AddTransient<IUrlHasher, UrlHasher>();
 

@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration;
 using MTGView.Core.Models;
 
-namespace MTGView.Data.Background.Models;
+namespace MTGView.Core.Mapping.ExcelMappings;
 
 public sealed class MagicCardExcelMap : ClassMap<MagicCard>
 {
@@ -79,11 +79,11 @@ public sealed class MagicCardExcelMap : ClassMap<MagicCard>
 
     private static bool ConvertFromStringToBool(string valueToConvert)
     {
-        return Int32.TryParse(valueToConvert, out var result) && Convert.ToBoolean(result);
+        return int.TryParse(valueToConvert, out var result) && Convert.ToBoolean(result);
     }
 
-    private static Int32 ConvertFromStringToInteger(string valueToConvert)
+    private static int ConvertFromStringToInteger(string valueToConvert)
     {
-        return Int32.TryParse(valueToConvert, out var result) ? result : 0;
+        return int.TryParse(valueToConvert, out var result) ? result : 0;
     }
 }
