@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Blazorise.DataGrid;
+using MTGView.Blazor.Server.UrlHashing;
 
 namespace MTGView.Blazor.Server.Pages;
 public partial class CardList : ComponentBase
@@ -10,6 +11,8 @@ public partial class CardList : ComponentBase
     [Inject] public IScryfallCardService ScryfallCardService { get; init; }
 
     [Inject] public IScryfallSetInformationService ScryfallSetInformationService { get; init; }
+
+    [Inject] public IUrlHasher UrlHasher { get; init; }
 
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
 
@@ -114,6 +117,11 @@ public partial class CardList : ComponentBase
 
             magicCard.SetName = setDetails?.Name ?? String.Empty;
         }
+    }
+
+    private Task<String> EncodeUrl(Guid guid)
+    {
+        return Task.FromResult(String.Empty);
     }
     #endregion
 }

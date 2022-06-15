@@ -1,26 +1,25 @@
-﻿namespace MTGView.Data.EFCore.Extensions
+﻿namespace MTGView.Data.EFCore.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
     {
-        private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
+        builder.AddConsole();
+    });
+
+    public static IServiceCollection AddMtgDataServices(this IServiceCollection services, String connectionString)
+    {
+        services.AddPooledDbContextFactory<MagicthegatheringDbContext>(config =>
         {
-            builder.AddConsole();
+            config
+                .UseSqlServer(connectionString)
+                .UseLoggerFactory(LoggerFactory)
+                .EnableDetailedErrors()
+                .EnableSensitiveDataLogging()
+                .EnableServiceProviderCaching();
         });
 
-        public static IServiceCollection AddMtgDataServices(this IServiceCollection services, String connectionString)
-        {
-            services.AddPooledDbContextFactory<MagicthegatheringDbContext>(config =>
-            {
-                config
-                    .UseSqlServer(connectionString)
-                    .UseLoggerFactory(LoggerFactory)
-                    .EnableDetailedErrors()
-                    .EnableSensitiveDataLogging()
-                    .EnableServiceProviderCaching();
-            });
-
-            return services;
-        }
-
+        return services;
     }
+
 }

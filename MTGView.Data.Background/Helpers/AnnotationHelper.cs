@@ -7,13 +7,11 @@ public static class AnnotationHelper
 {
     private static string GetName(IEntityType entityType, string defaultSchemaName = "dbo")
     {
-        var schema = entityType.FindAnnotation("Relational:Schema").Value;
+        var schema = entityType.FindAnnotation("Relational:Schema")?.Value ?? defaultSchemaName;
 
-        var tableName = entityType.GetAnnotation("Relational:TableName").Value.ToString();
+        var tableName = entityType.GetAnnotation("Relational:TableName")?.Value ?? String.Empty;
 
-        var schemaName = schema == null ? defaultSchemaName : schema.ToString();
-
-        var name = $"[{schemaName}].[{tableName}]";
+        var name = $"[{schema}].[{tableName}]";
 
         return name;
     }
@@ -21,12 +19,14 @@ public static class AnnotationHelper
     public static string TableName<T>(DbContext dbContext) where T : class
     {
         var entityType = dbContext.Model.FindEntityType(typeof(T));
+
         return GetName(entityType);
     }
 
     public static string TableName<T>(DbSet<T> dbSet) where T : class
     {
         var entityType = dbSet.EntityType;
+        
         return GetName(entityType);
     }
 }

@@ -28,7 +28,7 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
     {
         await ClearLegalities();
 
-        await using var fileStream = new FileStream($"{fileName}.{FileExtension}", FileMode.Open, FileAccess.Read);
+        await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
 
         using var reader = new StreamReader(fileStream);
 
@@ -40,13 +40,13 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var legalities = new List<Legality>(70_000);
-
-        legalities.AddRange(csv.GetRecords<Legality>());
+        var legalities = new List<Legality>(csv.GetRecords<Legality>());
 
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await context.BulkInsertAllAsync(legalities, cancellationToken);
+
+        legalities.Clear();
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }

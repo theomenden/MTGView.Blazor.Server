@@ -46,13 +46,16 @@ internal sealed class UnzippingService : IUnzippingService
             if (!Directory.Exists(currentDirectory))
             {
                 var directoryNotFound = new DirectoryNotFoundException("Could not find requested directory");
+                
                 _logger.LogError("{@ex}", directoryNotFound);
+                
                 return Task.FromException(directoryNotFound);
             }
 
             if (!File.Exists(_filePath))
             {
                 var fileNotFound = new FileNotFoundException($"{_filePath} did not contain the file!");
+                
                 _logger.LogError("Could not process file: {@ex}", fileNotFound);
 
                 return Task.FromException(fileNotFound);

@@ -27,7 +27,7 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
     {
         await ClearRulings();
 
-        await using var fileStream = new FileStream($"{fileName}.{FileExtension}", FileMode.Open, FileAccess.Read);
+        await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
 
         using var reader = new StreamReader(fileStream);
 
@@ -39,13 +39,13 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var rulings = new List<Ruling>(70_000);
-        
-        rulings.AddRange(csv.GetRecords<Ruling>());
+        var rulings = new List<Ruling>(csv.GetRecords<Ruling>());
 
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await context.BulkInsertAllAsync(rulings, cancellationToken);
+
+        rulings.Clear();
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }

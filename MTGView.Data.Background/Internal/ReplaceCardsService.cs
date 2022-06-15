@@ -5,7 +5,6 @@ using MTGView.Core.Mapping.ExcelMappings;
 using MTGView.Core.Models;
 using MTGView.Data.Background.Helpers;
 using MTGView.Data.Background.Interfaces;
-using MTGView.Data.Background.Models;
 using MTGView.Data.EFCore.Contexts;
 
 namespace MTGView.Data.Background.Internal;
@@ -29,7 +28,7 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
     {
         await ClearCards();
 
-        await using var fileStream = new FileStream($"{fileName}.{FileExtension}", FileMode.Open, FileAccess.Read);
+        await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
 
         using var reader = new StreamReader(fileStream);
 
@@ -41,13 +40,13 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var cardsToAdd = new List<MagicCard>(70_000);
-
-        cardsToAdd.AddRange(csv.GetRecords<MagicCard>());
+        var cardsToAdd = new List<MagicCard>(csv.GetRecords<MagicCard>());
         
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await context.BulkInsertAllAsync(cardsToAdd, cancellationToken);
+
+        cardsToAdd.Clear();
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }
