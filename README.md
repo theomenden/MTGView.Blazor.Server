@@ -1,4 +1,4 @@
-# Blazor based Magic The Gathering lookup [![GitHub issues](https://img.shields.io/github/issues/theomenden/MTGView.Blazor.Server?style=plastic)](https://github.com/theomenden/MTGView.Blazor.Server/issues) [![GitHub license](https://img.shields.io/github/license/theomenden/MTGView.Blazor.Server)](https://github.com/theomenden/MTGView.Blazor.Server)
+# Blazor based Magic The Gathering lookup [![GitHub issues](https://img.shields.io/github/issues/theomenden/MTGView.Blazor.Server?style=plastic)](https://github.com/theomenden/MTGView.Blazor.Server/issues) [![GitHub license](https://img.shields.io/github/license/theomenden/MTGView.Blazor.Server)](https://github.com/theomenden/MTGView.Blazor.Server/blob/master/License)
 ## This application is built using [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor)
   - Rationale for using blazor comes from:
     - The ability to use C# throughout the entire application with minimal javascript interaction/interop.
