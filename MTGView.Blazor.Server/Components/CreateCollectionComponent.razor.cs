@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MTGView.Data.Personal.EfCore.Contexts;
-using MTGView.Data.Scryfall.Services;
+﻿using MTGView.Data.Personal.EfCore.Contexts;
 
 namespace MTGView.Blazor.Server.Components
 {

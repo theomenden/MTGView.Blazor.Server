@@ -1,10 +1,7 @@
-﻿using System.Globalization;
-using CsvHelper;
-using System.Text.Json;
+﻿using CsvHelper;
 using System.Text.Json.Serialization;
 using AutoMapper;
 using MTGView.Blazor.Server.Models;
-using MTGView.Core.Extensions;
 
 
 namespace MTGView.Blazor.Server.Pages;

@@ -1,5 +1,4 @@
-﻿using MTGView.Data.Scryfall.Models;
-using Nosthy.Blazor.DexieWrapper.Database;
+﻿using Nosthy.Blazor.DexieWrapper.Database;
 
 namespace MTGView.Blazor.Server.Data;
 public class MtgIndexedDb : Db

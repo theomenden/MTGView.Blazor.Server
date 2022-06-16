@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Net.Mime;
-using System.Text.Json;
-using MTGView.Blazor.Server.Bootstrapping;
+﻿using MTGView.Blazor.Server.Bootstrapping;
 using MTGView.Blazor.Server.Invariants;
 using MTGView.Core.Logging;
 

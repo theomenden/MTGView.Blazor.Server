@@ -49,7 +49,6 @@ public partial class MagicthegatheringDbContext : DbContext
 
         try
         {
-
             await connection.OpenAsync(cancellationToken);
 
             using var bulkCopy = new SqlBulkCopy(connection)
@@ -76,6 +75,47 @@ public partial class MagicthegatheringDbContext : DbContext
         finally
         {
             await connection.CloseAsync();
+        }
+    }
+
+    public void BulkInsertAll<T>(IEnumerable<T> entities)
+    {
+        var connectionString = Database.GetConnectionString();
+
+        using var connection = new SqlConnection(connectionString);
+
+        var entityType = typeof(T);
+
+        var destinationTableName = Model.FindEntityType(entityType)?.GetSchemaQualifiedTableName();
+
+        try
+        {
+            connection.Open();
+
+            using var bulkCopy = new SqlBulkCopy(connection)
+            {
+                DestinationTableName = destinationTableName
+            };
+
+            var properties = Model.FindEntityType(entityType)!.GetProperties();
+
+            using var table = new DataTable();
+
+            table.Columns.AddRange(properties.Select(CreateEntityDataColumns).ToArray());
+
+            foreach (var entity in entities)
+            {
+                var mappedProperties = properties
+                    .Select(property => GetPropertyValue(property.PropertyInfo?.GetValue((entity)))).ToArray();
+
+                table.Rows.Add(mappedProperties);
+            }
+
+            bulkCopy.WriteToServer(table);
+        }
+        finally
+        {
+            connection.Close();
         }
     }
 

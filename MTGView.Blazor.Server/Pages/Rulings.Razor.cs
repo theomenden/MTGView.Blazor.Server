@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Blazorise.DataGrid;
-using Blazorise.DataGrid.Configuration;
-using Microsoft.EntityFrameworkCore;
+﻿using Blazorise.DataGrid;
 
 namespace MTGView.Blazor.Server.Pages;
 
@@ -18,12 +15,7 @@ public partial class Rulings : ComponentBase
     private DataGrid<Ruling> _dataGrid = new();
     
     public int CurrentPage { get; set; } = 1;
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
+    
     private static Task<List<Ruling>> LoadRulings(MagicthegatheringDbContext context, DataGridReadDataEventArgs<Ruling> eventArgs)
     {
         var cards = context.Rulings

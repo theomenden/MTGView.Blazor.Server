@@ -15,6 +15,8 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
     private readonly ILogger<ReplaceRulingsService> _logger;
 
+    private List<Ruling>? _rulings = new (50_000);
+
     private const string FileExtension = "csv";
 
     public ReplaceRulingsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory, ILogger<ReplaceRulingsService> logger)
@@ -39,13 +41,15 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var rulings = new List<Ruling>(csv.GetRecords<Ruling>());
+        _rulings = csv.GetRecords<Ruling>().ToList();
 
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await context.BulkInsertAllAsync(rulings, cancellationToken);
+        await context.BulkInsertAllAsync(_rulings, cancellationToken);
 
-        rulings.Clear();
+        _rulings.Clear();
+
+        _rulings = null;
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }

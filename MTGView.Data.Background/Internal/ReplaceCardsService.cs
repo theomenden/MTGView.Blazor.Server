@@ -15,6 +15,8 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
     private readonly ILogger<ReplaceCardsService> _logger;
 
+    private List<MagicCard>? _magicCards = new(70_000);
+
     private const string FileExtension = "csv";
 
     public ReplaceCardsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory,
@@ -38,17 +40,18 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
         var startTime = DateTime.Now;
 
+        _magicCards = csv.GetRecords<MagicCard>().ToList();
+
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var cardsToAdd = new List<MagicCard>(csv.GetRecords<MagicCard>());
-        
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await context.BulkInsertAllAsync(cardsToAdd, cancellationToken);
-
-        cardsToAdd.Clear();
+        await context.BulkInsertAllAsync(_magicCards, cancellationToken);
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
+
+        _magicCards.Clear();
+        _magicCards = null;
     }
 
     private async Task ClearCards()

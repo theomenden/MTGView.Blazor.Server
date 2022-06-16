@@ -60,7 +60,7 @@ public partial class CardDetails : ComponentBase
 
         var scryfallData = scryfallDataResponse.Data;
 
-        _magicCardToReview.ScryfallImageUri = scryfallData.image_uris.HighResolution;
+        _magicCardToReview.ScryfallImageUri = scryfallData.image_uris.Normal;
 
         _magicCardToReview.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
 

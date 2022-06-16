@@ -279,9 +279,9 @@ public partial class UrlHasher : IUrlHasher
     {
         var number = 0L;
 
-        for (var i = 0; i < input.Length; i++)
+        foreach (var letter in input)
         {
-            var position = alphabet.IndexOf(input[i]);
+            var position = alphabet.IndexOf(letter);
 
             number = (number * _alphabet.Length) + position;
         }

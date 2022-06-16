@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MTGView.Data.Personal.EfCore.Contexts;
+﻿using MTGView.Data.Personal.EfCore.Contexts;
 
 namespace MTGView.Blazor.Server.Pages;
 public partial class PersonalCollectionComponent: ComponentBase

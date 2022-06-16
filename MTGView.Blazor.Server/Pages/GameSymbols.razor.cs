@@ -29,7 +29,6 @@ public partial class GameSymbols: ComponentBase
         {
             _symbols = symbolEndPointResponse.Data.Select(symbolInformation => symbolInformation).ToList();
             
-
             _funnySymbols.AddRange(_symbols.Where(symbol => symbol.IsFunny));
 
             _manaCostSymbols.AddRange(_symbols.Where(symbol => symbol.CanBeInManaCost));

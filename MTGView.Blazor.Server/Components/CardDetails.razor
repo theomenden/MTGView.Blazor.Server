@@ -24,12 +24,15 @@
                         </Repeater>
                     </Paragraph>
                 </CardHeader>
-                <CardImage Source="@_magicCardToReview.ScryfallImageUri"
+                <CardImage Margin="Margin.Is4.FromStart.OnWidescreen.Is3.OnX.OnMobile"
+                           Flex="Flex.JustifyContent.Center"
                            Alt="@_magicCardToReview.name"
-                           Margin="Margin.Is4.FromStart.OnWidescreen.Is3.OnX.OnMobile"
-                           Flex="Flex.JustifyContent.Center">
-                </CardImage>
+                           data-src="@_magicCardToReview.ScryfallImageUri" 
+                           data-srcset="@(String.Join(',', _magicCardToReview.ScryfallImagesAsSizes.ToList()))"
+                           data-sizes="auto"
+                           Class="lazyload"/>
                 <CardTitle Size="5">
+                    @_magicCardToReview.artist
                 </CardTitle>
                 <CardSubtitle>
                     Types: <Text Italic TextWeight="TextWeight.Light">@_magicCardToReview.types</Text>
@@ -65,6 +68,7 @@
                                     <Badge Color="@DetermineBackgroundFromStatus(context.status)"
                                            TextColor="@(context.status.Equals("Banned") ? TextColor.Light : TextColor.Dark)"
                                            TextTransform="TextTransform.Uppercase"
+                                           Border="Border.Is2.OnAll.Rounded.Light"
                                            Pill
                                            Class="fs-5 fw-light text-decoration-underline fw-bolder">
                                         @context.status
@@ -79,13 +83,20 @@
     </Row>
     <Row>
         <Column ColumnSize="ColumnSize.Is3">
-            <Button Color="Color.Primary"
-                    Type="ButtonType.Link"
-                    To="/cards"
-                    Border="Border.Is2.OnAll.Rounded.Light"
-                    Margin="Margin.Is2.OnX.OnFullHD.Is4.OnX.OnMobile">
-                Back to List
-            </Button>
+            <Buttons Role="ButtonsRole.Toolbar" Background="Background.Dark" Border="Border.Is2.OnAll.Rounded.Light" Flex="Flex.Row.JustifyContent.Between.Grow.Is1">
+                <Button Color="Color.Primary"
+                        Type="ButtonType.Link"
+                        To="/cards"
+                        Border="Border.Is2.OnAll.Light">
+                    Back to List
+                </Button>
+                <Button Color="Color.Success"
+                        Type="ButtonType.Link"
+                        To="/"
+                        Border="Border.Is2.OnAll.Light">
+                    <Icon IconStyle="IconStyle.Solid" TextColor="TextColor.White" Name="IconName.Home" /> Home
+                </Button>
+            </Buttons>
         </Column>
     </Row>
 </Container>

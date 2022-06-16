@@ -1,6 +1,4 @@
-﻿using MTGView.Data.Scryfall.Models;
-
-namespace MTGView.Blazor.Server.Data;
+﻿namespace MTGView.Blazor.Server.Data;
 public class SymbologyRepository
     {
         private readonly MtgIndexedDb _db;

@@ -15,6 +15,8 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 
     private readonly ILogger<ReplaceLegalitiesService> _logger;
 
+    private List<Legality>? _legalities = new (50_000);
+
     private const string FileExtension = "csv";
 
     public ReplaceLegalitiesService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory,
@@ -40,13 +42,14 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        var legalities = new List<Legality>(csv.GetRecords<Legality>());
+        _legalities = csv.GetRecords<Legality>().ToList();
 
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await context.BulkInsertAllAsync(legalities, cancellationToken);
+        await context.BulkInsertAllAsync(_legalities, cancellationToken);
 
-        legalities.Clear();
+        _legalities.Clear();
+        _legalities = null;
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }

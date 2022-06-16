@@ -25,7 +25,7 @@ public sealed class MagicCardExcelMap : ClassMap<MagicCard>
         Map(card => card.flavorText).Name("flavorText");
         Map(card => card.frameEffects).Name("frameEffects");
         Map(card => card.frameVersion).Name("frameVersion");
-        Map(card => card.hasAlternativeDeckLimit).Convert(row => ConvertFromStringToBool(row.Row.GetField("hasAlternativeDeckLimit"))); ;
+        Map(card => card.hasAlternativeDeckLimit).Convert(row => ConvertFromStringToBool(row.Row.GetField("hasAlternativeDeckLimit")));
         Map(card => card.isAlternative).Convert(row => ConvertFromStringToBool(row.Row.GetField("isAlternative")));
         Map(card => card.isFullArt).Convert(row => ConvertFromStringToBool(row.Row.GetField("isFullArt")));
         Map(card => card.isFunny).Convert(row => ConvertFromStringToBool(row.Row.GetField("isFunny")));
@@ -34,7 +34,7 @@ public sealed class MagicCardExcelMap : ClassMap<MagicCard>
         Map(card => card.isPromo).Convert(row => ConvertFromStringToBool(row.Row.GetField("isPromo")));
         Map(card => card.isRebalanced).Convert(row => ConvertFromStringToBool(row.Row.GetField("isRebalanced")));
         Map(card => card.isReprint).Convert(row => ConvertFromStringToBool(row.Row.GetField("isReprint")));
-        Map(card => card.isReserved).Convert(row => ConvertFromStringToBool(row.Row.GetField("isReserved"))); ;
+        Map(card => card.isReserved).Convert(row => ConvertFromStringToBool(row.Row.GetField("isReserved")));
         Map(card => card.isStarter).Convert(row => ConvertFromStringToBool(row.Row.GetField("isStarter")));
         Map(card => card.isStorySpotlight).Convert(row => ConvertFromStringToBool(row.Row.GetField("isStorySpotlight")));
         Map(card => card.isTextless).Convert(row => ConvertFromStringToBool(row.Row.GetField("isTextless")));
