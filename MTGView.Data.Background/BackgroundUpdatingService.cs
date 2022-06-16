@@ -5,30 +5,62 @@ namespace MTGView.Data.Background;
 
 public class BackgroundUpdatingService : BackgroundService
 {
+    private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(10d);
+
     private readonly ILogger<BackgroundUpdatingService> _logger;
 
-    private readonly IServiceProvider _services;
+    private readonly IServiceScopeFactory _services;
 
-    public BackgroundUpdatingService(IServiceProvider services,
-        ILogger<BackgroundUpdatingService> logger)
+    private Int32 _executionCount = 0;
+
+    public BackgroundUpdatingService(ILogger<BackgroundUpdatingService> logger, IServiceScopeFactory serviceScopeFactory)
     {
-        _services = services;
+        _services = serviceScopeFactory;
         _logger = logger;
     }
+
+    public Boolean IsEnabled { get; set; }
+
     #region Overrides
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await ConsumeFileDownloadingServices(stoppingToken);
+        using var timer = new PeriodicTimer(_updateInterval);
 
-        await ConsumeCardReplacementServices(stoppingToken);
+        while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
+        {
+            try
+            {
+                if (!IsEnabled || _executionCount <= 0)
+                {
+                    _logger.LogInformation("Skipped {serviceName} Execution", nameof(BackgroundUpdatingService));
 
-        await ConsumeRulingReplacementServices(stoppingToken);
+                    continue;
+                }
 
-        await ConsumeLegalityReplacementServices(stoppingToken);
+                await ConsumeFileDownloadingServices(stoppingToken);
 
-        await CleanupDownloadedFiles(stoppingToken);
+                await ConsumeCardReplacementServices(stoppingToken);
 
-        await StopAsync(stoppingToken);
+                await ConsumeRulingReplacementServices(stoppingToken);
+
+                await ConsumeLegalityReplacementServices(stoppingToken);
+
+                _executionCount++;
+
+                _logger.LogInformation("{serviceName} Execution: {executionCount}", nameof(BackgroundUpdatingService), _executionCount);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to execute {serviceName} due to exception: {@ex}", nameof(BackgroundUpdatingService), ex);
+
+            }
+            finally
+            {
+                await CleanupDownloadedFiles(stoppingToken);
+            }
+        }
+
     }
 
     public override Task StopAsync(CancellationToken stoppingToken)
@@ -37,9 +69,11 @@ public class BackgroundUpdatingService : BackgroundService
     }
     #endregion
     #region Cleanup
-    private static Task CleanupDownloadedFiles(CancellationToken stoppingToken)
+    private Task CleanupDownloadedFiles(CancellationToken stoppingToken)
     {
         const string pattern = "*.csv";
+
+        _logger.LogInformation("Running cleanup steps at {currentTime}", DateTime.Now);
 
         var currentDirectory = Directory.GetCurrentDirectory();
 
@@ -47,8 +81,12 @@ public class BackgroundUpdatingService : BackgroundService
 
         foreach (var file in Directory.GetFiles(currentDirectory).Where(fileName => matches.Contains(fileName)))
         {
+            _logger.LogInformation("Deleting {fileName} from Current Directory", file);
             File.Delete(file);
+            _logger.LogInformation("Deleted {fileName} from Current Directory", file);
         }
+
+        _logger.LogInformation("Finished cleanup steps at {currentTime}", DateTime.Now);
 
         return Task.CompletedTask;
     }
@@ -56,7 +94,7 @@ public class BackgroundUpdatingService : BackgroundService
     #region Scoped Service Calls
     private async Task ConsumeFileDownloadingServices(CancellationToken stoppingToken)
     {
-        using var scope = _services.CreateScope();
+        await using var scope = _services.CreateAsyncScope();
 
         var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IUnzippingService>();
 
@@ -65,7 +103,7 @@ public class BackgroundUpdatingService : BackgroundService
 
     private async Task ConsumeCardReplacementServices(CancellationToken stoppingToken)
     {
-        using var scope = _services.CreateScope();
+        await using var scope = _services.CreateAsyncScope();
 
         var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IReplaceCardsService>();
 
@@ -78,7 +116,7 @@ public class BackgroundUpdatingService : BackgroundService
 
     private async Task ConsumeRulingReplacementServices(CancellationToken stoppingToken)
     {
-        using var scope = _services.CreateScope();
+        await using var scope = _services.CreateAsyncScope();
 
         var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IReplaceRulingsService>();
 
@@ -91,7 +129,7 @@ public class BackgroundUpdatingService : BackgroundService
 
     private async Task ConsumeLegalityReplacementServices(CancellationToken stoppingToken)
     {
-        using var scope = _services.CreateScope();
+        await using var scope = _services.CreateAsyncScope();
 
         var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IReplaceLegalitiesService>();
 

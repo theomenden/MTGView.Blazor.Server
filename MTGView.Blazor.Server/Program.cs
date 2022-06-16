@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using MTGView.Blazor.Server.Bootstrapping;
 using MTGView.Blazor.Server.Middleware;
+using MTGView.Blazor.Server.Models;
 using MTGView.Blazor.Server.UrlHashing;
 using MTGView.Data.Background;
 using MTGView.Data.Background.Extensions;
@@ -52,7 +53,7 @@ try
     builder.Services.AddLocalization();
 
     builder.Services.AddLazyCache();
-    
+
     builder.Services.AddBlazoredLocalStorage();
 
     builder.Services.AddBlazoredSessionStorage();
@@ -62,7 +63,8 @@ try
     builder.Services.AddScoped<MtgIndexedDb>();
     builder.Services.AddScoped<SetInformationRepository>();
     builder.Services.AddScoped<SymbologyRepository>();
-    builder.Services.AddHostedService<BackgroundUpdatingService>();
+    builder.Services.AddSingleton<BackgroundUpdatingService>();
+    builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundUpdatingService>());
     builder.Services.AddBackgroundProcessingServicesForBlazor(builder.Configuration.GetConnectionString("MtgApi"));
     builder.Services.AddTransient<IUrlHasher, UrlHasher>();
 
@@ -101,7 +103,7 @@ try
     app.UseHttpsRedirection();
 
     app.UseStaticFiles();
-    
+
     app.UseRouting();
 
     app.UseApiExceptionHandler(options =>
@@ -109,6 +111,14 @@ try
         options.AddResponseDetails = OptionsDelegates.UpdateApiErrorResponse;
         options.DetermineLogLevel = OptionsDelegates.DetermineLogLevel;
     });
+
+    app.MapGet("/background", (BackgroundUpdatingService service) =>
+    {
+        return new BackgroundUpdatingServiceState(service.IsEnabled);
+    });
+
+    app.MapMethods("/background", new[] { "PATCH" },
+        (BackgroundUpdatingServiceState state, BackgroundUpdatingService service) => service.IsEnabled = state.IsEnabled);
 
     app.MapBlazorHub();
     app.MapFallbackToPage("/_Host");
