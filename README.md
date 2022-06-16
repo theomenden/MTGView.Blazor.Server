@@ -6,7 +6,7 @@
   
   Thank you for understanding! I have no plans on moving this to Angular or React at this time.
  
-## The UI Components are built using [Blazorise](https://www.blazorise.com) and [Bootstrap 5](https://www.getbootstrap.com)
+## The UI Components are built using [Blazorise](https://blazorise.com) and [Bootstrap 5](https://www.getbootstrap.com)
  Blazorise is a free, and easy to use component library for blazor server and web applications, providing access to over 80 free components.
  
  Bootstrap is an independent CSS framework, aimed towards responsive design.
