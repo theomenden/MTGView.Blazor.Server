@@ -1,21 +1,10 @@
-﻿using System.Globalization;
-using CsvHelper;
-using Microsoft.EntityFrameworkCore;
-using MTGView.Core.Mapping.ExcelMappings;
-using MTGView.Core.Models;
-using MTGView.Data.Background.Helpers;
-using MTGView.Data.Background.Interfaces;
-using MTGView.Data.EFCore.Contexts;
-
-namespace MTGView.Data.Background.Internal;
+﻿namespace MTGView.Data.Background.Internal;
 
 internal sealed class ReplaceCardsService : IReplaceCardsService
 {
     private readonly IDbContextFactory<MagicthegatheringDbContext> _dbContextFactory;
 
     private readonly ILogger<ReplaceCardsService> _logger;
-
-    private List<MagicCard>? _magicCards = new(70_000);
 
     private const string FileExtension = "csv";
 
@@ -28,8 +17,6 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
     public async Task DeserializeCsvToMagicCards(String fileName, CancellationToken cancellationToken = default)
     {
-        await ClearCards();
-
         await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
 
         using var reader = new StreamReader(fileStream);
@@ -40,31 +27,26 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
         var startTime = DateTime.Now;
 
-        _magicCards = csv.GetRecords<MagicCard>().ToList();
-
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await context.BulkInsertAllAsync(_magicCards, cancellationToken);
+        await ClearCards(context, cancellationToken);
+
+        await context.BulkInsertStreamAsync(csv.EnumerateRecordsAsync<MagicCard>(new(), cancellationToken), cancellationToken);
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
-
-        _magicCards.Clear();
-        _magicCards = null;
     }
 
-    private async Task ClearCards()
+    private async Task ClearCards(MagicthegatheringDbContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Cleaning Previous cards from Database at {timeStarted}", DateTime.Now);
 
-        await using var context = await _dbContextFactory.CreateDbContextAsync();
-
         var cmd = $"TRUNCATE TABLE {AnnotationHelper.TableName(context.Cards)}";
 
-        await context.Database.ExecuteSqlRawAsync(cmd);
+        await context.Database.ExecuteSqlRawAsync(cmd, cancellationToken);
 
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Cleared Previous cards from Database at {timeEnded}", DateTime.Now);
     }

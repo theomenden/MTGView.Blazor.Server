@@ -15,14 +15,7 @@ public static class AnnotationHelper
 
         return name;
     }
-
-    public static string TableName<T>(DbContext dbContext) where T : class
-    {
-        var entityType = dbContext.Model.FindEntityType(typeof(T));
-
-        return GetName(entityType);
-    }
-
+    
     public static string TableName<T>(DbSet<T> dbSet) where T : class
     {
         var entityType = dbSet.EntityType;

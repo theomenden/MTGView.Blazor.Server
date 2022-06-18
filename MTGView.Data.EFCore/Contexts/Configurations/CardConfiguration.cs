@@ -181,18 +181,6 @@ namespace MTGView.Data.EFCore.Contexts.Configurations
                 .HasMaxLength(130)
                 .IsUnicode(false);
 
-            entity.Property(e => e.CollectionCardMappingId)
-                .IsRequired(false);
-
-            entity.HasIndex(e => e.CollectionCardMappingId)
-                .HasDatabaseName("IX_Cards_CollectionCardMapping_Id")
-                .IncludeProperties(e => new
-                {
-                    e.name,
-                    e.manaCost,
-                    e.setCode
-                });
-
             OnConfigurePartial(entity);
         }
 

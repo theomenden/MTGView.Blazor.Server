@@ -1,22 +1,11 @@
-﻿using System.Globalization;
-using CsvHelper;
-using Microsoft.EntityFrameworkCore;
-using MTGView.Core.Mapping.ExcelMappings;
-using MTGView.Core.Models;
-using MTGView.Data.Background.Helpers;
-using MTGView.Data.Background.Interfaces;
-using MTGView.Data.EFCore.Contexts;
-
-namespace MTGView.Data.Background.Internal;
+﻿namespace MTGView.Data.Background.Internal;
 
 internal sealed class ReplaceRulingsService: IReplaceRulingsService
 {
     private readonly IDbContextFactory<MagicthegatheringDbContext> _dbContextFactory;
 
     private readonly ILogger<ReplaceRulingsService> _logger;
-
-    private List<Ruling>? _rulings = new (50_000);
-
+    
     private const string FileExtension = "csv";
 
     public ReplaceRulingsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory, ILogger<ReplaceRulingsService> logger)
@@ -27,8 +16,6 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
     public async Task DeserializeCsvToRulings(String fileName, CancellationToken cancellationToken = default)
     {
-        await ClearRulings();
-
         await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
 
         using var reader = new StreamReader(fileStream);
@@ -41,30 +28,24 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        _rulings = csv.GetRecords<Ruling>().ToList();
-
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await context.BulkInsertAllAsync(_rulings, cancellationToken);
+        await ClearRulings(context, cancellationToken);
 
-        _rulings.Clear();
-
-        _rulings = null;
+        await context.BulkInsertStreamAsync(csv.GetRecordsAsync<Ruling>(cancellationToken), cancellationToken);
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }
 
-    private async Task ClearRulings()
+    private async Task ClearRulings(MagicthegatheringDbContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Cleaning Previous Rulings from Database at {timeStarted}", DateTime.Now);
 
-        await using var context = await _dbContextFactory.CreateDbContextAsync();
-
         var cmd = $"TRUNCATE TABLE {AnnotationHelper.TableName(context.Rulings)}";
 
-        await context.Database.ExecuteSqlRawAsync(cmd);
+        await context.Database.ExecuteSqlRawAsync(cmd, cancellationToken);
 
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Cleared Previous Rulings from Database at {timeEnded}", DateTime.Now);
     }

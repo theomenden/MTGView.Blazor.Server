@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace MTGView.Core.Models;
+﻿namespace MTGView.Core.Models;
 
 public class PersonalCollection
 {

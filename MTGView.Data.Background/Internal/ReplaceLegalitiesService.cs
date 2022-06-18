@@ -1,21 +1,10 @@
-﻿using System.Globalization;
-using CsvHelper;
-using Microsoft.EntityFrameworkCore;
-using MTGView.Core.Models;
-using MTGView.Core.Mapping.ExcelMappings;
-using MTGView.Data.Background.Helpers;
-using MTGView.Data.Background.Interfaces;
-using MTGView.Data.EFCore.Contexts;
-
-namespace MTGView.Data.Background.Internal;
+﻿namespace MTGView.Data.Background.Internal;
 
 internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 {
     private readonly IDbContextFactory<MagicthegatheringDbContext> _dbContextFactory;
 
     private readonly ILogger<ReplaceLegalitiesService> _logger;
-
-    private List<Legality>? _legalities = new (50_000);
 
     private const string FileExtension = "csv";
 
@@ -28,8 +17,6 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 
     public async Task DeserializeCsvToLegalities(string fileName, CancellationToken cancellationToken = default)
     {
-        await ClearLegalities();
-
         await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
 
         using var reader = new StreamReader(fileStream);
@@ -42,29 +29,24 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 
         _logger.LogInformation("Starting Database Update Process at: {timeNow}", startTime);
 
-        _legalities = csv.GetRecords<Legality>().ToList();
-
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        await context.BulkInsertAllAsync(_legalities, cancellationToken);
+        await ClearLegalities(context, cancellationToken);
 
-        _legalities.Clear();
-        _legalities = null;
+        await context.BulkInsertStreamAsync(csv.GetRecordsAsync<Legality>(cancellationToken), cancellationToken);
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }
 
-    private async Task ClearLegalities()
+    private async Task ClearLegalities(MagicthegatheringDbContext context, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Cleaning Previous legalities from Database at {timeStarted}", DateTime.Now);
 
-        await using var context = await _dbContextFactory.CreateDbContextAsync();
-
         var cmd = $"TRUNCATE TABLE {AnnotationHelper.TableName(context.Legalities)}";
 
-        await context.Database.ExecuteSqlRawAsync(cmd);
+        await context.Database.ExecuteSqlRawAsync(cmd, cancellationToken);
 
-        await context.SaveChangesAsync();
+        await context.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Cleared Previous legalities from Database at {timeEnded}", DateTime.Now);
     }

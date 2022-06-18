@@ -75,6 +75,15 @@ internal sealed class UnzippingService : IUnzippingService
 
     private async Task DeserializeStreamToFile(Stream stream)
     {
+        if (!stream.CanRead)
+        {
+            var exception = new IOException($"Stream was unable to be read {nameof(stream)}");
+
+            _logger.LogError("Could read stream into file for {fileName}: {@ex}", CompleteFileName, exception);
+
+            return;
+        }
+
         var fileInfo = new FileInfo($"{CompleteFileName}");
 
         await using var fileStream = File.Create(fileInfo.FullName);

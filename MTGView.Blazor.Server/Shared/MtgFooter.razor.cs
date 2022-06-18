@@ -16,17 +16,14 @@ public partial class MtgFooter : ComponentBase
         await GetClaimsPrincipalData();
     }
 
-    private async Task GetClaimsPrincipalData()
+    private Task GetClaimsPrincipalData()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _username = Environment.UserName;
 
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated == true)
-        {
-            _username = user.Claims.FirstOrDefault(c => c.Type == "name")?.Value ?? user.Identity?.Name;
-        }
+        return Task.CompletedTask;
     }
+
+    private static string GetCurrentUserName => Environment.UserName;
 
     private static string AssemblyProductVersion
     {

@@ -1,26 +1,31 @@
-using MTGView.Data.Background.Interfaces;
-using MTGView.Data.Background.Models;
-
 namespace MTGView.Data.Background;
 
 public class BackgroundUpdatingService : BackgroundService
 {
-    private readonly TimeSpan _updateInterval = TimeSpan.FromSeconds(10d);
-
+    private readonly TimeSpan _updateInterval;
+    
     private readonly ILogger<BackgroundUpdatingService> _logger;
 
     private readonly IServiceScopeFactory _services;
 
-    private Int32 _executionCount = 0;
+    private int _executionCount;
 
-    public BackgroundUpdatingService(ILogger<BackgroundUpdatingService> logger, IServiceScopeFactory serviceScopeFactory)
+    public BackgroundUpdatingService(IConfiguration configuration, ILogger<BackgroundUpdatingService> logger, IServiceScopeFactory serviceScopeFactory)
     {
+        var configurationSection = configuration.GetSection("BackgroundUpdating");
+
+        _updateInterval = TimeSpan.FromSeconds(configurationSection.GetValue<double>("RefreshPeriodInSeconds"));
+
+        IsEnabled = configurationSection.GetValue<bool>("IsEnabled");
+
         _services = serviceScopeFactory;
+
         _logger = logger;
     }
 
     public Boolean IsEnabled { get; set; }
 
+    public Boolean IsRunning { get; set; }
     #region Overrides
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -30,20 +35,22 @@ public class BackgroundUpdatingService : BackgroundService
         {
             try
             {
-                if (!IsEnabled || _executionCount <= 0)
+                if (!IsEnabled)
                 {
                     _logger.LogInformation("Skipped {serviceName} Execution", nameof(BackgroundUpdatingService));
 
                     continue;
                 }
-
                 await ConsumeFileDownloadingServices(stoppingToken);
 
-                await ConsumeCardReplacementServices(stoppingToken);
+                var tasksToRun = new []
+                {
+                    ConsumeCardReplacementServices(stoppingToken),
+                    ConsumeRulingReplacementServices(stoppingToken),
+                    ConsumeLegalityReplacementServices(stoppingToken)
+                };
 
-                await ConsumeRulingReplacementServices(stoppingToken);
-
-                await ConsumeLegalityReplacementServices(stoppingToken);
+                await Task.WhenAll(tasksToRun);
 
                 _executionCount++;
 
@@ -57,6 +64,7 @@ public class BackgroundUpdatingService : BackgroundService
             }
             finally
             {
+                IsRunning = false;
                 await CleanupDownloadedFiles(stoppingToken);
             }
         }
@@ -65,6 +73,7 @@ public class BackgroundUpdatingService : BackgroundService
 
     public override Task StopAsync(CancellationToken stoppingToken)
     {
+        IsRunning = false;
         return Task.CompletedTask;
     }
     #endregion
@@ -87,9 +96,31 @@ public class BackgroundUpdatingService : BackgroundService
         }
 
         _logger.LogInformation("Finished cleanup steps at {currentTime}", DateTime.Now);
+        return Task.CompletedTask;
+    }
+
+    private Task CleanupDownloadedFilesAsync(CancellationToken stoppingToken)
+    {
+        const string pattern = "*.csv";
+
+        _logger.LogInformation("Running cleanup steps at {currentTime}", DateTime.Now);
+
+        var currentDirectory = Directory.GetCurrentDirectory();
+
+        var matches = Directory.GetFiles(currentDirectory, pattern);
+
+        foreach (var file in Directory.GetFiles(currentDirectory).Where(fileName => matches.Contains(fileName)))
+        {
+            _logger.LogInformation("Deleting {fileName} from Current Directory", file);
+            File.Delete(file);
+            _logger.LogInformation("Deleted {fileName} from Current Directory", file);
+        }
+
+        _logger.LogInformation("Finished cleanup steps at {currentTime}", DateTime.Now);
 
         return Task.CompletedTask;
     }
+
     #endregion
     #region Scoped Service Calls
     private async Task ConsumeFileDownloadingServices(CancellationToken stoppingToken)

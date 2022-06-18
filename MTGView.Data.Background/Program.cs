@@ -1,6 +1,3 @@
-using MTGView.Data.Background;
-using MTGView.Data.Background.Extensions;
-
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(app => app.SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json", true, true)
@@ -14,10 +11,8 @@ var host = Host.CreateDefaultBuilder(args)
             {"MtgApi", context.Configuration.GetConnectionString("MtgApi")},
             {"MtgDb", context.Configuration.GetConnectionString("MtgDb")}
         };
-
         services.AddBackgroundProcessingServices(connectionStrings);
         services.AddHostedService<BackgroundUpdatingService>();
-
     })
     .Build();
 

@@ -78,6 +78,49 @@ public partial class MagicthegatheringDbContext : DbContext
         }
     }
 
+    public async Task BulkInsertStreamAsync<T>(IAsyncEnumerable<T> entityStream, CancellationToken cancellationToken = default)
+    {
+        var connectionString = Database.GetConnectionString();
+
+        await using var connection = new SqlConnection(connectionString);
+
+        var entityType = typeof(T);
+
+        var destinationTableName = Model.FindEntityType(entityType)?.GetSchemaQualifiedTableName();
+
+        using var table = new DataTable();
+
+        try
+        {
+            await connection.OpenAsync(cancellationToken);
+
+            using var bulkCopy = new SqlBulkCopy(connection)
+            {
+                DestinationTableName = destinationTableName,
+                BatchSize = 2000
+            };
+
+            var properties = Model.FindEntityType(entityType)!.GetProperties();
+
+            table.Columns.AddRange(properties.Select(CreateEntityDataColumns).ToArray());
+
+            await foreach (var entity in entityStream)
+            {
+                var mappedProperties = properties
+                    .Select(property => GetPropertyValue(property.PropertyInfo?.GetValue((entity)))).ToArray();
+
+                table.Rows.Add(mappedProperties);
+            }
+
+            await bulkCopy.WriteToServerAsync(table, cancellationToken);
+            }
+        finally
+        {
+            table.Clear();
+            await connection.CloseAsync();
+        }
+    }
+
     public void BulkInsertAll<T>(IEnumerable<T> entities)
     {
         var connectionString = Database.GetConnectionString();

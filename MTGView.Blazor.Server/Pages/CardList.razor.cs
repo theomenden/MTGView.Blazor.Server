@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Blazorise.DataGrid;
+using MTGView.Blazor.Server.Invariants;
 using MTGView.Blazor.Server.UrlHashing;
 
 namespace MTGView.Blazor.Server.Pages;
@@ -21,34 +22,74 @@ public partial class CardList : ComponentBase
     #region Private Fields
     private IEnumerable<MagicCard> _magicCards = new List<MagicCard>(70_000);
 
+    private List<String> _setsToSearch = new(20);
+    private List<String> _multipleSelectionTexts = new(20);
+    private string _selectedComparisonOperator = String.Empty;
     private Int32 _magicCardCount;
+
+    private decimal _magicCardManaCost;
 
     private MagicCard? _selectedCard;
 
+    private string _cardName = String.Empty;
+
+    private readonly List<MagicSet> _availableSets = new(800);
+
     private readonly Lazy<Regex> _regex = new(() => new(@"\{.\}", RegexOptions.Compiled | RegexOptions.IgnoreCase));
     #endregion
-    #region Private Methods
-    private static Task<List<MagicCard>> LoadCards(MagicthegatheringDbContext context, DataGridReadDataEventArgs<MagicCard> eventArgs)
+    #region Overrides
+    protected override async Task OnInitializedAsync()
     {
-        var cards = context.Cards
-            .DynamicFilter(eventArgs)
-            .DynamicSort(eventArgs)
+        await using var context = await ContextFactory.CreateDbContextAsync();
+
+        await foreach (var set in context.Sets.OrderBy(s => s.code).AsAsyncEnumerable())
+        {
+            _availableSets.Add(set);
+        }
+    }
+    #endregion
+    #region Private Methods
+    private async Task<List<MagicCard>> LoadCards(MagicthegatheringDbContext context, DataGridReadDataEventArgs<MagicCard> eventArgs)
+    {
+        var queryableCards = context.Cards.AsQueryable();
+
+        if (!String.IsNullOrWhiteSpace(_cardName))
+        {
+            var queryString = $"%{_cardName}%";
+
+            queryableCards = queryableCards
+                .Where(c => EF.Functions.Like(c.name!, queryString));
+        }
+
+        queryableCards = _selectedComparisonOperator switch
+        {
+            ">" => queryableCards.WhereInterpolated($"manaValue > {_magicCardManaCost}"),
+            "<" => queryableCards.WhereInterpolated($"manaValue < {_magicCardManaCost}"),
+            ">=" => queryableCards.WhereInterpolated($"manaValue >= {_magicCardManaCost}"),
+            "<=" => queryableCards.WhereInterpolated($"manaValue <= {_magicCardManaCost}"),
+            "=" => queryableCards.WhereInterpolated($"manaValue = {_magicCardManaCost}"),
+            _ => queryableCards
+        };
+
+        if (_setsToSearch.Any())
+        {
+            queryableCards = queryableCards.Where("setCode in @0", _setsToSearch);
+        }
+
+        _magicCardCount = queryableCards.Count();
+
+        var cards = await queryableCards
             .Paging(eventArgs)
             .ToListAsync(eventArgs.CancellationToken);
 
         return cards;
     }
 
-    private static Task<Int32> GetCardCount(MagicthegatheringDbContext context,
-        CancellationToken cancellationToken = default) => context.Cards.CountAsync(cancellationToken);
-
     private async Task OnReadData(DataGridReadDataEventArgs<MagicCard> e)
     {
-        await using var context = await ContextFactory.CreateDbContextAsync(e.CancellationToken);
-
         if (!e.CancellationToken.IsCancellationRequested)
         {
-            _magicCardCount = await GetCardCount(context, e.CancellationToken);
+            await using var context = await ContextFactory.CreateDbContextAsync(e.CancellationToken);
 
             await MaterializeCardInformation(e, context);
         }
@@ -81,7 +122,6 @@ public partial class CardList : ComponentBase
 
             await InvokeAsync(StateHasChanged);
         }
-
     }
 
     //THINDAL Provided Guidance :) 4/17/2022
@@ -117,6 +157,19 @@ public partial class CardList : ComponentBase
 
             magicCard.SetName = setDetails?.Name ?? String.Empty;
         }
+    }
+
+    private EventCallback ClearFilter(ButtonRowContext<MagicCard> context)
+    {
+        _selectedComparisonOperator = String.Empty;
+        _magicCardManaCost = 0;
+        _cardName = String.Empty;
+        _setsToSearch.Clear();
+        _setsToSearch = new();
+        _multipleSelectionTexts.Clear();
+        _multipleSelectionTexts = new();
+
+        return context.ClearFilterCommand.Clicked;
     }
 
     private Task<String> EncodeUrl(Guid guid)

@@ -112,13 +112,14 @@ try
         options.DetermineLogLevel = OptionsDelegates.DetermineLogLevel;
     });
 
-    app.MapGet("/background", (BackgroundUpdatingService service) =>
-    {
-        return new BackgroundUpdatingServiceState(service.IsEnabled);
-    });
+    app.MapGet("/background", (BackgroundUpdatingService service) => new BackgroundUpdatingServiceState(service.IsEnabled, service.IsRunning));
 
     app.MapMethods("/background", new[] { "PATCH" },
-        (BackgroundUpdatingServiceState state, BackgroundUpdatingService service) => service.IsEnabled = state.IsEnabled);
+        (BackgroundUpdatingServiceState state, BackgroundUpdatingService service) =>
+        {
+            service.IsEnabled = state.IsEnabled;
+            service.IsRunning = state.IsRunning;
+        });
 
     app.MapBlazorHub();
     app.MapFallbackToPage("/_Host");

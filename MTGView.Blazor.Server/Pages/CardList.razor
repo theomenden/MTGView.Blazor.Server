@@ -18,8 +18,9 @@
                       TotalItems="_magicCardCount"
                       ReadData="OnReadData"
                       Data="_magicCards"
-                      CommandMode="DataGridCommandMode.Commands"
+                      CommandMode="DataGridCommandMode.ButtonRow"
                       ShowPager
+                      PagerPosition="DataGridPagerPosition.TopAndBottom"
                       PageSize="25"
                       PageSizes="new Int32[] { 10, 25, 50, 100, 200 }"
                       Padding="Padding.Is3.OnY.OnWidescreen.Is5.OnY.OnMobile"
@@ -34,7 +35,6 @@
                       Sortable
                       Borderless
                       Filterable
-                      FilterMethod="DataGridFilterMethod.Contains"
                       DetailRowTrigger="@((e) => e.Item.id == _selectedCard?.id)">
                 <EmptyTemplate>
                     <Paragraph>
@@ -51,18 +51,6 @@
                     <Paragraph Background="Background.Dark" TextColor="TextColor.Danger" Italic>Couldn't find the cards based off of your filter</Paragraph>
                 </EmptyFilterTemplate>
                 <DataGridColumns>
-                    <DataGridCommandColumn>
-                        <ClearFilterCommandTemplate>
-                            <Button Color="Color.Warning"
-                                    TextTransform="TextTransform.Capitalize"
-                                    TextWeight="TextWeight.Bold"
-                                    TextColor="TextColor.Dark"
-                                    Border="Border.Is2.Rounded.Light.OnAll"
-                                    Clicked="@context.Clicked">
-                                @context.LocalizationString
-                            </Button>
-                        </ClearFilterCommandTemplate>
-                    </DataGridCommandColumn>
                     <DataGridColumn Field="@nameof(MagicCard.id)" Caption="Details" HeaderCellClass="bg-dark" Filterable="false">
                         <DisplayTemplate>
                             <Button Type="ButtonType.Link"
@@ -75,7 +63,11 @@
                             </Button>
                         </DisplayTemplate>
                     </DataGridColumn>
-                    <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark">
+                    <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark" Filterable>
+                        <FilterTemplate>
+                            <TextEdit Text="@_cardName" TextChanged="@(value => { _cardName = value; if (value.Length < 3) {return;} 
+                                                                                    context.TriggerFilterChange(value); })" />
+                        </FilterTemplate>
                         <DisplayTemplate>
                             @{
                                 var magicCard = context as MagicCard;
@@ -83,27 +75,59 @@
                                 var magicCardImages = String.Join(',', magicCard?.ScryfallImagesAsSizes.ToList() ?? new List<string> { magicCard?.ScryfallImageUri ?? String.Empty });
 
                                 <Tooltip Placement="TooltipPlacement.BottomEnd"
-                                     Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
+                                         Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
                                     <Paragraph>@context?.name</Paragraph>
                                 </Tooltip>
                             }
                         </DisplayTemplate>
                     </DataGridColumn>
                     <DataGridColumn Field="@nameof(MagicCard.manaCost)" Caption="Mana Cost" HeaderCellClass="bg-dark" Sortable Filterable>
+                        <FilterTemplate>
+                            <Div Flex="Flex.Row.JustifyContent.Start">
+                                <Select Width="Width.Is50" TValue="String" SelectedValue="@_selectedComparisonOperator" SelectedValueChanged="@(value => { _selectedComparisonOperator = value; context.TriggerFilterChange(value); })">
+                                    <SelectItem Value="@("*")">All</SelectItem>
+                                    <SelectItem Value="@(">=")">Greater Than Or Equal To</SelectItem>
+                                    <SelectItem Value="@("<=")">Less Than Or Equal To</SelectItem>
+                                    <SelectItem Value="@(">")">Greater Than</SelectItem>
+                                    <SelectItem Value="@("<")">Less Than</SelectItem>
+                                    <SelectItem Value="@("=")">Equals</SelectItem>
+                                </Select>
+                                <NumericPicker Width="Width.Is25" TValue="decimal" Value="_magicCardManaCost" ValueChanged="@(value => { _magicCardManaCost = value; context.TriggerFilterChange(value);})"/>
+                            </Div>
+                        </FilterTemplate>
                         <DisplayTemplate>
                             <Repeater TItem="string" Items="context.ManaCostSvgUris" Context="manaCostContext">
                                 <Image Source="@manaCostContext" Text="@context.manaCost" Style="height: 32px; width: 32px;" />
                             </Repeater>
                         </DisplayTemplate>
                     </DataGridColumn>
-                    <DataGridColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" HeaderCellClass="bg-dark" Sortable Filterable>
+                    <DataGridSelectColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" HeaderCellClass="bg-dark" Sortable>
+                        <FilterTemplate>
+                            <Autocomplete TItem="MagicSet"
+                                          TValue="String"
+                                          Data="@_availableSets"
+                                          TextField="@( item => item.name)"
+                                          ValueField="@( item => item.code)"
+                                          Placeholder="Search..."
+                                          Multiple
+                                          FreeTyping
+                                          SelectedValues="_setsToSearch"
+                                          @bind-SelectedTexts="_multipleSelectionTexts"
+                                          SelectedValuesChanged="@(value => { _setsToSearch= value; context.TriggerFilterChange( _setsToSearch ); })">
+                            </Autocomplete>
+                        </FilterTemplate>
                         <DisplayTemplate>
                             <Tooltip Text="@context.SetName">
-                                <Image Source="@context.ScryfallSetIconUri" Style="height: 32px; width: 32px;" Text="@context.setCode" Class="lazyload" Background="Background.Secondary"/>
+                                <Image Source="@context.ScryfallSetIconUri" Style="height: 32px; width: 32px;" Text="@context.setCode" Class="lazyload" Background="Background.Secondary" />
                             </Tooltip>
                         </DisplayTemplate>
-                    </DataGridColumn>
+                    </DataGridSelectColumn>
                 </DataGridColumns>
+                <ButtonRowTemplate>
+                    <Button Color="Color.Warning" 
+                            Border="Border.Is2.OnAll.Rounded.Light" 
+                            Clicked="@ClearFilter(context)">@context.ClearFilterCommand.LocalizationString</Button>
+                </ButtonRowTemplate>
                 <PageButtonTemplate>
                     <Div TextColor="@(context.Active ? TextColor.White50 : TextColor.Light)" Class="text-decoration-underline">
                         @context.PageNumer

@@ -1,0 +1,11 @@
+﻿global using System.Globalization;
+global using CsvHelper;
+global using Microsoft.EntityFrameworkCore;
+global using MTGView.Core.Mapping.ExcelMappings;
+global using MTGView.Core.Models;
+global using MTGView.Data.Background;
+global using MTGView.Data.Background.Extensions;
+global using MTGView.Data.Background.Helpers;
+global using MTGView.Data.Background.Interfaces;
+global using MTGView.Data.Background.Models;
+global using MTGView.Data.EFCore.Contexts;

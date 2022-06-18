@@ -90,12 +90,8 @@ public partial class MagicCard
     [JsonIgnore]
     public string ScryfallSetIconUri { get; set; }
 
-    [JsonIgnore]
-    public Guid? CollectionCardMappingId { get; set; }
 
     [NotMapped] [JsonIgnore] public IEnumerable<String> ScryfallImagesAsSizes { get; set; } = new List<string>(10);
-
-    [JsonIgnore] public virtual PersonalCardMapping CollectionCardMapping { get; set; }
 
     [NotMapped]
     [JsonIgnore]

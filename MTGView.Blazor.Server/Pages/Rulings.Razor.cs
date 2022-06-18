@@ -19,7 +19,7 @@ public partial class Rulings : ComponentBase
     private static Task<List<Ruling>> LoadRulings(MagicthegatheringDbContext context, DataGridReadDataEventArgs<Ruling> eventArgs)
     {
         var cards = context.Rulings
-            .DynamicFilter(eventArgs)
+            //.DynamicFilter(eventArgs)
             .DynamicSort(eventArgs)
             .Paging(eventArgs)
             .ToListAsync(eventArgs.CancellationToken);

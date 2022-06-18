@@ -27,13 +27,17 @@ public static class IEnumerableExtensions
     /// <typeparam name="T">The type we're filtering results down</typeparam>
     /// <param name="source">The source queryable</param>
     /// <param name="columnStates">Contains the filtering context</param>
+    /// <param name="results">The amount of records returned after applying the filter</param>
     /// <returns></returns>
-    public static IQueryable<T> DynamicFilter<T>(this IQueryable<T> source, DataGridReadDataEventArgs<T> columnStates)
+    public static IQueryable<T> DynamicFilter<T>(this IQueryable<T> source, DataGridReadDataEventArgs<T> columnStates, out int results)
     {
         source = columnStates
             .Columns
-            .Where(cs => cs.SearchValue is not null)
-            .Aggregate(source, (current, columnState) => FilterBy(current.AsQueryable(), columnState));
+            .Where(c => c.SearchValue != null)
+            .Aggregate(source, (current, columnState) =>
+                current.WhereInterpolated($"{columnState.Field} in {columnState.SearchValue}"));
+
+        results = source.Count();
 
         return source;
     }
@@ -43,12 +47,13 @@ public static class IEnumerableExtensions
     /// Splits the <paramref name="source"/> into chunks of a specified size, and returns them as an array to iterate through
     /// </summary>
     /// <typeparam name="T">The underlying chunk type</typeparam>
-    /// <param name="source">The provided queryable</param>
+    /// <param name="source">The provided <see cref="IQueryable{T}"/></param>
     /// <param name="columnInfo">Information regarding the chunk size</param>
     /// <returns></returns>
     public static IQueryable<T> Paging<T>(this IQueryable<T> source, DataGridReadDataEventArgs<T> columnInfo)
     {
         return source
+            .DynamicSort(columnInfo)
             .Skip(columnInfo.PageSize * (columnInfo.Page -1))
             .Take(columnInfo.PageSize);
     }
@@ -67,23 +72,6 @@ public static class IEnumerableExtensions
             .Columns
             .Where(cs => cs.SortDirection is not SortDirection.Default)
             .Aggregate(source, (current, columnState) => SortBy(current.AsQueryable(), columnState));
-
-        return source;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="columnStates"></param>
-    /// <returns></returns>
-    public static IEnumerable<T> DynamicFilter<T>(this IEnumerable<T> source, DataGridReadDataEventArgs<T> columnStates)
-    {
-        source = columnStates
-            .Columns
-            .Where(cs => cs.SearchValue is not null)
-            .Aggregate(source, (current, columnState) => FilterBy(current.AsQueryable(), columnState));
 
         return source;
     }
@@ -125,12 +113,6 @@ public static class IEnumerableExtensions
             _ => String.Empty
         };
 
-    private static IQueryable<T> FilterBy<T>(this IQueryable<T> source, DataGridColumnInfo columnState)
-    {
-        source = source.WhereInterpolated($"{columnState.Field} == {columnState.SearchValue}");
-
-        return source;
-    }
     private static bool IsOrdered<T>(this IQueryable<T> source)
     {
         if (source is null)

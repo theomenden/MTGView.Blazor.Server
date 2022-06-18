@@ -16,6 +16,8 @@ public partial class Index : ComponentBase
     [Inject] public SetInformationRepository SetInformationRepository { get; init; }
 
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
+    
+    [Inject] public IPageProgressService PageProgressService { get; init; }
     #endregion
     #region Fields
     private IEnumerable<ScryfallSetDetails> _setDetails = new List<ScryfallSetDetails>(800);
@@ -34,19 +36,23 @@ public partial class Index : ComponentBase
     #region Lifecycle Methods
     protected override async Task OnInitializedAsync()
     {
+        await PageProgressService.Go(null, options => { options.Color = Color.Warning; });
+
         await PopulateIndexedDbOnLoad();
 
         await PopulateRandomCardInformation();
 
         await PopulateRandomCardScryfallImage();
+
+        await PageProgressService.Go(-1, options => { options.Color = Color.Warning; });
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
         {
-
             await SetInformationRepository.CreateOrUpdateMany(_setDetails);
+
             await SymbologyRepository.CreateOrUpdateMany(_symbols);
 
             await AddSetInformation();
@@ -74,13 +80,17 @@ public partial class Index : ComponentBase
 
     private async Task PopulateRandomCardScryfallImage()
     {
-        var scryfallCardDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCard.scryfallId);
+        if (_magicCard is not null)
+        {
+            var scryfallCardDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCard.scryfallId);
 
-        var materializedCardData = scryfallCardDataResponse.Data;
+            var materializedCardData = scryfallCardDataResponse.Data;
 
-        _magicCard.ScryfallImageUri = materializedCardData.image_uris?.HighResolution ?? String.Empty;
+            _magicCard.ScryfallImageUri = materializedCardData.image_uris?.HighResolution ?? String.Empty;
 
-        _magicCard.ScryfallImagesAsSizes = materializedCardData.image_uris?.GetAllImagesAsSizes() ?? new List<String>(1);
+            _magicCard.ScryfallImagesAsSizes =
+                materializedCardData.image_uris?.GetAllImagesAsSizes() ?? new List<String>(1);
+        }
     }
 
     private async Task PopulateIndexedDbOnLoad()
@@ -106,6 +116,10 @@ public partial class Index : ComponentBase
     private Task AddColorIdentitySymbols()
     {
         var regex = _regex.Value;
+        if (_magicCard is null)
+        {
+            return Task.CompletedTask;
+        }
 
         var matches = regex.Matches(_magicCard.colorIdentity ?? String.Empty)
             .SelectMany(match => match.Groups.Values);
@@ -113,7 +127,8 @@ public partial class Index : ComponentBase
         foreach (var match in matches)
         {
             var symbolToAdd = _symbols.First(l => !String.IsNullOrWhiteSpace(l.LooseVariant)
-                                                                                    && l.LooseVariant.Equals(match.Value, StringComparison.OrdinalIgnoreCase));
+                                                  && l.LooseVariant.Equals(match.Value,
+                                                      StringComparison.OrdinalIgnoreCase));
 
             _magicCard.ColorIdentitySvgUris.TryAdd(match.Value, symbolToAdd.SvgUri);
         }
@@ -123,13 +138,15 @@ public partial class Index : ComponentBase
 
     private Task AddSetInformation()
     {
-        if (String.IsNullOrWhiteSpace(_magicCard?.setCode))
+        if (_magicCard is null || !String.IsNullOrWhiteSpace(_magicCard.setCode))
         {
-            var setInformation =
-                _setDetails.First(s => s.Code.Equals(_magicCard.setCode, StringComparison.OrdinalIgnoreCase));
-
-            _setName = $"<strong>{setInformation.Name}</strong><br />Released: <em>{setInformation.ReleasedAt:d}</em>";
+            return Task.CompletedTask;
         }
+
+        var setInformation =
+            _setDetails.First(s => s.Code.Equals(_magicCard.setCode, StringComparison.OrdinalIgnoreCase));
+
+        _setName = $"<strong>{setInformation.Name}</strong><br />Released: <em>{setInformation.ReleasedAt:d}</em>";
 
         return Task.CompletedTask;
     }

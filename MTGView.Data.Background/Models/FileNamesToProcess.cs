@@ -1,6 +1,6 @@
 ﻿namespace MTGView.Data.Background.Models;
 
-public class FileNamesToProcess
+public static class FileNamesToProcess
 {
     public const string Cards = "cards";
     public const string ForeignData = "foreign_data";
