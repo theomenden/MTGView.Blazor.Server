@@ -29,6 +29,15 @@ public class SetInformationRepository
         return result.FirstOrDefault();
     }
 
+    public async Task<IDictionary<String,ScryfallSetDetails>> GetBySetCodes(IEnumerable<String> setCodes)
+    {
+        var result = await _db.ScryfallSetInformationStore.Where(nameof(ScryfallSetDetails.Code))
+            .AnyOfIgnoreCase(setCodes)
+            .ToArray();
+
+        return result.ToDictionary(r => r.Code, r=> r);
+    }
+
     public async Task<ScryfallSetDetails> CreateOrUpdate(ScryfallSetDetails setDetail)
     {
         await _db.ScryfallSetInformationStore.Put(setDetail);

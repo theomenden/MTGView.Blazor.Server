@@ -105,9 +105,5 @@ public partial class MagicCard
     [JsonIgnore] 
     public IDictionary<String,String> ColorIdentitySvgUris { get; set; } = new Dictionary<String,String>(5);
 
-    public static MagicCard From(MagicCard card, IEnumerable<Legality> legalities)
-    {
-        card.Legalities = legalities.ToArray();
-        return card;
-    }
+    [NotMapped] [JsonIgnore] public string CurrentPrice { get; set; } = String.Empty;
 }

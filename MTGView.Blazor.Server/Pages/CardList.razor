@@ -63,10 +63,9 @@
                             </Button>
                         </DisplayTemplate>
                     </DataGridColumn>
-                    <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark" Filterable>
+                    <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark" Filterable="false">
                         <FilterTemplate>
-                            <TextEdit Text="@_cardName" TextChanged="@(value => { _cardName = value; if (value.Length < 3) {return;} 
-                                                                                    context.TriggerFilterChange(value); })" />
+                            <TextEdit Text="@_cardName" TextChanged="@(value => { _cardName = value; if (value.Length >= 3) { context.TriggerFilterChange(value); }})" />
                         </FilterTemplate>
                         <DisplayTemplate>
                             @{

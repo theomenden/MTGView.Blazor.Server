@@ -31,7 +31,7 @@ public class BackgroundUpdatingService : BackgroundService
     {
         using var timer = new PeriodicTimer(_updateInterval);
 
-        while (!stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
+        while (_executionCount == 0 || !stoppingToken.IsCancellationRequested && await timer.WaitForNextTickAsync(stoppingToken))
         {
             try
             {

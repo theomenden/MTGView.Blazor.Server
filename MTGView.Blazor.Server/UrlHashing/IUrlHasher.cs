@@ -94,6 +94,5 @@ public interface IUrlHasher
     #region String Encoding Methods
 
     String EncodeHex(String hex);
-
     #endregion
 }

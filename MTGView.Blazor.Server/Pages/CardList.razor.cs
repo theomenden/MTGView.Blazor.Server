@@ -1,7 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using Blazorise.DataGrid;
-using MTGView.Blazor.Server.Invariants;
-using MTGView.Blazor.Server.UrlHashing;
 
 namespace MTGView.Blazor.Server.Pages;
 public partial class CardList : ComponentBase
@@ -12,8 +10,6 @@ public partial class CardList : ComponentBase
     [Inject] public IScryfallCardService ScryfallCardService { get; init; }
 
     [Inject] public IScryfallSetInformationService ScryfallSetInformationService { get; init; }
-
-    [Inject] public IUrlHasher UrlHasher { get; init; }
 
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
 
@@ -110,18 +106,20 @@ public partial class CardList : ComponentBase
 
             var scryfallData = scryfallDataResponse.Data;
 
-            magicCard.ScryfallImageUri = scryfallData.image_uris.BorderCropped;
+            if (scryfallData.image_uris is not null)
+            {
+                magicCard.ScryfallImageUri = scryfallData.image_uris.BorderCropped;
 
-            magicCard.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
-
+                magicCard.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
+            }
             await AddVisibleSetSymbols(magicCard);
 
             await AddManaCostVisibleSymbols(magicCard);
 
             await GetSetName(magicCard);
-
-            await InvokeAsync(StateHasChanged);
         }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     //THINDAL Provided Guidance :) 4/17/2022
@@ -170,11 +168,6 @@ public partial class CardList : ComponentBase
         _multipleSelectionTexts = new();
 
         return context.ClearFilterCommand.Clicked;
-    }
-
-    private Task<String> EncodeUrl(Guid guid)
-    {
-        return Task.FromResult(String.Empty);
     }
     #endregion
 }

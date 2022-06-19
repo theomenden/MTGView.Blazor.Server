@@ -25,21 +25,33 @@ public partial class CardDetails : ComponentBase
         {"Legal", Color.Success}
     };
 
+    private IEnumerable<Ruling>? _rulings;
+
     private MagicCard? _magicCardToReview;
 
+    private IDictionary<String, ScryfallSetDetails> _setValuePairs = new Dictionary<String, ScryfallSetDetails>(15);
+
     #region Lifecycle Methods
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
 
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("cardId", out var cardId)
             && Guid.TryParse(cardId, out var magicGuid))
         {
-            using var context = MtgContextFactory.CreateDbContext();
+            await using var context = await MtgContextFactory.CreateDbContextAsync();
 
-            _magicCardToReview = context.Cards.First(card => card.uuid == magicGuid);
+            _magicCardToReview = context.Cards.AsQueryable().First(card => card.uuid == magicGuid);
 
-            _magicCardToReview.Legalities = context.Legalities.Where(legality => legality.uuid == magicGuid).ToArray();
+            _magicCardToReview.Legalities = await context.Legalities
+                .Where(legality => legality.uuid == magicGuid)
+                .AsAsyncEnumerable()
+                .ToArrayAsync();
+
+            _rulings = await context.Rulings
+                .Where(r => r.RulingGuid == _magicCardToReview.uuid)
+                .AsAsyncEnumerable()
+                .ToArrayAsync();
         }
     }
 
@@ -47,24 +59,39 @@ public partial class CardDetails : ComponentBase
     {
         if (firstRender)
         {
-            await GetScryfallImageInformation();
-            await AddManaCostVisibleSymbols();
-            await AddVisibleSetSymbols();
+            await Task.WhenAll(
+                GetScryfallCardApiInformation(),
+                AddManaCostVisibleSymbols(),
+                AddVisibleSetSymbols(),
+                GetOtherPrintingSetSymbolUris());
+
+            await InvokeAsync(StateHasChanged);
         }
     }
     #endregion
     #region Private Methods
-    private async Task GetScryfallImageInformation()
+    private async Task GetScryfallCardApiInformation()
     {
         var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCardToReview.scryfallId);
 
         var scryfallData = scryfallDataResponse.Data;
 
-        _magicCardToReview.ScryfallImageUri = scryfallData.image_uris.Normal;
+        if (scryfallData.image_uris is not null)
+        {
+            _magicCardToReview.ScryfallImageUri = scryfallData.image_uris.Normal ?? String.Empty;
 
-        _magicCardToReview.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
+            _magicCardToReview.ScryfallImagesAsSizes = scryfallData.image_uris.GetAllImagesAsSizes();
+        }
 
-        StateHasChanged();
+        if (scryfallData.purchase_uris is not null)
+        {
+            _magicCardToReview.purchaseUrls = scryfallData.purchase_uris.tcgplayer;
+        }
+
+        if (scryfallData.prices is not null)
+        {
+            _magicCardToReview.CurrentPrice = $"${scryfallData.prices.usd}";
+        }
     }
 
     //THINDAL Provided Guidance :) 4/17/2022
@@ -81,8 +108,6 @@ public partial class CardDetails : ComponentBase
 
             _magicCardToReview.ManaCostSvgUris.Add(symbolToAdd?.SvgUri ?? String.Empty);
         }
-
-        StateHasChanged();
     }
 
     private async Task AddVisibleSetSymbols()
@@ -90,8 +115,16 @@ public partial class CardDetails : ComponentBase
         var symbolToAdd = await SetInformationRepository.GetBySetCode(_magicCardToReview.setCode ?? String.Empty);
 
         _magicCardToReview.ScryfallSetIconUri = symbolToAdd?.IconUri ?? String.Empty;
+    }
 
-        StateHasChanged();
+    private async Task GetOtherPrintingSetSymbolUris()
+    {
+        if (_magicCardToReview is not null && !String.IsNullOrWhiteSpace(_magicCardToReview.printings))
+        {
+            var setCodes = _magicCardToReview.printings.Split(',');
+
+            _setValuePairs = await SetInformationRepository.GetBySetCodes(setCodes);
+        }
     }
 
     private Color DetermineBackgroundFromStatus(String status)
