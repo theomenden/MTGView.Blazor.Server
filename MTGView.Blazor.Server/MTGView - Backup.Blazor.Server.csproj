@@ -12,14 +12,6 @@
     <UserSecretsId>e3b0567d-203d-42d7-8404-8a42341227a1</UserSecretsId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Company>The Omen Den L.L.C.</Company>
-    <Authors>Andrew D. Beers</Authors>
-    <Copyright>2022</Copyright>
-    <RepositoryUrl>https://github.com/theomenden/MTGView.Blazor.Server</RepositoryUrl>
-    <PackageTags>blazor;magic the gathering;csharp;blazorise</PackageTags>
-    <Description>A simple Card viewer for Magic the Gathering cards 
-(We maintain no affiliation to Wizards of the Coast (WOTC) or any provider/subsidiary of them or Hasbro.)</Description>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
   <Target Name="GenerateVersionInfo" BeforeTargets="BeforeBuild">
     <WriteLinesToFile File="Properties\VersionInfo.cs" Lines="$(AssemblyFileVersionAttribute)" Overwrite="true"></WriteLinesToFile>
@@ -96,8 +88,21 @@
     <ProjectReference Include="..\MTGView.Data.Personal.EfCore\MTGView.Data.Personal.EfCore.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Content Update="electron.manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

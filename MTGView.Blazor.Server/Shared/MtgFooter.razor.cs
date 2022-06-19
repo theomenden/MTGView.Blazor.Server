@@ -9,21 +9,6 @@ public partial class MtgFooter : ComponentBase
 
     [Parameter] public EventCallback<string> ThemeColorChanged { get; init; }
 
-    private string _username = String.Empty;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await GetClaimsPrincipalData();
-    }
-
-    private Task GetClaimsPrincipalData()
-    {
-        _username = Environment.UserName;
-
-        return Task.CompletedTask;
-    }
-
-    private static string GetCurrentUserName => Environment.UserName;
 
     private static string AssemblyProductVersion
     {

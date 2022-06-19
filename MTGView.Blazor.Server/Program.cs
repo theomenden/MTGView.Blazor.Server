@@ -1,5 +1,7 @@
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using ElectronNET.API;
+using Microsoft.Extensions.Hosting;
 using MTGView.Blazor.Server.Bootstrapping;
 using MTGView.Blazor.Server.Middleware;
 using MTGView.Blazor.Server.Models;
@@ -24,6 +26,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+
     builder.Host
         .ConfigureAppConfiguration((context, config) =>
         {
@@ -32,11 +35,15 @@ try
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true)
                 .AddEnvironmentVariables();
+
+            Task.Run(async () => await Electron.WindowManager.CreateWindowAsync());
         })
         .UseDefaultServiceProvider(options => options.ValidateScopes = false)
         .UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services));
+
+    builder.WebHost.UseElectron(args);
 
     builder.Logging
         .ClearProviders()
