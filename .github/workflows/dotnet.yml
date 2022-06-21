@@ -13,20 +13,20 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: 'microsoft'
+          distribution: 'temurin'
           java-version: '17'
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Cache SonarCloud packages
-        uses: actions/cache@v3
+        uses: actions/cache@v1
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v3
+        uses: actions/cache@v1
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
@@ -44,28 +44,31 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"theomenden_MTGView.Blazor.Server" /o:"theomenden" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          name: build
+
           env:
             DOTNET_VERSION: '6.0.x' # The .NET SDK version to use
-          build:
 
-            name: build-${{matrix.os}}
-            runs-on: ${{ matrix.os }}
-            strategy:
-              matrix:
-                os: [ubuntu-latest, windows-latest]
+          jobs:
+            build:
 
-            steps:
-            - uses: actions/checkout@v3
-            - name: Setup .NET 6
-              uses: actions/setup-dotnet@v2.1.0
-              with:
-                dotnet-version: ${{ env.DOTNET_VERSION }}
+              name: build-${{matrix.os}}
+              runs-on: ${{ matrix.os }}
+              strategy:
+                matrix:
+                  os: [ubuntu-latest, windows-latest, macOS-latest]
 
-            - name: Install dependencies
-              run: dotnet restore
-              
-            - name: Build
-              run: dotnet build --no-restore                
+              steps:
+              - uses: actions/checkout@v3 
+              - name: Setup .NET 6
+                uses: actions/setup-dotnet@v2.1.0
+                with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+              - name: Install dependencies
+                run: dotnet restore
+                
+              - name: Build
+                run: dotnet build --configuration Release --no-restore
+
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-
-          
