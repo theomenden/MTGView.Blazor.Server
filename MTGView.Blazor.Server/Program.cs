@@ -56,6 +56,8 @@ try
         .AddBootstrapIcons()
         .AddBlazoriseRichTextEdit();
 
+    builder.Services.AddElectron();
+
     builder.Services.AddLocalization();
 
     builder.Services.AddLazyCache();
@@ -96,7 +98,7 @@ try
             options.MaximumReceiveMessageSize = 104_857_600;
         });
 
-    var app = builder.Build();
+    using var app = builder.Build();
 
     app.UseResponseCompression();
 
@@ -129,6 +131,14 @@ try
 
     app.MapBlazorHub();
     app.MapFallbackToPage("/_Host");
+
+    if(HybridSupport.IsElectronActive)
+    {
+        var window = await Electron.WindowManager.CreateWindowAsync();
+        window.OnClosed += () => {
+            Electron.App.Quit();
+        };
+    }
 
     await app.RunAsync();
 }

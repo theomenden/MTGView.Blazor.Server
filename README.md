@@ -15,3 +15,7 @@
 ### **MtgJson** is where most of the underlying card information is imported, via a self-contained background running service
 ## [Scryfall](https://scryfall.com/)
 ### **Scryfall** is where the imagery, and latest pricing information is imported. 
+
+
+####
+MTG Blazor is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC
