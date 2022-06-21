@@ -16,6 +16,8 @@ public partial class MagicthegatheringDbContext : DbContext
 
     public virtual DbSet<MagicCard> Cards { get; set; } = null!;
 
+    public virtual DbSet<Keyword> Keywords { get; set; } = null!;
+
     public virtual DbSet<Meta> Metas { get; set; } = null!;
     
     public virtual DbSet<Legality> Legalities { get; set; } = null!;
@@ -27,10 +29,13 @@ public partial class MagicthegatheringDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new Configurations.CardConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.KeywordConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.MetaConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.LegalityConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.RulingConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.SetConfiguration());
+
+
 
         OnModelCreatingPartial(modelBuilder);
     }

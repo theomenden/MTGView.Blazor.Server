@@ -3,17 +3,18 @@ using MTGView.Data.Background.Interfaces;
 
 namespace MTGView.Data.Background.Internal;
 
-internal sealed class UnzippingService : IUnzippingService
+internal sealed class FileProcessingService : IUnzippingService
 {
     private readonly IHttpClientFactory _mtgJsonClientFactory;
-    private readonly ILogger<UnzippingService> _logger;
+    private readonly ILogger<FileProcessingService> _logger;
 
     private const string CompressedExtension = ".zip";
     private const string AllPrintingsFileName = "AllPrintingsCSVFiles";
-    private const string CompleteFileName = $"{AllPrintingsFileName}{CompressedExtension}";
+    private const string KeywordsFileName = $"{FileNamesToProcess.Keywords}.json";
+    private const string AllPrintingsCompressedFileName = $"{AllPrintingsFileName}{CompressedExtension}";
     private string _filePath = String.Empty;
 
-    public UnzippingService(IHttpClientFactory httpClientFactory, ILogger<UnzippingService> logger)
+    public FileProcessingService(IHttpClientFactory httpClientFactory, ILogger<FileProcessingService> logger)
     {
         _mtgJsonClientFactory = httpClientFactory;
         _logger = logger;
@@ -23,7 +24,7 @@ internal sealed class UnzippingService : IUnzippingService
     {
         using var client = _mtgJsonClientFactory.CreateClient("MtgJsonClient");
 
-        using var message = new HttpRequestMessage(HttpMethod.Get, $"{client.BaseAddress}{CompleteFileName}");
+        using var message = new HttpRequestMessage(HttpMethod.Get, $"{client.BaseAddress}{AllPrintingsCompressedFileName}");
 
         using var response = await client.SendAsync(message, cancellationToken);
 
@@ -31,7 +32,7 @@ internal sealed class UnzippingService : IUnzippingService
         {
             await using var content = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-            await DeserializeStreamToFile(content);
+            await DeserializeStreamToFileAsync(AllPrintingsCompressedFileName, content, cancellationToken);
 
             await UnzipDownloadedFile();
         }
@@ -63,7 +64,7 @@ internal sealed class UnzippingService : IUnzippingService
 
             ZipFile.ExtractToDirectory(_filePath, currentDirectory, true);
          
-            File.Delete($"{currentDirectory}\\{CompleteFileName}");
+            File.Delete($"{currentDirectory}\\{AllPrintingsCompressedFileName}");
         }
         catch (Exception ex)
         {
@@ -73,24 +74,29 @@ internal sealed class UnzippingService : IUnzippingService
         return Task.CompletedTask;
     }
 
-    private async Task DeserializeStreamToFile(Stream stream)
+    private async Task DeserializeStreamToFileAsync(String fileName, Stream stream, CancellationToken cancellationToken)
     {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+
         if (!stream.CanRead)
         {
             var exception = new IOException($"Stream was unable to be read {nameof(stream)}");
 
-            _logger.LogError("Could read stream into file for {fileName}: {@ex}", CompleteFileName, exception);
+            _logger.LogError("Could read stream into file for {fileName}: {@ex}", fileName, exception);
 
             return;
         }
 
-        var fileInfo = new FileInfo($"{CompleteFileName}");
+        var fileInfo = new FileInfo($"{fileName}");
 
         await using var fileStream = File.Create(fileInfo.FullName);
 
         stream.Seek(0, SeekOrigin.Begin);
 
-        await stream.CopyToAsync(fileStream);
+        await stream.CopyToAsync(fileStream, cancellationToken);
 
         _filePath = fileInfo.FullName;
     }

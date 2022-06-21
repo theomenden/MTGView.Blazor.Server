@@ -19,7 +19,6 @@ public partial class Rulings : ComponentBase
     private static Task<List<Ruling>> LoadRulings(MagicthegatheringDbContext context, DataGridReadDataEventArgs<Ruling> eventArgs)
     {
         var cards = context.Rulings
-            //.DynamicFilter(eventArgs)
             .DynamicSort(eventArgs)
             .Paging(eventArgs)
             .ToListAsync(eventArgs.CancellationToken);
@@ -50,6 +49,9 @@ public partial class Rulings : ComponentBase
 
         StateHasChanged();
     }
+
+
+
     private Task Reset()
     {
         return _dataGrid.Reload();

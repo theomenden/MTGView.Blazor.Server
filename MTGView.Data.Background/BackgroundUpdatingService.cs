@@ -47,7 +47,8 @@ public class BackgroundUpdatingService : BackgroundService
                 {
                     ConsumeCardReplacementServices(stoppingToken),
                     ConsumeRulingReplacementServices(stoppingToken),
-                    ConsumeLegalityReplacementServices(stoppingToken)
+                    ConsumeLegalityReplacementServices(stoppingToken),
+                    ConsumeKeywordsService(stoppingToken)
                 };
 
                 await Task.WhenAll(tasksToRun);
@@ -169,6 +170,15 @@ public class BackgroundUpdatingService : BackgroundService
         await scopedProcessingService.DeserializeCsvToLegalities($"{FileNamesToProcess.Legalities}", stoppingToken);
 
         _logger.LogInformation("Processing finished at {timeStarted}", DateTime.Now);
+    }
+
+    private async Task ConsumeKeywordsService(CancellationToken stoppingToken)
+    {
+        await using var scope = _services.CreateAsyncScope();
+
+        var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IReplaceKeywordsService>();
+
+        await scopedProcessingService.DownloadKeywordsData(stoppingToken);
     }
     #endregion
 }

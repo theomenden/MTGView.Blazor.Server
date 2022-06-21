@@ -72,7 +72,7 @@ public partial class CardDetails : ComponentBase
     #region Private Methods
     private async Task GetScryfallCardApiInformation()
     {
-        var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCardToReview.scryfallId);
+        var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCardToReview?.scryfallId ?? Guid.Empty);
 
         var scryfallData = scryfallDataResponse.Data;
 
@@ -112,7 +112,7 @@ public partial class CardDetails : ComponentBase
 
     private async Task AddVisibleSetSymbols()
     {
-        var symbolToAdd = await SetInformationRepository.GetBySetCode(_magicCardToReview.setCode ?? String.Empty);
+        var symbolToAdd = await SetInformationRepository.GetBySetCode(_magicCardToReview?.setCode ?? String.Empty);
 
         _magicCardToReview.ScryfallSetIconUri = symbolToAdd?.IconUri ?? String.Empty;
     }

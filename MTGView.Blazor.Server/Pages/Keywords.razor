@@ -1,10 +1,11 @@
-﻿@page "/rulings"
+﻿@page "/keywords"
+<PageTitle>Current MTG Keywords</PageTitle>
 <Jumbotron Background="Background.Dark"
            TextColor="TextColor.Light"
            Margin="Margin.Is2.OnAll.OnWidescreen.Is4.OnY.OnMobile"
            Padding="Padding.Is1.OnAll.OnWidescreen.Is4.OnAll.OnMobile"
            Border="Border.Is2.Rounded.Light.OnAll">
-    <JumbotronTitle Size="JumbotronTitleSize.Is1" TextColor="TextColor.Light">Current Rulings from Magic The Gathering Official</JumbotronTitle>
+    <JumbotronTitle Size="JumbotronTitleSize.Is1" TextColor="TextColor.Light">Current Keywords in Magic The Gathering</JumbotronTitle>
     <JumbotronSubtitle TextColor="TextColor.White50">Don't try to memorize them</JumbotronSubtitle>
 </Jumbotron>
 <Divider />
@@ -15,19 +16,19 @@
            Border="Border.Is3.Rounded.Light.OnAll"
            Overflow="Overflow.Hidden">
     <DataGrid @ref="_dataGrid"
-              TItem="Ruling"
+              TItem="Keyword"
               Class="table-dark border border-2 border-light rounded rounded-2 shadow"
               Narrow
               Responsive
               Hoverable
               Striped
               Sortable
-              TotalItems="_rulingsCount"
+              TotalItems="_keywordsCount"
               FixedHeader
               FixedHeaderDataGridHeight="1000px"
               FixedHeaderDataGridMaxHeight="100vh"
               HeaderThemeContrast="ThemeContrast.Dark"
-              Data="_rulings"
+              Data="_keywords"
               ReadData="OnReadData"
               CommandMode="DataGridCommandMode.Commands"
               ShowPager
@@ -47,19 +48,19 @@
             </Span>
         </LoadingTemplate>
         <DataGridColumns>
-            <DataGridNumericColumn HeaderCellClass="bg-dark" TItem="Ruling" Caption="Ruling Number" Field="@nameof(Ruling.Id)" Sortable />
-            <DataGridDateColumn HeaderCellClass="bg-dark" TItem="Ruling" Caption="Date Created" Field="@nameof(Ruling.CreatedAt)" Sortable>
+            <DataGridNumericColumn HeaderCellClass="bg-dark" TItem="Keyword" Caption="Id" Field="@nameof(Keyword.Id)" Sortable />
+            <DataGridColumn HeaderCellClass="bg-dark" TItem="Keyword" Caption="Keyword" Field="@nameof(Keyword.Name)" Sortable="false">
                 <DisplayTemplate>
-                    @context.CreatedAt.ToShortDateString()
+                    @context.Name
                 </DisplayTemplate>
-            </DataGridDateColumn>
-            <DataGridColumn HeaderCellClass="bg-dark" TItem="Ruling" Caption="Rule Text" Field="@nameof(Ruling.RuleText)" Sortable="false">
+            </DataGridColumn>
+            <DataGridColumn HeaderCellClass="bg-dark" TItem="Keyword" Caption="Type" Field="@nameof(Keyword.RecordType)" Sortable>
                 <DisplayTemplate>
                     <Text TextColor="TextColor.Light" 
                           TextWeight="TextWeight.Light" 
                           TextOverflow="TextOverflow.Wrap" 
                           Overflow="Overflow.Scroll">
-                        @context.RuleText
+                        @DisplayKeywordNamedType(context.RecordType)
                     </Text>
                 </DisplayTemplate>
             </DataGridColumn>

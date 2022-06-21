@@ -1,5 +1,4 @@
-﻿using MTGView.Data.Background.Interfaces;
-using MTGView.Data.Background.Internal;
+﻿using MTGView.Data.Background.Internal;
 using MTGView.Data.EFCore.Extensions;
 using Polly;
 using Polly.Extensions.Http;
@@ -16,7 +15,9 @@ public static class ServiceCollectionExtensions
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
 
-        services.AddScoped<IUnzippingService, UnzippingService>()
+        services
+            .AddScoped<IUnzippingService, FileProcessingService>()
+            .AddScoped<IReplaceKeywordsService, ReplaceKeywordsService>()
             .AddScoped<IReplaceCardsService, ReplaceCardsService>()
             .AddScoped<IReplaceRulingsService, ReplaceRulingsService>()
             .AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>();
@@ -26,19 +27,20 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddBackgroundProcessingServices(this IServiceCollection services, IDictionary<String, String> connectionStrings)
     {
-        services.AddHttpClient("MtgJsonClient",client =>
+        services.AddHttpClient("MtgJsonClient", client =>
         {
-            client.BaseAddress = new (connectionStrings["MtgApi"]);
+            client.BaseAddress = new(connectionStrings["MtgApi"]);
         })
             .AddPolicyHandler(GetRetryPolicy())
             .AddPolicyHandler(GetCircuitBreakerPolicy());
 
         services.AddMtgDataServices(connectionStrings["MtgDb"]);
 
-        services.AddScoped<IUnzippingService, UnzippingService>();
-        services.AddScoped<IReplaceCardsService, ReplaceCardsService>();
-        services.AddScoped<IReplaceRulingsService, ReplaceRulingsService>();
-        services.AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>();
+        services.AddScoped<IUnzippingService, FileProcessingService>()
+                .AddScoped<IReplaceKeywordsService, ReplaceKeywordsService>()
+                .AddScoped<IReplaceCardsService, ReplaceCardsService>()
+                .AddScoped<IReplaceRulingsService, ReplaceRulingsService>()
+                .AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>();
 
         return services;
     }

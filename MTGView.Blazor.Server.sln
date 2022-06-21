@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Core", "MTGView.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.Personal.EfCore", "MTGView.Data.Personal.EfCore\MTGView.Data.Personal.EfCore.csproj", "{5C84E934-E5E2-46AB-A372-B463A2F6B69D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGView.Data.Background", "MTGView.Data.Background\MTGView.Data.Background.csproj", "{7D4497C7-4E1D-4D0B-BFA8-816970B27D5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.Background", "MTGView.Data.Background\MTGView.Data.Background.csproj", "{7D4497C7-4E1D-4D0B-BFA8-816970B27D5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

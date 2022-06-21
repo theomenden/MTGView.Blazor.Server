@@ -25,8 +25,7 @@ Log.Logger = new LoggerConfiguration()
 try
 {
     var builder = WebApplication.CreateBuilder(args);
-
-
+    
     builder.Host
         .ConfigureAppConfiguration((context, config) =>
         {

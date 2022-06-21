@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Blazorise.DataGrid;
+using MTGView.Blazor.Server.Invariants;
 
 namespace MTGView.Blazor.Server.Pages;
 public partial class CardList : ComponentBase
@@ -19,7 +20,9 @@ public partial class CardList : ComponentBase
     private IEnumerable<MagicCard> _magicCards = new List<MagicCard>(70_000);
 
     private List<String> _setsToSearch = new(20);
-    private List<String> _multipleSelectionTexts = new(20);
+    private List<String> _multipleSelectionSets = new(20);
+    private List<String> _keywordsToSearch = new(20);
+    private List<String> _multipleSelectionKeywords = new(20);
     private string _selectedComparisonOperator = String.Empty;
     private Int32 _magicCardCount;
 
@@ -31,6 +34,8 @@ public partial class CardList : ComponentBase
 
     private readonly List<MagicSet> _availableSets = new(800);
 
+    private readonly List<Keyword> _availableKeywords = new(300);
+
     private readonly Lazy<Regex> _regex = new(() => new(@"\{.\}", RegexOptions.Compiled | RegexOptions.IgnoreCase));
     #endregion
     #region Overrides
@@ -41,6 +46,11 @@ public partial class CardList : ComponentBase
         await foreach (var set in context.Sets.OrderBy(s => s.code).AsAsyncEnumerable())
         {
             _availableSets.Add(set);
+        }
+
+        await foreach (var keyword in context.Keywords.Where(c => c.RecordType == KeywordTypes.KeywordAbilities).OrderBy(k => k.Id).AsAsyncEnumerable())
+        {
+            _availableKeywords.Add(keyword);
         }
     }
     #endregion
@@ -55,6 +65,13 @@ public partial class CardList : ComponentBase
 
             queryableCards = queryableCards
                 .Where(c => EF.Functions.Like(c.name!, queryString));
+        }
+
+        if (_keywordsToSearch.Any())
+        {
+            var keywordsToSearch = "%" +String.Join(',',_keywordsToSearch)+ "%";
+
+            queryableCards = queryableCards.Where(c => EF.Functions.Like(c.keywords!, keywordsToSearch));
         }
 
         queryableCards = _selectedComparisonOperator switch
@@ -163,9 +180,13 @@ public partial class CardList : ComponentBase
         _magicCardManaCost = 0;
         _cardName = String.Empty;
         _setsToSearch.Clear();
+        _keywordsToSearch.Clear();
         _setsToSearch = new();
-        _multipleSelectionTexts.Clear();
-        _multipleSelectionTexts = new();
+        _keywordsToSearch = new();
+        _multipleSelectionSets.Clear();
+        _multipleSelectionKeywords.Clear();
+        _multipleSelectionSets = new();
+        _multipleSelectionKeywords = new();
 
         return context.ClearFilterCommand.Clicked;
     }

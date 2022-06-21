@@ -1,4 +1,4 @@
-var host = Host.CreateDefaultBuilder(args)
+using var host = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration(app => app.SetBasePath(Directory.GetCurrentDirectory())
         .AddJsonFile("appsettings.json", true, true)
         .AddEnvironmentVariables())

@@ -100,6 +100,27 @@
                             </Repeater>
                         </DisplayTemplate>
                     </DataGridColumn>
+                    <DataGridColumn Field="@nameof(MagicCard.keywords)" Caption="Abilities" HeaderCellClass="bg-dark" Filterable>
+                        <FilterTemplate>
+                                <Autocomplete TItem="Keyword"
+                                              TValue="String"
+                                              Data="@_availableKeywords"
+                                              TextField="@( item => item.Name)"
+                                              ValueField="@( item => item.Name)"
+                                              Placeholder="Search For Abilities..."
+                                              Multiple
+                                              FreeTyping
+                                              SelectedValues="_keywordsToSearch"
+                                              @bind-SelectedTexts="_multipleSelectionKeywords"
+                                              SelectedValuesChanged="@(value => { _keywordsToSearch = value; context.TriggerFilterChange( _keywordsToSearch ); })">
+                                </Autocomplete>
+                            </FilterTemplate>
+                        <DisplayTemplate>
+                            <Text TextTransform="TextTransform.Uppercase" TextWeight="TextWeight.Light" Italic>
+                                @context?.keywords
+                            </Text>
+                        </DisplayTemplate>
+                    </DataGridColumn>
                     <DataGridSelectColumn Field="@nameof(MagicCard.setCode)" Caption="Set Available In" HeaderCellClass="bg-dark" Sortable>
                         <FilterTemplate>
                             <Autocomplete TItem="MagicSet"
@@ -111,7 +132,7 @@
                                           Multiple
                                           FreeTyping
                                           SelectedValues="_setsToSearch"
-                                          @bind-SelectedTexts="_multipleSelectionTexts"
+                                          @bind-SelectedTexts="_multipleSelectionSets"
                                           SelectedValuesChanged="@(value => { _setsToSearch= value; context.TriggerFilterChange( _setsToSearch ); })">
                             </Autocomplete>
                         </FilterTemplate>

@@ -4,6 +4,7 @@ public static class FileNamesToProcess
 {
     public const string Cards = "cards";
     public const string ForeignData = "foreign_data";
+    public const string Keywords = "Keywords";
     public const string Legalities = "legalities";
     public const string Meta = "meta";
     public const string Rulings = "rulings";
