@@ -44,31 +44,5 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"theomenden_MTGView.Blazor.Server" /o:"theomenden" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          name: build
-
-          env:
-            DOTNET_VERSION: '6.0.x' # The .NET SDK version to use
-
-          jobs:
-            build:
-
-              name: build-${{matrix.os}}
-              runs-on: ${{ matrix.os }}
-              strategy:
-                matrix:
-                  os: [ubuntu-latest, windows-latest, macOS-latest]
-
-              steps:
-              - uses: actions/checkout@v3 
-              - name: Setup .NET 6
-                uses: actions/setup-dotnet@v2.1.0
-                with:
-                  dotnet-version: ${{ env.DOTNET_VERSION }}
-
-              - name: Install dependencies
-                run: dotnet restore
-                
-              - name: Build
-                run: dotnet build --configuration Release --no-restore
-
+            dotnet build
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
