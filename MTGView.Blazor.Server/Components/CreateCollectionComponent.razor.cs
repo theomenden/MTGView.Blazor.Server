@@ -1,4 +1,5 @@
 ﻿using MTGView.Data.Personal.EfCore.Contexts;
+using MTGView.Data.Scryfall.Internal;
 
 namespace MTGView.Blazor.Server.Components
 {
@@ -8,7 +9,7 @@ namespace MTGView.Blazor.Server.Components
 
         [Inject] public IDbContextFactory<PersonalcollectionsDbContext> PersonalCollectionDbContextFactory { get; init; }
 
-        [Inject] public IScryfallCardService ScryfallCardService { get; init; }
+        [Inject] public ScryfallCardService ScryfallCardService { get; init; }
 
         [Inject] public ILogger<CreateCollectionComponent> Logger { get; init; }
 
@@ -73,7 +74,7 @@ namespace MTGView.Blazor.Server.Components
                                .Where(c => c.setCode.Equals(_magicSet.code))
                                .AsAsyncEnumerable())
             {
-                var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(card.scryfallId);
+                var scryfallDataResponse = await ScryfallCardService.GetContentAsync(card.scryfallId.ToString());
 
                 var scryfallData = scryfallDataResponse.Data;
 

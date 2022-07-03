@@ -1,41 +1,31 @@
 ﻿
+using Microsoft.Extensions.Options;
+using TheOmenDen.Shared.Configuration;
+using TheOmenDen.Shared.Infrastructure;
+
 namespace MTGView.Data.Scryfall.Internal;
 
-internal class ScryfallSetInformationService : IScryfallSetInformationService
+public sealed class ScryfallSetInformationService : ApiServiceBase<ScryfallSetRootInformation>
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly ILogger<ScryfallSetInformationService> _logger;
+    private const string SetsEndpoint = "sets/";
 
-    public ScryfallSetInformationService(IHttpClientFactory httpClientFactory, ILogger<ScryfallSetInformationService> logger)
+    public ScryfallSetInformationService(IHttpClientFactory httpClientFactory, IOptions<HttpClientConfiguration> options, ILogger<ScryfallSetInformationService> logger)
+    : base(httpClientFactory, options)
     {
-        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
-    public async Task<ApiResponse<IEnumerable<ScryfallSetDetails>>> GetAllSetsAsync(CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<IEnumerable<ScryfallSetDetails>>> GetSetDetailsAsync(CancellationToken cancellationToken = default)
     {
         var apiResponse = new ApiResponse<IEnumerable<ScryfallSetDetails>>();
 
         try
         {
-            using var client = _httpClientFactory.CreateClient("scryfallSetContext");
+           var content = await base.GetContentAsync(SetsEndpoint, cancellationToken);
+           apiResponse.Outcome = OperationOutcome.SuccessfulOutcome;
 
-
-            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, client.BaseAddress);
-
-            using var response = await client.SendAsync(requestMessage, cancellationToken);
-
-            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-            var scryfallSetRootInformation = await responseStream.DeserializeFromStreamAsync<ScryfallSetRootInformation>(cancellationToken);
-
-            if (scryfallSetRootInformation is not null && scryfallSetRootInformation.Data.Any())
-            {
-                apiResponse.Data = scryfallSetRootInformation.Data;
-            }
-
-            apiResponse.Outcome = OperationOutcome.SuccessfulOutcome;
+           apiResponse.Data = content.Data.Data;
         }
         catch (HttpRequestException ex)
         {
@@ -45,7 +35,7 @@ internal class ScryfallSetInformationService : IScryfallSetInformationService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving Sets from scryfall, Exception was: {@ex}", ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
 
         }
         catch (HttpListenerException ex)
@@ -56,7 +46,7 @@ internal class ScryfallSetInformationService : IScryfallSetInformationService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving Sets from scryfall, Exception was: {@ex}", ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
         }
         catch (JsonException ex)
         {
@@ -66,7 +56,7 @@ internal class ScryfallSetInformationService : IScryfallSetInformationService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving Sets from scryfall, Exception was: {@ex}", ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
         }
         catch (NullReferenceException ex)
         {
@@ -77,7 +67,7 @@ internal class ScryfallSetInformationService : IScryfallSetInformationService
             errors.Add(ex.Message);
             errors.Add(innermostExceptionMessage);
 
-            apiResponse.Outcome = OperationOutcome.ValidationFailureOutcome(errors, "Could not get Sets deserialized");
+            apiResponse.Outcome = OperationOutcome.ValidationFailureOutcome(errors, "Could not get symbols deserialized");
         }
         catch (Exception ex)
         {
@@ -87,7 +77,7 @@ internal class ScryfallSetInformationService : IScryfallSetInformationService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving Sets from scryfall, Exception was: {@ex}", ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
         }
 
         return apiResponse;

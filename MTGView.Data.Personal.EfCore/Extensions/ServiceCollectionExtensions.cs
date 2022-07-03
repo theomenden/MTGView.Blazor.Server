@@ -7,19 +7,23 @@ namespace MTGView.Data.Personal.EfCore.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    private static ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+#if DEBUG
+    private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
     {
         builder.AddConsole();
     });
-
+#endif
     public static IServiceCollection AddPersonalCollectionServices(this IServiceCollection services, String connectionString)
     {
         services.AddPooledDbContextFactory<PersonalcollectionsDbContext>(options =>
         {
-            options.UseLoggerFactory(_loggerFactory)
+            options
                 .UseSqlServer(connectionString)
+#if DEBUG
+                .UseLoggerFactory(LoggerFactory)
                 .EnableDetailedErrors()
                 .EnableSensitiveDataLogging()
+#endif
                 .EnableServiceProviderCaching();
         });
 

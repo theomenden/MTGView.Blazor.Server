@@ -1,26 +1,29 @@
 ﻿using MTGView.Blazor.Server.Bootstrapping;
+using MTGView.Data.Scryfall.Internal;
+using TheOmenDen.Shared.Enumerations;
+using TheOmenDen.Shared.Extensions;
 
 namespace MTGView.Blazor.Server.Pages;
 
 public partial class GameSymbols: ComponentBase
 {
-    [Inject] public IScryfallSymbologyService ScryfallSymbologyService { get; init; }
+    [Inject] public ScryfallSymbologyService ScryfallSymbologyService { get; init; }
 
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
 
     [Inject] public IMessageService MessageService { get; init; }
 
     private List<SymbologyDatum> _symbols = new (200);
-
-    private List<SymbologyDatum> _funnySymbols = new(50);
-
-    private List<SymbologyDatum> _manaSymbols = new(20);
-
-    private List<SymbologyDatum> _manaCostSymbols = new(40);
-
-    private List<SymbologyDatum> _transposableSymbols = new(40);
-
-    private List<SymbologyDatum> _otherSymbols = new(40);
+             
+    private readonly List<SymbologyDatum> _funnySymbols = new(50);
+             
+    private readonly List<SymbologyDatum> _manaSymbols = new(20);
+             
+    private readonly List<SymbologyDatum> _manaCostSymbols = new(40);
+             
+    private readonly List<SymbologyDatum> _transposableSymbols = new(40);
+             
+    private readonly List<SymbologyDatum> _otherSymbols = new(40);
 
     private string _selectedTab = "manaCosts";
 

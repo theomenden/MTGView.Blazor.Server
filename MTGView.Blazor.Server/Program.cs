@@ -1,11 +1,8 @@
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using ElectronNET.API;
-using Microsoft.Extensions.Hosting;
-using MTGView.Blazor.Server.Bootstrapping;
 using MTGView.Blazor.Server.Middleware;
 using MTGView.Blazor.Server.Models;
-using MTGView.Blazor.Server.UrlHashing;
 using MTGView.Data.Background;
 using MTGView.Data.Background.Extensions;
 
@@ -64,7 +61,6 @@ try
 
     builder.Services.AddBlazoredSessionStorage();
 
-    builder.Services.AddAutomappingProfiles<Program>();
     builder.Services.AddScoped<IModuleFactory, EsModuleFactory>();
     builder.Services.AddScoped<MtgIndexedDb>();
     builder.Services.AddScoped<SetInformationRepository>();
@@ -72,7 +68,6 @@ try
     builder.Services.AddSingleton<BackgroundUpdatingService>();
     builder.Services.AddHostedService(provider => provider.GetRequiredService<BackgroundUpdatingService>());
     builder.Services.AddBackgroundProcessingServicesForBlazor(builder.Configuration.GetConnectionString("MtgApi"));
-    builder.Services.AddTransient<IUrlHasher, UrlHasher>();
 
     builder.Services.AddResponseCompression(options =>
     {
@@ -96,7 +91,7 @@ try
             options.MaximumReceiveMessageSize = 104_857_600;
         });
 
-    var app = builder.Build();
+    await using var app = builder.Build();
 
     app.UseResponseCompression();
 

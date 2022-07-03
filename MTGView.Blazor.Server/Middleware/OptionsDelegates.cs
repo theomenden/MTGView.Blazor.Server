@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
+
 namespace MTGView.Blazor.Server.Middleware;
 
 public static class OptionsDelegates

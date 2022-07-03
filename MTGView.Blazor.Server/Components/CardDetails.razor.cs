@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.WebUtilities;
+using MTGView.Data.Scryfall.Internal;
 
 namespace MTGView.Blazor.Server.Components;
 
@@ -8,7 +9,7 @@ public partial class CardDetails : ComponentBase
     #region Injected Members
     [Inject] public IDbContextFactory<MagicthegatheringDbContext> MtgContextFactory { get; init; }
 
-    [Inject] public IScryfallCardService ScryfallCardService { get; init; }
+    [Inject] public ScryfallCardService ScryfallCardService { get; init; }
 
     [Inject] public NavigationManager NavigationManager { get; init; }
 
@@ -72,7 +73,7 @@ public partial class CardDetails : ComponentBase
     #region Private Methods
     private async Task GetScryfallCardApiInformation()
     {
-        var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCardToReview?.scryfallId ?? Guid.Empty);
+        var scryfallDataResponse = await ScryfallCardService.GetContentAsync(_magicCardToReview?.scryfallId.ToString());
 
         var scryfallData = scryfallDataResponse.Data;
 

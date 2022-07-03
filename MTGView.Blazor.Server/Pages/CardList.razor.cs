@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Blazorise.DataGrid;
-using MTGView.Blazor.Server.Invariants;
+using MTGView.Data.Scryfall.Internal;
 
 namespace MTGView.Blazor.Server.Pages;
 public partial class CardList : ComponentBase
@@ -8,9 +8,9 @@ public partial class CardList : ComponentBase
     #region Injected Members
     [Inject] public IDbContextFactory<MagicthegatheringDbContext> ContextFactory { get; init; }
 
-    [Inject] public IScryfallCardService ScryfallCardService { get; init; }
+    [Inject] public ScryfallCardService ScryfallCardService { get; init; }
 
-    [Inject] public IScryfallSetInformationService ScryfallSetInformationService { get; init; }
+    [Inject] public ScryfallSetInformationService ScryfallSetInformationService { get; init; }
 
     [Inject] public SymbologyRepository SymbologyRepository { get; init; }
 
@@ -48,7 +48,7 @@ public partial class CardList : ComponentBase
             _availableSets.Add(set);
         }
 
-        await foreach (var keyword in context.Keywords.Where(c => c.RecordType == KeywordTypes.KeywordAbilities).OrderBy(k => k.Id).AsAsyncEnumerable())
+        await foreach (var keyword in context.Keywords.Where(c => c.RecordType == KeywordTypes.KeywordAbilities.ToString()).OrderBy(k => k.Id).AsAsyncEnumerable())
         {
             _availableKeywords.Add(keyword);
         }
@@ -119,7 +119,7 @@ public partial class CardList : ComponentBase
 
         foreach (var magicCard in _magicCards)
         {
-            var scryfallDataResponse = await ScryfallCardService.GetScryfallInformationAsync(magicCard.scryfallId, e.CancellationToken);
+            var scryfallDataResponse = await ScryfallCardService.GetContentAsync(magicCard.scryfallId.ToString(), e.CancellationToken);
 
             var scryfallData = scryfallDataResponse.Data;
 

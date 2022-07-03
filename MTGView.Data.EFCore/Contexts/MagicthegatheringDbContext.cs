@@ -4,6 +4,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata;
+using MTGView.Data.EFCore.Contexts.Configurations;
 
 namespace MTGView.Data.EFCore.Contexts;
 
@@ -28,14 +29,12 @@ public partial class MagicthegatheringDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfiguration(new Configurations.CardConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.KeywordConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.MetaConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.LegalityConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.RulingConfiguration());
-        modelBuilder.ApplyConfiguration(new Configurations.SetConfiguration());
-
-
+        modelBuilder.ApplyConfiguration(new CardConfiguration());
+        modelBuilder.ApplyConfiguration(new KeywordConfiguration());
+        modelBuilder.ApplyConfiguration(new MetaConfiguration());
+        modelBuilder.ApplyConfiguration(new LegalityConfiguration());
+        modelBuilder.ApplyConfiguration(new RulingConfiguration());
+        modelBuilder.ApplyConfiguration(new SetConfiguration());
 
         OnModelCreatingPartial(modelBuilder);
     }

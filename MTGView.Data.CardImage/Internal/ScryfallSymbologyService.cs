@@ -1,14 +1,16 @@
-﻿namespace MTGView.Data.Scryfall.Internal;
+﻿using Microsoft.Extensions.Options;
 
-public class ScryfallSymbologyService: IScryfallSymbologyService
+namespace MTGView.Data.Scryfall.Internal;
+
+public sealed class ScryfallSymbologyService: ApiServiceBase<Symbology>
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-
     private readonly ILogger<ScryfallSymbologyService> _logger;
 
-    public ScryfallSymbologyService(IHttpClientFactory httpClientFactory, ILogger<ScryfallSymbologyService> logger)
+    private const string SymbologyEndpoint = $"symbology/";
+
+    public ScryfallSymbologyService(IHttpClientFactory httpClientFactory, IOptions<HttpClientConfiguration> options, ILogger<ScryfallSymbologyService> logger)
+    :base(httpClientFactory, options)
     {
-        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
@@ -18,23 +20,9 @@ public class ScryfallSymbologyService: IScryfallSymbologyService
 
         try
         {
-            using var client = _httpClientFactory.CreateClient("scryfallSymbologyContext");
-
-            
-            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, client.BaseAddress);
-
-            using var response = await client.SendAsync(requestMessage, cancellationToken);
-
-            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-            var scryfallSymbology = await responseStream.DeserializeFromStreamAsync<Symbology>(cancellationToken);
-
-            if (scryfallSymbology is not null && scryfallSymbology.Data.Any())
-            {
-                apiResponse.Data = scryfallSymbology.Data;
-
-                apiResponse.Outcome = OperationOutcome.SuccessfulOutcome;
-            }
+            var content = await GetContentAsync(SymbologyEndpoint, cancellationToken);
+            apiResponse.Outcome = OperationOutcome.SuccessfulOutcome;
+            apiResponse.Data = content.Data.Data;
         }
         catch (HttpRequestException ex)
         {

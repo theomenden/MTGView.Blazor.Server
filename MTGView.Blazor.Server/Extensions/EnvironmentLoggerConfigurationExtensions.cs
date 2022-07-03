@@ -1,5 +1,6 @@
-﻿using MTGView.Core.Logging;
+﻿
 using Serilog.Configuration;
+using TheOmenDen.Shared.Logging.Serilog;
 
 namespace MTGView.Blazor.Server.Extensions;
 

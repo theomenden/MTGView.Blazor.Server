@@ -1,42 +1,30 @@
 ﻿
 
+using Microsoft.Extensions.Options;
+
 namespace MTGView.Data.Scryfall.Internal;
 
-internal class ScryfallCardService : IScryfallCardService
+public sealed class ScryfallCardService : ApiServiceBase<ScryfallCard>
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ILogger _logger;
+    private const string CardsEndPoint = "cards/";
 
-    private readonly ILogger<ScryfallCardService> _logger;
-
-    public ScryfallCardService(IHttpClientFactory httpClientFactory, ILogger<ScryfallCardService> logger)
+    public ScryfallCardService(IHttpClientFactory httpClientFactory,
+        IOptions<HttpClientConfiguration> httpClientOptions,
+        ILogger<ScryfallCardService> logger)
+    : base(httpClientFactory, httpClientOptions)
     {
-        _httpClientFactory = httpClientFactory;
         _logger = logger;
     }
 
-    public async Task<ApiResponse<ScryfallCard>> GetScryfallInformationAsync(Guid scryfallId, CancellationToken cancellationToken = default)
+    public override async Task<ApiResponse<ScryfallCard>> GetContentAsync(String uri, CancellationToken cancellationToken = default)
     {
         var apiResponse = new ApiResponse<ScryfallCard>();
 
         try
         {
-            using var client = _httpClientFactory.CreateClient("scryfallCardContext");
-
-            var requestUri = $"{client.BaseAddress}{scryfallId}";
-
-            using var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            using var response = await client.SendAsync(requestMessage, cancellationToken);
-
-            await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-            var scryfallCard = await responseStream.DeserializeFromStreamAsync<ScryfallCard>(cancellationToken);
-
-            if (scryfallCard is not null)
-            {
-                apiResponse.Data = scryfallCard;
-
-            }
+            apiResponse =  await base.GetContentAsync($"{CardsEndPoint}{uri}", cancellationToken);
+            apiResponse.Outcome = OperationOutcome.SuccessfulOutcome;
         }
         catch (HttpRequestException ex)
         {
@@ -46,7 +34,7 @@ internal class ScryfallCardService : IScryfallCardService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving card with scryfallId: {id}, Exception was: {@ex}", scryfallId, ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
 
         }
         catch (HttpListenerException ex)
@@ -57,7 +45,7 @@ internal class ScryfallCardService : IScryfallCardService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving card with scryfallId: {id}, Exception was: {@ex}", scryfallId, ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
         }
         catch (JsonException ex)
         {
@@ -67,7 +55,7 @@ internal class ScryfallCardService : IScryfallCardService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving card with scryfallId: {id}, Exception was: {@ex}", scryfallId, ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
         }
         catch (NullReferenceException ex)
         {
@@ -78,7 +66,7 @@ internal class ScryfallCardService : IScryfallCardService
             errors.Add(ex.Message);
             errors.Add(innermostExceptionMessage);
 
-            apiResponse.Outcome = OperationOutcome.ValidationFailureOutcome(errors, "Could not get card deserialized");
+            apiResponse.Outcome = OperationOutcome.ValidationFailureOutcome(errors, "Could not get symbols deserialized");
         }
         catch (Exception ex)
         {
@@ -88,20 +76,10 @@ internal class ScryfallCardService : IScryfallCardService
 
             apiResponse.Outcome.Message = ex.Message;
 
-            _logger.LogError("Failed retrieving card with scryfallId: {id}, Exception was: {@ex}", scryfallId, ex);
+            _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
         }
 
         return apiResponse;
-    }
-
-    public async IAsyncEnumerable<ApiResponse<ScryfallCard>> GetScryfallInformationAsync(IEnumerable<Guid> scryfallIds, [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        foreach (var scryfallId in scryfallIds)
-        {
-            Thread.Sleep(75);
-
-            yield return await GetScryfallInformationAsync(scryfallId, cancellationToken);
-        }
     }
 }
 

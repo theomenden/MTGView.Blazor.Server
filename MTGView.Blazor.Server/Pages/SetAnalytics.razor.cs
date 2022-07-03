@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using MTGView.Blazor.Server.Models;
+using TheOmenDen.Shared.Enumerations;
 
 namespace MTGView.Blazor.Server.Pages;
 
@@ -157,7 +158,9 @@ public partial class SetAnalytics : ComponentBase
     {
         await using var context = await DbContextFactory.CreateDbContextAsync();
 
-        var labels = Enum.GetNames(typeof(MtgColors));
+        var labels = EnumerationBase.GetAll<InGameColors>()
+            .Select(color => color.Name)
+            .ToList();
 
         var setToResearch = _selectedSetValue;
 
@@ -247,23 +250,23 @@ public partial class SetAnalytics : ComponentBase
     {
         if (String.IsNullOrWhiteSpace(setBasedIndicator))
         {
-            return MtgColors.Colorless.ToString();
+            return InGameColors.Colorless.ToString();
         }
 
         var colorIdentity = setBasedIndicator.ToCharArray();
 
         if (colorIdentity.Length > 1)
         {
-            return MtgColors.Gold.ToString();
+            return InGameColors.Gold.ToString();
         }
 
         return colorIdentity[0] switch
         {
-            'W' => MtgColors.White.ToString(),
-            'U' => MtgColors.Blue.ToString(),
-            'B' => MtgColors.Black.ToString(),
-            'R' => MtgColors.Red.ToString(),
-            'G' => MtgColors.Green.ToString(),
+            'W' => InGameColors.White.ToString(),
+            'U' => InGameColors.Blue.ToString(),
+            'B' => InGameColors.Black.ToString(),
+            'R' => InGameColors.Red.ToString(),
+            'G' => InGameColors.Green.ToString(),
             _ => throw new ArgumentOutOfRangeException(nameof(colorIdentity))
         };
     }

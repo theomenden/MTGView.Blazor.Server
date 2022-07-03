@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using MTGView.Data.Scryfall.Internal;
+using TheOmenDen.Shared.Enumerations;
 
 namespace MTGView.Blazor.Server.Pages;
 
@@ -7,11 +9,11 @@ public partial class Index : ComponentBase
     #region Injected Properties
     [Inject] public IDbContextFactory<MagicthegatheringDbContext> DbContextFactory { get; init; }
 
-    [Inject] public IScryfallCardService ScryfallCardService { get; init; }
+    [Inject] public ScryfallCardService ScryfallCardService { get; init; }
 
-    [Inject] public IScryfallSetInformationService SetInformationService { get; init; }
+    [Inject] public ScryfallSetInformationService SetInformationService { get; init; }
 
-    [Inject] public IScryfallSymbologyService SymbologyService { get; init; }
+    [Inject] public ScryfallSymbologyService SymbologyService { get; init; }
 
     [Inject] public SetInformationRepository SetInformationRepository { get; init; }
 
@@ -82,7 +84,7 @@ public partial class Index : ComponentBase
     {
         if (_magicCard is not null)
         {
-            var scryfallCardDataResponse = await ScryfallCardService.GetScryfallInformationAsync(_magicCard.scryfallId);
+            var scryfallCardDataResponse = await ScryfallCardService.GetContentAsync(_magicCard.scryfallId.ToString());
 
             var materializedCardData = scryfallCardDataResponse.Data;
 
@@ -95,7 +97,7 @@ public partial class Index : ComponentBase
 
     private async Task PopulateIndexedDbOnLoad()
     {
-        var apiSetResponse = await SetInformationService.GetAllSetsAsync();
+        var apiSetResponse = await SetInformationService.GetSetDetailsAsync();
 
         var apiSymbolsResponse = await SymbologyService.GetAllSymbolsFromScryfall();
 
@@ -107,9 +109,11 @@ public partial class Index : ComponentBase
 
         if (apiSymbolsResponse.Outcome.OperationResult is OperationResult.Success)
         {
+
             _symbols = apiSymbolsResponse.Data;
             _symbolsStored = apiSymbolsResponse.Data.Count();
         }
+
     }
 
     //THINDAL Provided Guidance :) 4/17/2022
