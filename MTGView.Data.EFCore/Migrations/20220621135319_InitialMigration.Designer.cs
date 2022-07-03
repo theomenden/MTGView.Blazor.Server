@@ -12,17 +12,49 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MTGView.Data.EFCore.Migrations
 {
     [DbContext(typeof(MagicthegatheringDbContext))]
-    [Migration("20220422035716_UpdateIndiciesAndCardModels")]
-    partial class UpdateIndiciesAndCardModels
+    [Migration("20220621135319_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.4")
+                .HasAnnotation("ProductVersion", "6.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("MTGView.Core.Models.Keyword", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("RecordType")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .HasColumnName("Type");
+
+                    b.HasKey("Id")
+                        .HasName("PK_Keyword_Id");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"));
+
+                    b.HasIndex("RecordType")
+                        .HasDatabaseName("IX_Keywords_Type");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("RecordType"), new[] { "Name" });
+
+                    b.ToTable("Keywords", "MTG");
+                });
 
             modelBuilder.Entity("MTGView.Core.Models.Legality", b =>
                 {
@@ -56,9 +88,6 @@ namespace MTGView.Data.EFCore.Migrations
                 {
                     b.Property<int>("id")
                         .HasColumnType("int");
-
-                    b.Property<Guid?>("CollectionCardMappingId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("artist")
                         .HasMaxLength(390)
@@ -189,9 +218,6 @@ namespace MTGView.Data.EFCore.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(90)");
 
-                    b.Property<int?>("life")
-                        .HasColumnType("int");
-
                     b.Property<string>("loyalty")
                         .HasMaxLength(10)
                         .IsUnicode(false)
@@ -202,8 +228,8 @@ namespace MTGView.Data.EFCore.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(330)");
 
-                    b.Property<int?>("manaValue")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("manaValue")
+                        .HasColumnType("decimal(9,2)");
 
                     b.Property<string>("mtgjsonV4Id")
                         .HasMaxLength(390)
@@ -344,11 +370,6 @@ namespace MTGView.Data.EFCore.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("CollectionCardMappingId")
-                        .HasDatabaseName("IX_Cards_CollectionCardMapping_Id");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("CollectionCardMappingId"), new[] { "name", "manaCost", "setCode" });
-
                     b.HasIndex(new[] { "setCode" }, "IX_Cards_SetCode");
 
                     SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex(new[] { "setCode" }, "IX_Cards_SetCode"), new[] { "colorIdentity", "scryfallId", "manaCost" });
@@ -470,69 +491,6 @@ namespace MTGView.Data.EFCore.Migrations
                     b.ToTable("Meta", "MTG");
                 });
 
-            modelBuilder.Entity("MTGView.Core.Models.PersonalCard", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SetCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PersonalCard");
-                });
-
-            modelBuilder.Entity("MTGView.Core.Models.PersonalCardMapping", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CardId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PersonalCollectionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CardId");
-
-                    b.HasIndex("PersonalCollectionId");
-
-                    b.ToTable("PersonalCardMapping");
-                });
-
-            modelBuilder.Entity("MTGView.Core.Models.PersonalCollection", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PersonalCollection");
-                });
-
             modelBuilder.Entity("MTGView.Core.Models.Ruling", b =>
                 {
                     b.Property<int>("Id")
@@ -563,44 +521,6 @@ namespace MTGView.Data.EFCore.Migrations
                     b.HasIndex(new[] { "RulingGuid" }, "IX_Rulings_Uuid");
 
                     b.ToTable("rulings", "MTG");
-                });
-
-            modelBuilder.Entity("MTGView.Core.Models.MagicCard", b =>
-                {
-                    b.HasOne("MTGView.Core.Models.PersonalCardMapping", "CollectionCardMapping")
-                        .WithMany()
-                        .HasForeignKey("CollectionCardMappingId");
-
-                    b.Navigation("CollectionCardMapping");
-                });
-
-            modelBuilder.Entity("MTGView.Core.Models.PersonalCardMapping", b =>
-                {
-                    b.HasOne("MTGView.Core.Models.PersonalCard", "Card")
-                        .WithMany("CardMappings")
-                        .HasForeignKey("CardId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MTGView.Core.Models.PersonalCollection", "Collection")
-                        .WithMany("CardMappings")
-                        .HasForeignKey("PersonalCollectionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Card");
-
-                    b.Navigation("Collection");
-                });
-
-            modelBuilder.Entity("MTGView.Core.Models.PersonalCard", b =>
-                {
-                    b.Navigation("CardMappings");
-                });
-
-            modelBuilder.Entity("MTGView.Core.Models.PersonalCollection", b =>
-                {
-                    b.Navigation("CardMappings");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,6 @@
-# Blazor based Magic The Gathering lookup [![GitHub issues](https://img.shields.io/github/issues/theomenden/MTGView.Blazor.Server?style=plastic)](https://github.com/theomenden/MTGView.Blazor.Server/issues) [![GitHub license](https://img.shields.io/github/license/theomenden/MTGView.Blazor.Server)](https://github.com/theomenden/MTGView.Blazor.Server/blob/master/License)
+# Blazor based Magic The Gathering lookup [![GitHub issues](https://img.shields.io/github/issues/theomenden/MTGView.Blazor.Server?style=plastic)](https://github.com/theomenden/MTGView.Blazor.Server/issues)[![GitHub license](https://img.shields.io/github/license/theomenden/MTGView.Blazor.Server)](https://github.com/theomenden/MTGView.Blazor.Server/blob/master/License)[![Build](https://github.com/theomenden/MTGView.Blazor.Server/actions/workflows/dotnet.yml/badge.svg)](https://github.com/theomenden/MTGView.Blazor.Server/actions/workflows/dotnet.yml)
 ## This application is built using [Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor)
+
   - Rationale for using blazor comes from:
     - The ability to use C# throughout the entire application with minimal javascript interaction/interop.
     - Easier Maintainence from a single developer team
@@ -15,3 +16,7 @@
 ### **MtgJson** is where most of the underlying card information is imported, via a self-contained background running service
 ## [Scryfall](https://scryfall.com/)
 ### **Scryfall** is where the imagery, and latest pricing information is imported. 
+
+
+####
+MTG Blazor is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC
