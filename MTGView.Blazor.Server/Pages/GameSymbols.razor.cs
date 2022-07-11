@@ -1,4 +1,5 @@
-﻿using MTGView.Blazor.Server.Bootstrapping;
+﻿using System.Text;
+using MTGView.Blazor.Server.Bootstrapping;
 using MTGView.Data.Scryfall.Internal;
 using TheOmenDen.Shared.Enumerations;
 using TheOmenDen.Shared.Extensions;
@@ -27,13 +28,16 @@ public partial class GameSymbols: ComponentBase
 
     private string _selectedTab = "manaCosts";
 
-    private readonly StringBuilderPool _builderPool = new();
-
     protected override async Task OnInitializedAsync()
     {
+        if (!StringBuilderPoolFactory<GameSymbols>.Exists(nameof(GameSymbols)))
+        {
+            StringBuilderPoolFactory<GameSymbols>.Create(nameof(GameSymbols));
+        }
+
         var symbolEndPointResponse = await ScryfallSymbologyService.GetAllSymbolsFromScryfall();
 
-        if (symbolEndPointResponse.Outcome.OperationResult is OperationResult.Failure)
+        if (symbolEndPointResponse.Outcome.OperationResult == OperationResult.Failure)
         {
             await OnApiFailureAsync();
             return;
@@ -44,16 +48,13 @@ public partial class GameSymbols: ComponentBase
 
     private async Task OnApiFailureAsync()
     {
-        var sb = _builderPool.GetStringBuilderFromPool;
-
-        sb.Append("<a href='https://www.scryfall.com' class='text-link'>Scryfall Api</a> is down");
-        sb.Append("<br /><strong><em>Please refresh the page</em></strong>");
-        sb.Append(
+        var builder = StringBuilderPoolFactory<GameSymbols>.Get(nameof(GameSymbols));
+            builder.Append("<a href='https://www.scryfall.com' class='text-link'>Scryfall Api</a> is down");
+            builder.Append("<br /><strong><em>Please refresh the page</em></strong>");
+            builder.Append(
             "<br /><hr>If the error still persists, create an issue on our <a href='https://github.com/theomenden/MTGView.Blazor.Server/issues' class='text-link'>GitHub!</a>");
 
-        await MessageService.Error(new MarkupString(sb.ToString()), "Scryfall API could not be reached");
-
-        _builderPool.ReturnStringBuilderToPool(sb);
+        await MessageService.Error(new MarkupString(builder.ToString()), "Scryfall API could not be reached");
     }
 
     private void PopulateSymbolInformationAsync(ApiResponse<IEnumerable<SymbologyDatum>> symbolEndPointResponse)

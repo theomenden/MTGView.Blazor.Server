@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using MTGView.Data.Background.Interfaces;
 
 namespace MTGView.Data.Background.Internal;
 
@@ -10,7 +9,6 @@ internal sealed class FileProcessingService : IUnzippingService
 
     private const string CompressedExtension = ".zip";
     private const string AllPrintingsFileName = "AllPrintingsCSVFiles";
-    private const string KeywordsFileName = $"{FileNamesToProcess.Keywords}.json";
     private const string AllPrintingsCompressedFileName = $"{AllPrintingsFileName}{CompressedExtension}";
     private string _filePath = String.Empty;
 

@@ -1,6 +1,5 @@
 ﻿using MTGView.Blazor.Server.Bootstrapping;
 using TheOmenDen.Shared.Extensions;
-using TheOmenDen.Shared.Logging;
 
 namespace MTGView.Blazor.Server.Middleware;
 
@@ -37,7 +36,7 @@ public class ExceptionLogger
 
         var outcome = OperationOutcome.UnsuccessfulOutcome;
         outcome.CorrelationId = correlationId;
-        outcome.Message = String.Format(Errors.UnhandledError, correlationId);
+        outcome.ClientErrorPayload.Message = String.Format(Errors.UnhandledError, correlationId);
 
         options.AddResponseDetails?.Invoke(context, exception, outcome);
 

@@ -5,10 +5,7 @@ namespace MTGView.Blazor.Server.Shared;
 
 public partial class MtgFooter : ComponentBase
 {
-    [Inject] public AuthenticationStateProvider AuthenticationStateProvider { get; init; }
-
     [Parameter] public EventCallback<string> ThemeColorChanged { get; init; }
-
 
     private static string AssemblyProductVersion
     {

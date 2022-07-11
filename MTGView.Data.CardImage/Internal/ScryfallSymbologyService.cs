@@ -30,7 +30,7 @@ public sealed class ScryfallSymbologyService: ApiServiceBase<Symbology>
 
             apiResponse.Outcome.CorrelationId = Guid.NewGuid().ToString();
 
-            apiResponse.Outcome.Message = ex.Message;
+            apiResponse.Outcome.ClientErrorPayload.Message = ex.Message;
 
             _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}", ex);
 
@@ -41,7 +41,7 @@ public sealed class ScryfallSymbologyService: ApiServiceBase<Symbology>
 
             apiResponse.Outcome.CorrelationId = Guid.NewGuid().ToString();
 
-            apiResponse.Outcome.Message = ex.Message;
+            apiResponse.Outcome.ClientErrorPayload.Message = ex.Message;
 
             _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}",  ex);
         }
@@ -51,7 +51,7 @@ public sealed class ScryfallSymbologyService: ApiServiceBase<Symbology>
 
             apiResponse.Outcome.CorrelationId = Guid.NewGuid().ToString();
 
-            apiResponse.Outcome.Message = ex.Message;
+            apiResponse.Outcome.ClientErrorPayload.Message = ex.Message;
 
             _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}",  ex);
         }
@@ -72,7 +72,7 @@ public sealed class ScryfallSymbologyService: ApiServiceBase<Symbology>
 
             apiResponse.Outcome.CorrelationId = Guid.NewGuid().ToString();
 
-            apiResponse.Outcome.Message = ex.Message;
+            apiResponse.Outcome.ClientErrorPayload.Message = ex.Message;
 
             _logger.LogError("Failed retrieving symbols from scryfall, Exception was: {@ex}",  ex);
         }

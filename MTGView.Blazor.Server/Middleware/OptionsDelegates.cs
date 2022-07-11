@@ -10,7 +10,7 @@ public static class OptionsDelegates
     {
         if (exception.GetType().Name.Equals(nameof(SqlException), StringComparison.OrdinalIgnoreCase))
         {
-            operationOutcome.Message += "The exception was a database exception";
+            operationOutcome.ClientErrorPayload.Message += "The exception was a database exception";
         }
     }
 

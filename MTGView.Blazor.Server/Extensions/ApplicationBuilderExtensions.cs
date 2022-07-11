@@ -6,16 +6,16 @@ public static class ApplicationBuilderExtensions
     {
         app.UseResponseCaching();
 
-        if (env.IsDevelopment())
+        if (env.IsDevelopmentOrStaging())
         {
             app.UseDeveloperExceptionPage();
+
+            return app;
         }
-        else
-        {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
-        }
+
+        app.UseExceptionHandler("/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
 
         return app;
     }

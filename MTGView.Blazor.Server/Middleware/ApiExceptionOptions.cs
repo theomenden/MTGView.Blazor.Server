@@ -1,6 +1,4 @@
-﻿using TheOmenDen.Shared.Responses;
-
-namespace MTGView.Blazor.Server.Middleware;
+﻿namespace MTGView.Blazor.Server.Middleware;
 
 public class ApiExceptionOptions
 {

@@ -101,13 +101,13 @@ public partial class Index : ComponentBase
 
         var apiSymbolsResponse = await SymbologyService.GetAllSymbolsFromScryfall();
 
-        if (apiSetResponse.Outcome.OperationResult is OperationResult.Success)
+        if (apiSetResponse.Outcome.OperationResult == OperationResult.Success)
         {
             _setDetails = apiSetResponse.Data;
             _setsStored = apiSetResponse.Data.Count();
         }
 
-        if (apiSymbolsResponse.Outcome.OperationResult is OperationResult.Success)
+        if (apiSymbolsResponse.Outcome.OperationResult == OperationResult.Success)
         {
 
             _symbols = apiSymbolsResponse.Data;
@@ -120,6 +120,7 @@ public partial class Index : ComponentBase
     private Task AddColorIdentitySymbols()
     {
         var regex = _regex.Value;
+
         if (_magicCard is null)
         {
             return Task.CompletedTask;
