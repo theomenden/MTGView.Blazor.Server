@@ -84,7 +84,7 @@
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.1" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.19" />
-    <PackageReference Include="TheOmenDen.Shared" Version="2022.7.11.134" />
+    <PackageReference Include="TheOmenDen.Shared" Version="2022.7.11.1017" />
   </ItemGroup>
   <ItemGroup>
     <None Include="compilerconfig.json" />
