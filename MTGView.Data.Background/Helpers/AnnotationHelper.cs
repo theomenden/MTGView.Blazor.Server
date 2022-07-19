@@ -7,9 +7,9 @@ public static class AnnotationHelper
 {
     private static string GetName(IEntityType entityType, string defaultSchemaName = "dbo")
     {
-        var schema = entityType.FindAnnotation("Relational:Schema")?.Value ?? defaultSchemaName;
+        var schema = entityType.FindAnnotation(RelationalNames.RelationSchema)?.Value ?? defaultSchemaName;
 
-        var tableName = entityType.GetAnnotation("Relational:TableName")?.Value ?? String.Empty;
+        var tableName = entityType.GetAnnotation(RelationalNames.RelationalTable)?.Value ?? String.Empty;
 
         var name = $"[{schema}].[{tableName}]";
 

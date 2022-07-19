@@ -17,13 +17,14 @@ public partial class CardList : ComponentBase
     [Inject] public SetInformationRepository SetInformationRepository { get; init; }
     #endregion
     #region Private Fields
-    private IEnumerable<MagicCard> _magicCards = new List<MagicCard>(70_000);
+    private List<MagicCard> _magicCards = new List<MagicCard>(70_000);
 
     private List<String> _setsToSearch = new(20);
     private List<String> _multipleSelectionSets = new(20);
     private List<String> _keywordsToSearch = new(20);
     private List<String> _multipleSelectionKeywords = new(20);
     private string _selectedComparisonOperator = String.Empty;
+    
     private Int32 _magicCardCount;
 
     private decimal _magicCardManaCost;
@@ -55,9 +56,11 @@ public partial class CardList : ComponentBase
     }
     #endregion
     #region Private Methods
-    private async Task<List<MagicCard>> LoadCards(MagicthegatheringDbContext context, DataGridReadDataEventArgs<MagicCard> eventArgs)
+    private IAsyncEnumerable<MagicCard> LoadCards(MagicthegatheringDbContext context, DataGridReadDataEventArgs<MagicCard> eventArgs)
     {
-        var queryableCards = context.Cards.AsQueryable();
+        var queryableCards = context.Cards
+            .AsNoTracking()
+            .AsQueryable();
 
         if (!String.IsNullOrWhiteSpace(_cardName))
         {
@@ -69,7 +72,7 @@ public partial class CardList : ComponentBase
 
         if (_keywordsToSearch.Any())
         {
-            var keywordsToSearch = "%" +String.Join(',',_keywordsToSearch)+ "%";
+            var keywordsToSearch = $"%{String.Join(',',_keywordsToSearch)}%";
 
             queryableCards = queryableCards.Where(c => EF.Functions.Like(c.keywords!, keywordsToSearch));
         }
@@ -91,9 +94,9 @@ public partial class CardList : ComponentBase
 
         _magicCardCount = queryableCards.Count();
 
-        var cards = await queryableCards
+        var cards = queryableCards
             .Paging(eventArgs)
-            .ToListAsync(eventArgs.CancellationToken);
+            .ToAsyncEnumerable();
 
         return cards;
     }
@@ -110,14 +113,7 @@ public partial class CardList : ComponentBase
 
     private async Task MaterializeCardInformation(DataGridReadDataEventArgs<MagicCard> e, MagicthegatheringDbContext context)
     {
-        if (e.CancellationToken.IsCancellationRequested)
-        {
-            return;
-        }
-
-        _magicCards = await LoadCards(context, e);
-
-        foreach (var magicCard in _magicCards)
+        await foreach (var magicCard in LoadCards(context, e).WithCancellation(e.CancellationToken))
         {
             var scryfallDataResponse = await ScryfallCardService.GetContentAsync(magicCard.scryfallId.ToString(), e.CancellationToken);
 
@@ -134,6 +130,8 @@ public partial class CardList : ComponentBase
             await AddManaCostVisibleSymbols(magicCard);
 
             await GetSetName(magicCard);
+
+            _magicCards.Add(magicCard);
         }
 
         await InvokeAsync(StateHasChanged);
