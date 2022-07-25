@@ -39,7 +39,7 @@
     <PackageReference Include="Blazorise.Icons.Bootstrap" Version="1.0.5" />
     <PackageReference Include="Blazorise.Markdown" Version="1.0.5" />
     <PackageReference Include="Blazorise.QRCode" Version="1.0.5" />
-    <PackageReference Include="Blazorise.SpinKit" Version="1.0.5" />
+    <PackageReference Include="Blazorise.SpinKit" Version="1.0.6" />
     <PackageReference Include="Blazorise.Snackbar" Version="1.0.5" />
     <PackageReference Include="Blazorise.Sidebar" Version="1.0.5" />
     <PackageReference Include="Blazorise.RichTextEdit" Version="1.0.5" />
