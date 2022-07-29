@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MTGView.Data.Scryfall.Internal;
-using TheOmenDen.Shared.Extensions.DependencyInjection;
+using TheOmenDen.Shared.Services.DependencyInjection;
 
 namespace MTGView.Data.Scryfall.Extensions;
 

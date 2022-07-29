@@ -5,6 +5,7 @@ public static class ServiceCollectionExtensions
 #if DEBUG
     private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
     {
+        builder.AddJsonConsole();
         builder.AddConsole();
     });
 #endif

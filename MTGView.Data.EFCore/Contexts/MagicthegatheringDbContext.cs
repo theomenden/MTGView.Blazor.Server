@@ -27,6 +27,12 @@ public partial class MagicthegatheringDbContext : DbContext
     
     public virtual DbSet<MagicSet> Sets { get; set; } = null!;
 
+    public virtual DbSet<PersonalCard> PersonalCards { get; set; } = null!;
+
+    public virtual DbSet<PersonalCardMapping> PersonalCardMappings { get; set; } = null!;
+
+    public virtual DbSet<PersonalCollection> PersonalCollections { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new CardConfiguration());
@@ -35,136 +41,14 @@ public partial class MagicthegatheringDbContext : DbContext
         modelBuilder.ApplyConfiguration(new LegalityConfiguration());
         modelBuilder.ApplyConfiguration(new RulingConfiguration());
         modelBuilder.ApplyConfiguration(new SetConfiguration());
+        modelBuilder.ApplyConfiguration(new PersonalCardsConfiguration());
+        modelBuilder.ApplyConfiguration(new PersonalCollectionsConfiguration());
+        modelBuilder.ApplyConfiguration(new PersonalMappingsConfiguration());
 
         OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-    public async Task BulkInsertAllAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default)
-    {
-        var connectionString = Database.GetConnectionString();
-
-        await using var connection = new SqlConnection(connectionString);
-
-        var entityType = typeof(T);
-
-        var destinationTableName = Model.FindEntityType(entityType)?.GetSchemaQualifiedTableName();
-
-        try
-        {
-            await connection.OpenAsync(cancellationToken);
-
-            using var bulkCopy = new SqlBulkCopy(connection)
-            {
-                DestinationTableName = destinationTableName
-            };
-
-            var properties = Model.FindEntityType(entityType)!.GetProperties();
-            
-            using var table = new DataTable();
-
-            table.Columns.AddRange(properties.Select(CreateEntityDataColumns).ToArray());
-
-            foreach (var entity in entities)
-            {
-                var mappedProperties = properties
-                    .Select(property => GetPropertyValue(property.PropertyInfo?.GetValue((entity)))).ToArray();
-
-                table.Rows.Add(mappedProperties);
-            }
-            
-            await bulkCopy.WriteToServerAsync(table, cancellationToken);
-        }
-        finally
-        {
-            await connection.CloseAsync();
-        }
-    }
-
-    public async Task BulkInsertStreamAsync<T>(IAsyncEnumerable<T> entityStream, CancellationToken cancellationToken = default)
-    {
-        var connectionString = Database.GetConnectionString();
-
-        await using var connection = new SqlConnection(connectionString);
-
-        var entityType = typeof(T);
-
-        var destinationTableName = Model.FindEntityType(entityType)?.GetSchemaQualifiedTableName();
-
-        using var table = new DataTable();
-
-        try
-        {
-            await connection.OpenAsync(cancellationToken);
-
-            using var bulkCopy = new SqlBulkCopy(connection)
-            {
-                DestinationTableName = destinationTableName,
-                BatchSize = 2000
-            };
-
-            var properties = Model.FindEntityType(entityType)!.GetProperties();
-
-            table.Columns.AddRange(properties.Select(CreateEntityDataColumns).ToArray());
-
-            await foreach (var entity in entityStream)
-            {
-                var mappedProperties = properties
-                    .Select(property => GetPropertyValue(property.PropertyInfo?.GetValue((entity)))).ToArray();
-
-                table.Rows.Add(mappedProperties);
-            }
-
-            await bulkCopy.WriteToServerAsync(table, cancellationToken);
-            }
-        finally
-        {
-            table.Clear();
-            await connection.CloseAsync();
-        }
-    }
-
-    public void BulkInsertAll<T>(IEnumerable<T> entities)
-    {
-        var connectionString = Database.GetConnectionString();
-
-        using var connection = new SqlConnection(connectionString);
-
-        var entityType = typeof(T);
-
-        var destinationTableName = Model.FindEntityType(entityType)?.GetSchemaQualifiedTableName();
-
-        try
-        {
-            connection.Open();
-
-            using var bulkCopy = new SqlBulkCopy(connection)
-            {
-                DestinationTableName = destinationTableName
-            };
-
-            var properties = Model.FindEntityType(entityType)!.GetProperties();
-
-            using var table = new DataTable();
-
-            table.Columns.AddRange(properties.Select(CreateEntityDataColumns).ToArray());
-
-            foreach (var entity in entities)
-            {
-                var mappedProperties = properties
-                    .Select(property => GetPropertyValue(property.PropertyInfo?.GetValue((entity)))).ToArray();
-
-                table.Rows.Add(mappedProperties);
-            }
-
-            bulkCopy.WriteToServer(table);
-        }
-        finally
-        {
-            connection.Close();
-        }
-    }
 
     private static DataColumn CreateEntityDataColumns(IProperty property)
     {

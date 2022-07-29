@@ -7,9 +7,8 @@ internal sealed class FileProcessingService : IUnzippingService
     private readonly IHttpClientFactory _mtgJsonClientFactory;
     private readonly ILogger<FileProcessingService> _logger;
 
-    private const string CompressedExtension = ".zip";
     private const string AllPrintingsFileName = "AllPrintingsCSVFiles";
-    private const string AllPrintingsCompressedFileName = $"{AllPrintingsFileName}{CompressedExtension}";
+    private const string AllPrintingsCompressedFileName = $"{AllPrintingsFileName}{FileExtensions.ZipExtension}";
     private string _filePath = String.Empty;
 
     public FileProcessingService(IHttpClientFactory httpClientFactory, ILogger<FileProcessingService> logger)
@@ -84,6 +83,8 @@ internal sealed class FileProcessingService : IUnzippingService
             var exception = new IOException($"Stream was unable to be read {nameof(stream)}");
 
             _logger.LogError("Could read stream into file for {fileName}: {@ex}", fileName, exception);
+
+            await Task.FromException(exception);
 
             return;
         }

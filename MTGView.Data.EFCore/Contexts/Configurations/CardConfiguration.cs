@@ -16,11 +16,14 @@ namespace MTGView.Data.EFCore.Contexts.Configurations
             entity.HasIndex(e => e.setCode, "IX_Cards_SetCode")
                 .IncludeProperties(e => new { e.colorIdentity, e.scryfallId, e.manaCost });
 
-            entity.Property(e => e.index).ValueGeneratedNever();
-            
             entity.Property(e => e.id)
                 .IsRequired()
+                .HasColumnOrder(1)
                 .ValueGeneratedNever();
+
+            entity.Property(e => e.index)
+                .ValueGeneratedNever()
+                .HasColumnOrder(2);
 
             entity.Property(e => e.artist)
                 .HasMaxLength(390)

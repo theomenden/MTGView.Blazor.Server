@@ -1,4 +1,6 @@
-﻿namespace MTGView.Data.Background.Internal;
+﻿using EFCore.BulkExtensions;
+
+namespace MTGView.Data.Background.Internal;
 
 internal sealed class ReplaceRulingsService: IReplaceRulingsService
 {
@@ -6,8 +8,6 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
     private readonly ILogger<ReplaceRulingsService> _logger;
     
-    private const string FileExtension = "csv";
-
     public ReplaceRulingsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory, ILogger<ReplaceRulingsService> logger)
     {
         _dbContextFactory = dbContextFactory;
@@ -16,7 +16,7 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
     public async Task DeserializeCsvToRulings(String fileName, CancellationToken cancellationToken = default)
     {
-        await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
+        await using var fileStream = File.OpenRead($"{fileName}{FileExtensions.CsvExtension}");
 
         using var reader = new StreamReader(fileStream);
 
@@ -32,7 +32,17 @@ internal sealed class ReplaceRulingsService: IReplaceRulingsService
 
         await ClearRulings(context, cancellationToken);
 
-        await context.BulkInsertStreamAsync(csv.GetRecordsAsync<Ruling>(cancellationToken), cancellationToken);
+        var bulkConfig = new BulkConfig
+        {
+            BatchSize = 2000,
+            EnableStreaming = true
+        };
+
+        var rulings = await csv.GetRecordsAsync<Ruling>(cancellationToken).ToListAsync(cancellationToken);
+
+        await context.BulkInsertOrUpdateAsync(rulings, bulkConfig, null, typeof(Ruling), cancellationToken);
+
+        await context.BulkSaveChangesAsync(bulkConfig,null, cancellationToken);
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }

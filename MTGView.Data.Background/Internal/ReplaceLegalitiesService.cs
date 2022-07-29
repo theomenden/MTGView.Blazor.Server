@@ -1,13 +1,13 @@
-﻿namespace MTGView.Data.Background.Internal;
+﻿using EFCore.BulkExtensions;
+
+namespace MTGView.Data.Background.Internal;
 
 internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 {
     private readonly IDbContextFactory<MagicthegatheringDbContext> _dbContextFactory;
 
     private readonly ILogger<ReplaceLegalitiesService> _logger;
-
-    private const string FileExtension = "csv";
-
+    
     public ReplaceLegalitiesService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory,
         ILogger<ReplaceLegalitiesService> logger)
     {
@@ -17,7 +17,7 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 
     public async Task DeserializeCsvToLegalities(string fileName, CancellationToken cancellationToken = default)
     {
-        await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
+        await using var fileStream = File.OpenRead($"{fileName}{FileExtensions.CsvExtension}");
 
         using var reader = new StreamReader(fileStream);
 
@@ -33,8 +33,16 @@ internal sealed class ReplaceLegalitiesService: IReplaceLegalitiesService
 
         await ClearLegalities(context, cancellationToken);
 
-        await context.BulkInsertStreamAsync(csv.GetRecordsAsync<Legality>(cancellationToken), cancellationToken);
+        var bulkConfig = new BulkConfig
+        {
+            BatchSize = 2000,
+            EnableStreaming = true
+        };
 
+        var legalities = await csv.GetRecordsAsync<Legality>(cancellationToken).ToListAsync(cancellationToken);
+
+        await context.BulkInsertOrUpdateAsync(legalities, bulkConfig, null, typeof(Legality), cancellationToken);
+        
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }
 

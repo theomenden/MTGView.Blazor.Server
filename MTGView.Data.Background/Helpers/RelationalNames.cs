@@ -1,6 +1,6 @@
 ﻿namespace MTGView.Data.Background.Helpers;
 
-internal sealed class RelationalNames
+internal static class RelationalNames
 {
     private const string Relational = "Relational";
 

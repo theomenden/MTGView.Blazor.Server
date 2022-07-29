@@ -1,8 +1,6 @@
 ﻿
 using Microsoft.Extensions.Options;
-using TheOmenDen.Shared.Configuration;
-using TheOmenDen.Shared.Infrastructure;
-
+using TheOmenDen.Shared.Services.DependencyInjection.Configuration;
 namespace MTGView.Data.Scryfall.Internal;
 
 public sealed class ScryfallSetInformationService : ApiServiceBase<ScryfallSetRootInformation>

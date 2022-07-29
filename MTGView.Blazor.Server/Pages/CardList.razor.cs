@@ -17,12 +17,12 @@ public partial class CardList : ComponentBase
     [Inject] public SetInformationRepository SetInformationRepository { get; init; }
     #endregion
     #region Private Fields
-    private List<MagicCard> _magicCards = new List<MagicCard>(70_000);
+    private List<MagicCard> _magicCards = Enumerable.Empty<MagicCard>().ToList();
 
-    private List<String> _setsToSearch = new(20);
-    private List<String> _multipleSelectionSets = new(20);
-    private List<String> _keywordsToSearch = new(20);
-    private List<String> _multipleSelectionKeywords = new(20);
+    private List<String> _setsToSearch = Enumerable.Empty<String>().ToList();
+    private List<String> _multipleSelectionSets = Enumerable.Empty<String>().ToList();
+    private List<String> _keywordsToSearch = Enumerable.Empty<String>().ToList();
+    private List<String> _multipleSelectionKeywords = Enumerable.Empty<String>().ToList();
     private string _selectedComparisonOperator = String.Empty;
     
     private Int32 _magicCardCount;
@@ -48,8 +48,13 @@ public partial class CardList : ComponentBase
         {
             _availableSets.Add(set);
         }
+        
+        var keywordAbilities = KeywordTypes.KeywordAbilities.ToString();
 
-        await foreach (var keyword in context.Keywords.Where(c => c.RecordType == KeywordTypes.KeywordAbilities.ToString()).OrderBy(k => k.Id).AsAsyncEnumerable())
+        await foreach (var keyword in context.Keywords
+                           .Where(c => c.RecordType == keywordAbilities)
+                           .OrderBy(k => k.Id)
+                           .AsAsyncEnumerable())
         {
             _availableKeywords.Add(keyword);
         }

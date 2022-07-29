@@ -10,7 +10,7 @@ namespace MTGView.Blazor.Server.Pages
 
         private IEnumerable<Keyword> _keywords = new List<Keyword>(500);
 
-        private Int32 _keywordsCount = 0;
+        private Int32 _keywordsCount;
 
         private DataGrid<Keyword> _dataGrid = new();
 

@@ -1,7 +1,7 @@
 ﻿using TheOmenDen.Shared.Enumerations;
 
 namespace MTGView.Core.Enums;
-public sealed class KeywordTypes: EnumerationBase
+public sealed record KeywordTypes: EnumerationBase
 {
     private KeywordTypes(String name, Int32 id)
     : base(name, id)

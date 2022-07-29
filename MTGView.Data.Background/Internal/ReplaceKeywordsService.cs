@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.Json;
+using EFCore.BulkExtensions;
 
 namespace MTGView.Data.Background.Internal;
 
@@ -10,9 +11,7 @@ internal sealed class ReplaceKeywordsService : IReplaceKeywordsService
     private readonly IHttpClientFactory _mtgJsonClientFactory;
 
     private readonly ILogger<ReplaceKeywordsService> _logger;
-
-    private const string FileExtension = ".json";
-
+    
     private static readonly JsonSerializerOptions JsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
 
     public ReplaceKeywordsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory,
@@ -29,7 +28,7 @@ internal sealed class ReplaceKeywordsService : IReplaceKeywordsService
 
         using var client = _mtgJsonClientFactory.CreateClient("MtgJsonClient");
 
-        using var message = new HttpRequestMessage(HttpMethod.Get, $"{client.BaseAddress}{FileNamesToProcess.Keywords}{FileExtension}");
+        using var message = new HttpRequestMessage(HttpMethod.Get, $"{client.BaseAddress}{FileNamesToProcess.Keywords}{FileExtensions.JsonExtension}");
 
         using var response = await client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
@@ -44,7 +43,7 @@ internal sealed class ReplaceKeywordsService : IReplaceKeywordsService
 
         await ProcessStreamToKeywordsAsync(content, cancellationToken);
 
-        File.Delete($"{FileNamesToProcess.Keywords}{ FileExtension}");
+        File.Delete($"{FileNamesToProcess.Keywords}{ FileExtensions.JsonExtension}");
 
         _logger.LogInformation("Finished processing and deleted Keywords File at: {endTime}", DateTime.Now);
     }
@@ -61,11 +60,18 @@ internal sealed class ReplaceKeywordsService : IReplaceKeywordsService
         
         await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        var keywords = ConvertKeywordRootToKeywords(searchResult?.Data);
-    
-        await context.Keywords.AddRangeAsync(keywords, cancellationToken);
+        var keywords = ConvertKeywordRootToKeywords(searchResult?.Data)
+            .ToArray();
 
-        await context.SaveChangesAsync(cancellationToken);
+        var bulkConfig = new BulkConfig
+        {
+            BatchSize = 2000,
+            EnableStreaming = true
+        };
+
+        await context.BulkInsertOrUpdateAsync(keywords, bulkConfig, null, typeof(Keyword), cancellationToken);
+
+        await context.BulkSaveChangesAsync(bulkConfig, null,cancellationToken);
     }
 
     private async Task ClearKeywords( CancellationToken cancellationToken)

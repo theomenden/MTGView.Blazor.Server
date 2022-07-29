@@ -1,5 +1,7 @@
 ﻿using MTGView.Blazor.Server.Bootstrapping;
 using TheOmenDen.Shared.Extensions;
+using TheOmenDen.Shared.Logging.Templates;
+using TheOmenDen.Shared.Responses.Templates;
 
 namespace MTGView.Blazor.Server.Middleware;
 

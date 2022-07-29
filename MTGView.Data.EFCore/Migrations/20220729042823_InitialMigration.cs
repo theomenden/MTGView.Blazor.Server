@@ -12,6 +12,9 @@ namespace MTGView.Data.EFCore.Migrations
             migrationBuilder.EnsureSchema(
                 name: "MTG");
 
+            migrationBuilder.EnsureSchema(
+                name: "Personal");
+
             migrationBuilder.CreateTable(
                 name: "Cards",
                 schema: "MTG",
@@ -89,6 +92,36 @@ namespace MTGView.Data.EFCore.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cards", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cards",
+                schema: "Personal",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false),
+                    name = table.Column<string>(type: "varchar(620)", unicode: false, maxLength: 620, nullable: false),
+                    setCode = table.Column<string>(type: "varchar(40)", unicode: false, maxLength: 40, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cards", x => x.id)
+                        .Annotation("SqlServer:Clustered", true);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Collections",
+                schema: "Personal",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newsequentialid())"),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2(7)", precision: 7, nullable: false, defaultValueSql: "getdate()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Collections", x => x.Id)
+                        .Annotation("SqlServer:Clustered", true);
                 });
 
             migrationBuilder.CreateTable(
@@ -188,12 +221,46 @@ namespace MTGView.Data.EFCore.Migrations
                     table.PrimaryKey("PK_sets", x => x.id);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Mappings",
+                schema: "Personal",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "(newsequentialid())"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "(getdate())"),
+                    PersonalCollectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CardId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Mappings", x => x.Id)
+                        .Annotation("SqlServer:Clustered", true);
+                    table.ForeignKey(
+                        name: "FK_Mappings_Card_Id",
+                        column: x => x.CardId,
+                        principalSchema: "Personal",
+                        principalTable: "Cards",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_Mappings_Collection_Id",
+                        column: x => x.PersonalCollectionId,
+                        principalSchema: "Personal",
+                        principalTable: "Collections",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_Cards_SetCode",
+                name: "IX_Cards_SetCode1",
                 schema: "MTG",
                 table: "Cards",
                 column: "setCode")
                 .Annotation("SqlServer:Include", new[] { "colorIdentity", "scryfallId", "manaCost" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cards_SetCode",
+                schema: "Personal",
+                table: "Cards",
+                column: "setCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Keywords_Type",
@@ -213,6 +280,18 @@ namespace MTGView.Data.EFCore.Migrations
                 schema: "MTG",
                 table: "legalities",
                 column: "uuid");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersonalCardMapping_CardId",
+                schema: "Personal",
+                table: "Mappings",
+                column: "CardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersonalCardMapping_PersonalCollectionId",
+                schema: "Personal",
+                table: "Mappings",
+                column: "PersonalCollectionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rulings_Index",
@@ -254,6 +333,10 @@ namespace MTGView.Data.EFCore.Migrations
                 schema: "MTG");
 
             migrationBuilder.DropTable(
+                name: "Mappings",
+                schema: "Personal");
+
+            migrationBuilder.DropTable(
                 name: "Meta",
                 schema: "MTG");
 
@@ -264,6 +347,14 @@ namespace MTGView.Data.EFCore.Migrations
             migrationBuilder.DropTable(
                 name: "sets",
                 schema: "MTG");
+
+            migrationBuilder.DropTable(
+                name: "Cards",
+                schema: "Personal");
+
+            migrationBuilder.DropTable(
+                name: "Collections",
+                schema: "Personal");
         }
     }
 }

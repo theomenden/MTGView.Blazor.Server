@@ -1,4 +1,4 @@
-﻿using MTGView.Data.Personal.EfCore.Contexts;
+﻿using MTGView.Data.EfCore.Contexts;
 using MTGView.Data.Scryfall.Internal;
 
 namespace MTGView.Blazor.Server.Components
@@ -6,8 +6,6 @@ namespace MTGView.Blazor.Server.Components
     public partial class CreateCollectionComponent: ComponentBase
     {
         [Inject] public IDbContextFactory<MagicthegatheringDbContext> MagicDbContextFactory { get; init; }
-
-        [Inject] public IDbContextFactory<PersonalcollectionsDbContext> PersonalCollectionDbContextFactory { get; init; }
 
         [Inject] public ScryfallCardService ScryfallCardService { get; init; }
 
@@ -131,9 +129,9 @@ namespace MTGView.Blazor.Server.Components
 
             try
             {
-                await using var context = await PersonalCollectionDbContextFactory.CreateDbContextAsync();
+                await using var context = await MagicDbContextFactory.CreateDbContextAsync();
 
-                context.Collections.Add(_createdCollection);
+                context.PersonalCollections.Add(_createdCollection);
 
                 await context.SaveChangesAsync();
             }

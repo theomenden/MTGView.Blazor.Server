@@ -2,7 +2,7 @@
 
 namespace MTGView.Core.Enums;
 
-public sealed class InGameColors : EnumerationBase
+public sealed record InGameColors : EnumerationBase
 {
     private InGameColors(String name, Int32 id)
     :base(name,id)

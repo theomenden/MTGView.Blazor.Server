@@ -2,43 +2,42 @@
 
 #nullable disable
 
-namespace MTGView.Data.EFCore.Contexts.Configurations
+namespace MTGView.Data.EFCore.Contexts.Configurations;
+
+public partial class SetConfiguration : IEntityTypeConfiguration<MagicSet>
 {
-    public partial class SetConfiguration : IEntityTypeConfiguration<MagicSet>
+    public void Configure(EntityTypeBuilder<MagicSet> entity)
     {
-        public void Configure(EntityTypeBuilder<MagicSet> entity)
-        {
-            entity.ToTable("sets", "MTG");
+        entity.ToTable("sets", "MTG");
 
-            entity.HasIndex(e => e.code, "IX_Mtg_Sets_Code");
+        entity.HasIndex(e => e.code, "IX_Mtg_Sets_Code");
 
-            entity.HasIndex(e => e.type, "IX_Mtg_Sets_Type");
+        entity.HasIndex(e => e.type, "IX_Mtg_Sets_Type");
 
-            entity.Property(e => e.id).ValueGeneratedNever();
+        entity.Property(e => e.id).ValueGeneratedNever();
 
-            entity.Property(e => e.block).HasMaxLength(50);
+        entity.Property(e => e.block).HasMaxLength(50);
 
-            entity.Property(e => e.code).HasMaxLength(50);
+        entity.Property(e => e.code).HasMaxLength(50);
 
-            entity.Property(e => e.keyruneCode).HasMaxLength(50);
+        entity.Property(e => e.keyruneCode).HasMaxLength(50);
 
-            entity.Property(e => e.mcmIdExtras).HasColumnType("decimal(5, 1)");
+        entity.Property(e => e.mcmIdExtras).HasColumnType("decimal(5, 1)");
 
-            entity.Property(e => e.mcmName).HasMaxLength(50);
+        entity.Property(e => e.mcmName).HasMaxLength(50);
 
-            entity.Property(e => e.mtgoCode).HasMaxLength(50);
+        entity.Property(e => e.mtgoCode).HasMaxLength(50);
 
-            entity.Property(e => e.name).HasMaxLength(50);
+        entity.Property(e => e.name).HasMaxLength(50);
 
-            entity.Property(e => e.parentCode).HasMaxLength(50);
+        entity.Property(e => e.parentCode).HasMaxLength(50);
 
-            entity.Property(e => e.sealedProduct).HasMaxLength(10);
+        entity.Property(e => e.sealedProduct).HasMaxLength(10);
 
-            entity.Property(e => e.type).HasMaxLength(50);
+        entity.Property(e => e.type).HasMaxLength(50);
 
-            OnConfigurePartial(entity);
-        }
-
-        partial void OnConfigurePartial(EntityTypeBuilder<MagicSet> entity);
+        OnConfigurePartial(entity);
     }
+
+    partial void OnConfigurePartial(EntityTypeBuilder<MagicSet> entity);
 }

@@ -1,6 +1,4 @@
-﻿using System.Text;
-using MTGView.Blazor.Server.Bootstrapping;
-using MTGView.Data.Scryfall.Internal;
+﻿using MTGView.Data.Scryfall.Internal;
 using TheOmenDen.Shared.Enumerations;
 using TheOmenDen.Shared.Extensions;
 

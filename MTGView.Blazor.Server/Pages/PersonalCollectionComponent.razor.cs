@@ -1,10 +1,8 @@
-﻿using MTGView.Data.Personal.EfCore.Contexts;
+﻿using MTGView.Data.EfCore.Contexts;
 
 namespace MTGView.Blazor.Server.Pages;
 public partial class PersonalCollectionComponent: ComponentBase
 {
-    [Inject] public IDbContextFactory<PersonalcollectionsDbContext> CollectionDbContextFactory { get; init; }
-
     [Inject] public IDbContextFactory<MagicthegatheringDbContext> MagicthegatheringDbContextFactory { get; init; }
 
     [Inject] public ILogger<PersonalCollectionComponent> Logger { get; init; }
@@ -15,9 +13,7 @@ public partial class PersonalCollectionComponent: ComponentBase
     {
         await using var mtgContext = await MagicthegatheringDbContextFactory.CreateDbContextAsync();
 
-        await using var context = await CollectionDbContextFactory.CreateDbContextAsync();
-
-        _personalCollection = context.Collections
+        _personalCollection = mtgContext.PersonalCollections
             .Include(c => c.CardMappings)
                 .ThenInclude(cm => cm.Card)
             .FirstOrDefault();

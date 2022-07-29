@@ -1,12 +1,12 @@
-﻿namespace MTGView.Data.Background.Internal;
+﻿using EFCore.BulkExtensions;
+
+namespace MTGView.Data.Background.Internal;
 
 internal sealed class ReplaceCardsService : IReplaceCardsService
 {
     private readonly IDbContextFactory<MagicthegatheringDbContext> _dbContextFactory;
 
     private readonly ILogger<ReplaceCardsService> _logger;
-
-    private const string FileExtension = "csv";
 
     public ReplaceCardsService(IDbContextFactory<MagicthegatheringDbContext> dbContextFactory,
         ILogger<ReplaceCardsService> logger)
@@ -17,7 +17,7 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
     public async Task DeserializeCsvToMagicCards(String fileName, CancellationToken cancellationToken = default)
     {
-        await using var fileStream = File.OpenRead($"{fileName}.{FileExtension}");
+        await using var fileStream = File.OpenRead($"{fileName}{FileExtensions.CsvExtension}");
 
         using var reader = new StreamReader(fileStream);
 
@@ -33,7 +33,17 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
 
         await ClearCards(context, cancellationToken);
 
-        await context.BulkInsertStreamAsync(csv.EnumerateRecordsAsync<MagicCard>(new(), cancellationToken), cancellationToken);
+        var bulkConfig = new BulkConfig
+        {
+            BatchSize = 2000,
+            EnableStreaming = true
+        };
+
+        var cards = await csv.GetRecordsAsync<MagicCard>(cancellationToken).ToListAsync(cancellationToken);
+        
+        await context.BulkInsertOrUpdateAsync(cards, bulkConfig,null, typeof(MagicCard), cancellationToken);
+
+        await context.BulkSaveChangesAsync(bulkConfig,null,cancellationToken);
 
         _logger.LogInformation("Finished Database Update Process in: {timeNow} seconds", (DateTime.Now - startTime).TotalSeconds);
     }

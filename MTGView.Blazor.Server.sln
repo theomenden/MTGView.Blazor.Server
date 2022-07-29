@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.Scryfall", "MT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Core", "MTGView.Core\MTGView.Core.csproj", "{19AA4324-CE89-4CBF-BFBD-684BB2006A26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.Personal.EfCore", "MTGView.Data.Personal.EfCore\MTGView.Data.Personal.EfCore.csproj", "{5C84E934-E5E2-46AB-A372-B463A2F6B69D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MTGView.Data.Background", "MTGView.Data.Background\MTGView.Data.Background.csproj", "{7D4497C7-4E1D-4D0B-BFA8-816970B27D5B}"
 EndProject
 Global
@@ -37,10 +35,6 @@ Global
 		{19AA4324-CE89-4CBF-BFBD-684BB2006A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19AA4324-CE89-4CBF-BFBD-684BB2006A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19AA4324-CE89-4CBF-BFBD-684BB2006A26}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C84E934-E5E2-46AB-A372-B463A2F6B69D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7D4497C7-4E1D-4D0B-BFA8-816970B27D5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7D4497C7-4E1D-4D0B-BFA8-816970B27D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D4497C7-4E1D-4D0B-BFA8-816970B27D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -5,6 +5,7 @@ using MTGView.Blazor.Server.Middleware;
 using MTGView.Blazor.Server.Models;
 using MTGView.Data.Background;
 using MTGView.Data.Background.Extensions;
+using TheOmenDen.Shared.Logging.Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
@@ -77,8 +78,6 @@ try
     builder.Services.AddResponseCaching();
 
     builder.Services.AddMtgDataServices(builder.Configuration.GetConnectionString("MtgDb"));
-
-    builder.Services.AddPersonalCollectionServices(builder.Configuration.GetConnectionString("PersonalCollectionsDb"));
 
     builder.Services.AddScryfallApiServices();
 
