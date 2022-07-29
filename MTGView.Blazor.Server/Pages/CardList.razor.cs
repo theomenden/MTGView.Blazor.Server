@@ -114,6 +114,7 @@ public partial class CardList : ComponentBase
 
             await MaterializeCardInformation(e, context);
         }
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task MaterializeCardInformation(DataGridReadDataEventArgs<MagicCard> e, MagicthegatheringDbContext context)
@@ -139,7 +140,6 @@ public partial class CardList : ComponentBase
             _magicCards.Add(magicCard);
         }
 
-        await InvokeAsync(StateHasChanged);
     }
 
     //THINDAL Provided Guidance :) 4/17/2022
