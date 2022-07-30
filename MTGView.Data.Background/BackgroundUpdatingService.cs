@@ -3,7 +3,7 @@ namespace MTGView.Data.Background;
 public class BackgroundUpdatingService : BackgroundService
 {
     private readonly TimeSpan _updateInterval;
-    
+
     private readonly ILogger<BackgroundUpdatingService> _logger;
 
     private readonly IServiceScopeFactory _services;
@@ -43,12 +43,13 @@ public class BackgroundUpdatingService : BackgroundService
                 }
                 await ConsumeFileDownloadingServices(stoppingToken);
 
-                var tasksToRun = new []
+                var tasksToRun = new[]
                 {
                     ConsumeCardReplacementServices(stoppingToken),
                     ConsumeRulingReplacementServices(stoppingToken),
                     ConsumeLegalityReplacementServices(stoppingToken),
-                    ConsumeKeywordsService(stoppingToken)
+                    ConsumeKeywordsService(stoppingToken),
+                    ConsumeSetsService(stoppingToken)
                 };
 
                 await Task.WhenAll(tasksToRun);
@@ -124,6 +125,20 @@ public class BackgroundUpdatingService : BackgroundService
 
     #endregion
     #region Scoped Service Calls
+
+    private async Task ConsumeSetsService(CancellationToken stoppingToken)
+    {
+        await using var scope = _services.CreateAsyncScope();
+
+        var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IReplaceSetsService>();
+
+        _logger.LogInformation("Processing started at {timeStarted}", DateTime.Now);
+
+        await scopedProcessingService.DeserializeCsvToSets(stoppingToken);
+
+        _logger.LogInformation("Processing finished at {timeStarted}", DateTime.Now);
+    }
+
     private async Task ConsumeFileDownloadingServices(CancellationToken stoppingToken)
     {
         await using var scope = _services.CreateAsyncScope();

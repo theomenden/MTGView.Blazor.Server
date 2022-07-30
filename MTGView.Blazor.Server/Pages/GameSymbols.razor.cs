@@ -1,8 +1,4 @@
-﻿using MTGView.Data.Scryfall.Internal;
-using TheOmenDen.Shared.Enumerations;
-using TheOmenDen.Shared.Extensions;
-
-namespace MTGView.Blazor.Server.Pages;
+﻿namespace MTGView.Blazor.Server.Pages;
 
 public partial class GameSymbols: ComponentBase
 {

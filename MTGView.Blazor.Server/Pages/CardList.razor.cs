@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using Blazorise.DataGrid;
-using MTGView.Data.Scryfall.Internal;
 
 namespace MTGView.Blazor.Server.Pages;
 public partial class CardList : ComponentBase
@@ -110,15 +109,17 @@ public partial class CardList : ComponentBase
     {
         if (!e.CancellationToken.IsCancellationRequested)
         {
-            await using var context = await ContextFactory.CreateDbContextAsync(e.CancellationToken);
-
-            await MaterializeCardInformation(e, context);
+            await MaterializeCardInformation(e);
         }
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task MaterializeCardInformation(DataGridReadDataEventArgs<MagicCard> e, MagicthegatheringDbContext context)
+    private async Task MaterializeCardInformation(DataGridReadDataEventArgs<MagicCard> e)
     {
+        await using var context = await ContextFactory.CreateDbContextAsync(e.CancellationToken);
+        
+        _magicCards.Clear();
+
         await foreach (var magicCard in LoadCards(context, e).WithCancellation(e.CancellationToken))
         {
             var scryfallDataResponse = await ScryfallCardService.GetContentAsync(magicCard.scryfallId.ToString(), e.CancellationToken);
@@ -139,7 +140,6 @@ public partial class CardList : ComponentBase
 
             _magicCards.Add(magicCard);
         }
-
     }
 
     //THINDAL Provided Guidance :) 4/17/2022

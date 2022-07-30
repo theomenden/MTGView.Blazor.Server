@@ -19,6 +19,7 @@ public partial class Rulings : ComponentBase
     private static Task<List<Ruling>> LoadRulings(MagicthegatheringDbContext context, DataGridReadDataEventArgs<Ruling> eventArgs)
     {
         var cards = context.Rulings
+            .AsNoTracking()
             .DynamicSort(eventArgs)
             .Paging(eventArgs)
             .ToListAsync(eventArgs.CancellationToken);
@@ -30,7 +31,9 @@ public partial class Rulings : ComponentBase
     {
         await using var mtgContext = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
-        return await mtgContext.Rulings.CountAsync(cancellationToken);
+        return await mtgContext.Rulings
+            .AsNoTracking()
+            .CountAsync(cancellationToken);
     }
 
     private async Task OnReadData(DataGridReadDataEventArgs<Ruling> e)

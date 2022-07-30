@@ -34,8 +34,7 @@
                       Striped
                       Sortable
                       Borderless
-                      Filterable
-                      DetailRowTrigger="@((e) => e.Item.id == _selectedCard?.id)">
+                      DetailRowTrigger="@(e => e.Item.id == _selectedCard?.id)">
                 <EmptyTemplate>
                     <Paragraph>
                         No Magic Cards were found in the database
@@ -63,7 +62,7 @@
                             </Button>
                         </DisplayTemplate>
                     </DataGridColumn>
-                    <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark" Filterable="false">
+                    <DataGridColumn Field="@nameof(MagicCard.name)" Caption="Card Name" HeaderCellClass="bg-dark" Filterable>
                         <FilterTemplate>
                             <TextEdit Text="@_cardName" TextChanged="@(value => { _cardName = value; if (value.Length >= 3) { context.TriggerFilterChange(value); }})" />
                         </FilterTemplate>
@@ -74,7 +73,7 @@
                                 var magicCardImages = String.Join(',', magicCard?.ScryfallImagesAsSizes.ToList() ?? new List<string> { magicCard?.ScryfallImageUri ?? String.Empty });
 
                                 <Tooltip Placement="TooltipPlacement.BottomEnd"
-                                         Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \"/>")">
+                                         Text="@($"<img data-srcset=\"{magicCardImages}\" data-sizes=\"auto\" class=\"lazyload\" alt=\"{magicCard?.name} {magicCard?.artist} \" loading=\"lazy\" />")">
                                     <Paragraph>@context?.name</Paragraph>
                                 </Tooltip>
                             }

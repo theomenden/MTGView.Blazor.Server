@@ -19,6 +19,7 @@ namespace MTGView.Blazor.Server.Pages
         private static Task<List<Keyword>> LoadKeywords(MagicthegatheringDbContext context, DataGridReadDataEventArgs<Keyword> eventArgs)
         {
             var keywords = context.Keywords
+                .AsNoTracking()
                 .DynamicSort(eventArgs)
                 .Paging(eventArgs)
                 .ToListAsync(eventArgs.CancellationToken);

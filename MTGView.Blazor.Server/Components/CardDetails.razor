@@ -69,7 +69,7 @@
                           TextColor="TextColor.Info" />
                     Other Printings for @_magicCardToReview?.name
                 </CardTitle>
-                <CardBody Flex="Flex.Row.AlignItems" TextOverflow="TextOverflow.Wrap">
+                <CardBody Flex="Flex.Row.Wrap.AlignItems" TextOverflow="TextOverflow.Wrap">
                     <Repeater TItem="KeyValuePair<String, ScryfallSetDetails>" Items="_setValuePairs">
                         <Tooltip Placement="TooltipPlacement.TopEnd" Text="@context.Value.Name">
                             <Image Source="@context.Value.IconUri" 
@@ -102,7 +102,7 @@
                                            TextColor="TextColor.Light"
                                            Border="Border.Is2.OnBottom.RoundedBottom.Light">
                                 <Div Background="Background.Transparent"
-                                     Flex="Flex.JustifyContent.Between.AlignItems.Stretch">
+                                     Flex="Flex.JustifyContent.Between.AlignItems.Stretch.Wrap">
                                     <Heading Size="HeadingSize.Is4"
                                              Margin="Margin.Is1.FromBottom"
                                              TextWeight="TextWeight.Bold"
@@ -158,9 +158,9 @@
                                 <Repeater TItem="Ruling" Items="_rulings">
                                     <ListGroupItem TextColor="TextColor.Light" Border="Border.Is2.OnBottom.Rounded.Light" Background="Background.Transparent">
                                         <Div Background="Background.Transparent"
-                                     Flex="Flex.JustifyContent.Between.AlignItems.Start">
+                                     Flex="Flex.JustifyContent.Between.AlignItems.Start.Wrap">
                                             <Heading Size="HeadingSize.Is5"
-                                             Margin="Margin.Is1.FromBottom"
+                                             Margin="Margin.Is1.OnY"
                                              TextWeight="TextWeight.Bold">
                                                 @context.RuleText
                                             </Heading>

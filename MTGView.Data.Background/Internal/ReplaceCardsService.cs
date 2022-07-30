@@ -20,7 +20,7 @@ internal sealed class ReplaceCardsService : IReplaceCardsService
         await using var fileStream = File.OpenRead($"{fileName}{FileExtensions.CsvExtension}");
 
         using var reader = new StreamReader(fileStream);
-
+        
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
         csv.Context.RegisterClassMap<MagicCardExcelMap>();

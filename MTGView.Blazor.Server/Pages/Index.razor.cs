@@ -1,6 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using MTGView.Data.Scryfall.Internal;
-using TheOmenDen.Shared.Enumerations;
 
 namespace MTGView.Blazor.Server.Pages;
 

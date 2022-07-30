@@ -1,6 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using MTGView.Blazor.Server.Models;
-using TheOmenDen.Shared.Enumerations;
 
 namespace MTGView.Blazor.Server.Pages;
 
@@ -65,9 +64,7 @@ public partial class SetAnalytics : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        await using var context = await DbContextFactory.CreateDbContextAsync();
-
-        _magicSets = await GetMagicSetsAsync(context).ToListAsync();
+        _magicSets = await GetMagicSetsAsync().ToListAsync();
     }
 
     private async IAsyncEnumerable<ColorAnalyticsBySet> GetMagicColorGraphDataBySetAsync(MagicthegatheringDbContext context, String setCode, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -140,9 +137,9 @@ public partial class SetAnalytics : ComponentBase
         StateHasChanged();
     }
 
-    private static async IAsyncEnumerable<MagicSet> GetMagicSetsAsync(MagicthegatheringDbContext context,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    private async IAsyncEnumerable<MagicSet> GetMagicSetsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        await using var context = await DbContextFactory.CreateDbContextAsync(cancellationToken);
 
         await foreach (var set in context.Sets
                            .OrderBy(s => s.index)
@@ -212,7 +209,8 @@ public partial class SetAnalytics : ComponentBase
 
         var chartData = await GetKeywordDataBySetAsync(context, _selectedSetValue).ToListAsync();
 
-        var labels = chartData.DistinctBy(c => c.Keyword)
+        var labels = chartData
+            .DistinctBy(c => c.Keyword)
             .Select(c =>  c.Keyword);
 
         var dataSet = new DoughnutChartDataset<Int32>

@@ -65,7 +65,14 @@
                 <Repeater TItem="SymbologyDatum" Items="@_manaCostSymbols" Context="manaSymbolContext">
                     <TableRow>
                         <TableRowCell>
-                            <Image data-src="@manaSymbolContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@manaSymbolContext.English" Class="lazyload" />
+                            <Image 
+                                data-src="@manaSymbolContext.SvgUri" 
+                                data-sizes="auto" 
+                                Style="height:48px;width:48px;" 
+                                Text="@manaSymbolContext.English"
+                                Fluid 
+                                loading="lazy"
+                                Class="lazyload" />
                         </TableRowCell>
                         <TableRowCell>
                             <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@manaSymbolContext.Symbol</Heading>
@@ -102,7 +109,14 @@
                 <Repeater TItem="SymbologyDatum" Items="@_manaSymbols" Context="manaRepresentativeContext">
                     <TableRow>
                         <TableRowCell>
-                            <Image data-src="@manaRepresentativeContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@manaRepresentativeContext.English" Class="lazyload" />
+                            <Image 
+                                data-src="@manaRepresentativeContext.SvgUri" 
+                                data-sizes="auto" 
+                                Style="height:48px;width:48px;" 
+                                Text="@manaRepresentativeContext.English" 
+                                Fluid
+                                loading="lazy"
+                                Class="lazyload" />
                         </TableRowCell>
                         <TableRowCell>
                             <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@manaRepresentativeContext.Symbol</Heading>
@@ -139,7 +153,14 @@
                 <Repeater TItem="SymbologyDatum" Items="@_transposableSymbols" Context="transposableContext">
                     <TableRow>
                         <TableRowCell>
-                            <Image data-src="@transposableContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@transposableContext.English" Class="lazyload" />
+                            <Image 
+                                data-src="@transposableContext.SvgUri" 
+                                data-sizes="auto" 
+                                Style="height:48px;width:48px;" 
+                                Text="@transposableContext.English" 
+                                Fluid
+                                loading="lazy"
+                                Class="lazyload" />
                         </TableRowCell>
                         <TableRowCell>
                             <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@transposableContext.Symbol</Heading>
@@ -176,7 +197,13 @@
                 <Repeater TItem="SymbologyDatum" Items="@_funnySymbols" Context="funnyContext">
                     <TableRow>
                         <TableRowCell>
-                            <Image data-src="@funnyContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@funnyContext.English" Class="lazyload" />
+                            <Image data-src="@funnyContext.SvgUri" 
+                                   data-sizes="auto" 
+                                   Style="height:48px;width:48px;" 
+                                   Text="@funnyContext.English"
+                                   Fluid
+                                   loading="lazy"
+                                   Class="lazyload" />
                         </TableRowCell>
                         <TableRowCell>
                             <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@funnyContext.Symbol</Heading>
@@ -213,7 +240,13 @@
                 <Repeater TItem="SymbologyDatum" Items="@_otherSymbols" Context="miscContext">
                     <TableRow>
                         <TableRowCell>
-                            <Image data-src="@miscContext.SvgUri" data-sizes="auto" Style="height:48px;width:48px;" Text="@miscContext.English" Class="lazyload" />
+                            <Image data-src="@miscContext.SvgUri" 
+                                   data-sizes="auto"
+                                   Fluid
+                                   loading="lazy"
+                                   Style="height:48px;width:48px;" 
+                                   Text="@miscContext.English" 
+                                   Class="lazyload" />
                         </TableRowCell>
                         <TableRowCell>
                             <Heading Size="HeadingSize.Is5" Margin="Margin.Is1.FromBottom" TextColor="TextColor.Light">@miscContext.Symbol</Heading>

@@ -20,7 +20,8 @@ public static class ServiceCollectionExtensions
             .AddScoped<IReplaceKeywordsService, ReplaceKeywordsService>()
             .AddScoped<IReplaceCardsService, ReplaceCardsService>()
             .AddScoped<IReplaceRulingsService, ReplaceRulingsService>()
-            .AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>();
+            .AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>()
+            .AddScoped<IReplaceSetsService, ReplaceSetsService>();
 
         return services;
     }
@@ -40,7 +41,8 @@ public static class ServiceCollectionExtensions
                 .AddScoped<IReplaceKeywordsService, ReplaceKeywordsService>()
                 .AddScoped<IReplaceCardsService, ReplaceCardsService>()
                 .AddScoped<IReplaceRulingsService, ReplaceRulingsService>()
-                .AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>();
+                .AddScoped<IReplaceLegalitiesService, ReplaceLegalitiesService>()
+                .AddScoped<IReplaceSetsService, ReplaceSetsService>();
 
         return services;
     }
