@@ -92,7 +92,7 @@
     <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.1" />
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.20" />
     <PackageReference Include="TheOmenDen.Shared" Version="2022.10.8.41" />
-    <PackageReference Include="TheOmenDen.Shared.Interfaces" Version="1.8.27.428" />
+    <PackageReference Include="TheOmenDen.Shared.Interfaces" Version="1.10.8.106" />
     <PackageReference Include="TheOmenDen.Shared.Logging" Version="1.10.8.134" />
     <PackageReference Include="TheOmenDen.Shared.Services" Version="1.7.27.28" />
   </ItemGroup>
